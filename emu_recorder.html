@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>EMU Καταγραφέας</title>
+<style>
+:root{--bg:#f3f4f6;--fg:#15171a;--card:#fff;--mut:#5d6470;--ac:#0b7a9e;--bd:#d5d9df;--ok:#17803d;--bad:#c62828;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1215;--fg:#e8eaed;--card:#181c21;--mut:#9aa3ad;--ac:#3cc4ee;--bd:#2b323a;--ok:#4cd07d;--bad:#ff6b6b}}
+:root[data-theme="dark"]{--bg:#0f1215;--fg:#e8eaed;--card:#181c21;--mut:#9aa3ad;--ac:#3cc4ee;--bd:#2b323a;--ok:#4cd07d;--bad:#ff6b6b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.4 -apple-system,system-ui,"Segoe UI",sans-serif;padding:12px}
+h1{font-size:20px;margin:4px 0 2px}
+.sub{color:var(--mut);font-size:13px;margin:0 0 10px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:10px;margin-bottom:10px}
+button{font:inherit;font-weight:600;border:0;border-radius:8px;padding:11px 14px;background:var(--ac);color:#04161d;margin:0 6px 6px 0}
+button.sec{background:transparent;color:var(--fg);border:1px solid var(--bd)}
+button.rec{background:var(--bad);color:#fff}
+input{font:inherit;width:100%;padding:10px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--fg);margin-bottom:6px}
+#st{font-weight:600}
+.n{color:var(--mut);font-size:13px}
+.w{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;font-size:14px}
+th,td{padding:5px 6px;text-align:right;border-bottom:1px solid var(--bd);white-space:nowrap}
+th:nth-child(-n+2),td:nth-child(-n+2){text-align:left}
+td.v{font-weight:700;color:var(--ac)}
+textarea{width:100%;height:210px;font:12px/1.35 ui-monospace,Menlo,monospace;background:var(--bg);color:var(--fg);border:1px solid var(--bd);border-radius:8px;padding:8px}
+</style>
+</head>
+<body>
+<h1>EMU Καταγραφέας</h1>
+<p class="sub">Μόνο ανάγνωση. Δεν στέλνει τίποτα προς τον εγκέφαλο.</p>
+
+<div class="card">
+<button id="bc">Σύνδεση με EMUBT</button><button id="ba" class="sec">Όλες οι συσκευές</button>
+<div id="st">Δεν είσαι συνδεδεμένος</div>
+<div class="n" id="cnt"></div>
+</div>
+
+<div class="card">
+<button id="br">Έναρξη καταγραφής</button>
+<input id="note" placeholder="Σημείωση, π.χ. ρελαντί, νερό 77, IAT 46">
+<button id="bm" class="sec">Σημείωση + στιγμιότυπο</button>
+<div class="n" id="mk">Καμία σημείωση ακόμα</div>
+</div>
+
+<div class="card w">
+<table><thead><tr><th>ID</th><th>Κανάλι</th><th>Τιμή</th><th>Ωμή</th><th>Min</th><th>Max</th></tr></thead><tbody id="tb"></tbody></table>
+</div>
+
+<div class="card">
+<button id="bg" class="sec">Δημιουργία αναφοράς</button><button id="bk" class="sec">Αντιγραφή</button>
+<textarea id="out" readonly placeholder="Η αναφορά εμφανίζεται εδώ. Πάτα Αντιγραφή και στείλ’ την στο Claude."></textarea>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+// Επιβεβαιωμένα ή πιθανά κανάλια. Το ? σημαίνει ότι δεν έχει επαληθευτεί.
+const L={1:['Στροφές rpm',v=>v],2:['MAP kPa',v=>v],3:['TPS %',v=>v],4:['IAT °C ?',v=>v],5:['Μπαταρία V ?',v=>(v*0.027).toFixed(2)],6:['Νερό °C ?',v=>v],16:['AFR ?',v=>(v/10).toFixed(1)]};
+const S={},raw=[],marks=[],tl=[],prev={};
+let buf=[],rec=false,t0=0,notifs=0,bytes=0,ok=0,bad=0,dev=null;
+const hx=n=>n.toString(16).toUpperCase().padStart(2,'0');
+const hexs=a=>Array.from(a,hx).join('');
+const status=m=>$('st').textContent=m;
+
+function parse(){
+  while(buf.length>=5){
+    if(buf[1]===0xA3&&((buf[0]+buf[1]+buf[2]+buf[3])&255)===buf[4]){
+      const id=buf[0],v=(buf[2]<<8)|buf[3],s=S[id]||(S[id]={last:v,min:v,max:v,n:0});
+      s.last=v;s.n++;if(v<s.min)s.min=v;if(v>s.max)s.max=v;ok++;buf.splice(0,5);
+    }else{bad++;buf.shift();}
+  }
+}
+function onData(e){
+  const d=e.target.value,a=new Uint8Array(d.buffer,d.byteOffset,d.byteLength);
+  notifs++;bytes+=a.length;
+  if(rec)raw.push(((performance.now()-t0)|0)+','+hexs(a));
+  for(const b of a)buf.push(b);
+  parse();
+}
+function dec(id,v){const l=L[id];return l?l[1](v):'';}
+function render(){
+  const ids=Object.keys(S).map(Number).sort((a,b)=>a-b);
+  $('tb').innerHTML=ids.map(id=>{const s=S[id],l=L[id];
+    return `<tr><td>${hx(id)}</td><td>${l?l[0]:'-'}</td><td class="v">${l?dec(id,s.last):s.last}</td><td>${s.last}</td><td>${s.min}</td><td>${s.max}</td></tr>`}).join('');
+  $('cnt').textContent=`Μηνύματα ${notifs}, byte ${bytes}, σωστά frames ${ok}, κατεστραμμένα ${bad}`+(rec?`, καταγραφή: ${raw.length} γραμμές`:'');
+}
+setInterval(render,300);
+// Αυτόματη χρονοσειρά: κάθε δευτερόλεπτο κρατά μόνο τις τιμές που άλλαξαν
+setInterval(()=>{
+  if(!rec)return;
+  const ch=[];
+  for(const k of Object.keys(S).map(Number).sort((a,b)=>a-b)){if(prev[k]!==S[k].last){prev[k]=S[k].last;ch.push(hx(k)+'='+S[k].last);}}
+  if(ch.length)tl.push(((performance.now()-t0)/1000).toFixed(0)+' '+ch.join(' '));
+},1000);
+
+async function connect(all){
+  if(!navigator.bluetooth){status('Αυτός ο browser δεν έχει Web Bluetooth. Άνοιξε τη σελίδα στο Bluefy.');return;}
+  try{
+    const opt=all?{acceptAllDevices:true,optionalServices:[0xffe0]}:{filters:[{namePrefix:'EMU'}],optionalServices:[0xffe0]};
+    dev=await navigator.bluetooth.requestDevice(opt);
+    dev.addEventListener('gattserverdisconnected',()=>status('Αποσυνδέθηκε. Κλείσε την TunerView και ξαναπάτα Σύνδεση.'));
+    status('Σύνδεση…');
+    const srv=await dev.gatt.connect(),svc=await srv.getPrimaryService(0xffe0),ch=await svc.getCharacteristic(0xffe1);
+    ch.addEventListener('characteristicvaluechanged',onData);
+    await ch.startNotifications();
+    status('Συνδέθηκε: '+(dev.name||'συσκευή'));
+    try{await navigator.wakeLock.request('screen');}catch(e){}
+  }catch(e){status('Σφάλμα: '+e.message);}
+}
+$('bc').onclick=()=>connect(false);
+$('ba').onclick=()=>connect(true);
+
+$('br').onclick=()=>{
+  rec=!rec;
+  if(rec){raw.length=0;tl.length=0;for(const k in prev)delete prev[k];t0=performance.now();}
+  $('br').textContent=rec?'Λήξη καταγραφής':'Έναρξη καταγραφής';
+  $('br').className=rec?'rec':'';
+};
+$('bm').onclick=()=>{
+  if(!t0)t0=performance.now();
+  const t=((performance.now()-t0)/1000).toFixed(1),txt=$('note').value.trim()||'-';
+  const snap=Object.keys(S).map(Number).sort((a,b)=>a-b).map(id=>hx(id)+'='+S[id].last).join(' ');
+  marks.push(`t=${t}s | ${txt} | ${snap}`);
+  $('note').value='';
+  $('mk').textContent=`Σημειώσεις: ${marks.length}. Τελευταία στα ${t}s`;
+};
+$('bg').onclick=()=>{
+  const ids=Object.keys(S).map(Number).sort((a,b)=>a-b);
+  let r=`EMU report, μηνύματα ${notifs}, frames ok ${ok}, bad ${bad}\n\nΣΗΜΕΙΩΣΕΙΣ (id hex=ωμή τιμή)\n`+(marks.join('\n')||'-')+
+   `\n\nΣΥΝΟΨΗ (id: n, min, max, last)\n`+ids.map(id=>{const s=S[id];return `${hx(id)}: n=${s.n} min=${s.min} max=${s.max} last=${s.last}`}).join('\n');
+  if(tl.length){r+=`\n\nΧΡΟΝΟΣΕΙΡΑ (δευτερόλεπτα, id=τιμή, μόνο αλλαγές), ${tl.length} γραμμές\n`+tl.slice(-700).join('\n');}
+  if(raw.length){r+=`\n\nRAW (ms,hex), τελευταίες ${Math.min(raw.length,60)} από ${raw.length}\n`+raw.slice(-60).join('\n');}
+  $('out').value=r;
+};
+$('bk').onclick=async()=>{
+  const o=$('out');if(!o.value)$('bg').onclick();
+  try{await navigator.clipboard.writeText(o.value);}catch(e){o.select();document.execCommand('copy');}
+  $('bk').textContent='Αντιγράφηκε';setTimeout(()=>$('bk').textContent='Αντιγραφή',1500);
+};
+</script>
+</body>
+</html>
