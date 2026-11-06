@@ -426,7 +426,7 @@ function bsvg(w,th){
     if(sv)s+='<g class="gv c1f" data-p="585,50,2.1,2.1,r,-6"></g>';
   }else if(th==='e'){ // Ψηφιακό LCD: σβηστά τμήματα, ψηφιακά γράμματα, 8άρια από πίσω
     const x0=22,x1=sv?440:578,X=fx(x0,x1),LL=L.length>6?L.filter((_,i)=>i%2===0):L;s='<svg viewBox="0 0 600 120" data-b="'+x0+','+x1+'" data-o=".12">';
-    s+='<rect x="4" y="6" width="592" height="108" rx="10" fill="#0b0d0b"'+(bb?' stroke="#2c2c2c"':'')+'/>';
+    s+='<rect x="4" y="6" width="592" height="108" rx="10" fill="'+(w.nf?'none':'#0b0d0b')+'"'+(bb?' stroke="#2c2c2c"':'')+'/>';
     LL.forEach(v=>s+='<g class="c2f" fill-opacity=".85">'+seg7(lab(v),X(v),18,.55,.55,'c',0)+'</g>');
     s+=segs(50,x0,x1,(x,sw,cls,fl,hot)=>'<rect class="'+cls+'"'+fl+' x="'+(x+1).toFixed(1)+'" y="34" width="'+(sw-2).toFixed(1)+'" height="'+(hot?44:36)+'" opacity=".12"/>');
     s+='<g class="c1f" fill-opacity=".8">'+segTxt(nm+(un?' '+un:''),22,88,.85,.85,'l',0)+'</g>';
@@ -598,7 +598,7 @@ function dlgW(w,isNew){
   <label>Συναγερμός πάνω από<span><input id="f_hi" value="${w.hi??''}" style="width:72px"> <input type="color" id="f_hc" value="${w.hc||'#ff2d2d'}" style="width:44px;padding:2px"></span></label>
   <label id="r_min">Κλίμακα αναλογικού, από<input id="f_min" value="${w.min??dmin(c0)}"></label>
   <label id="r_max">Κλίμακα αναλογικού, έως<input id="f_max" value="${w.max??dmax(c0)}"></label>${xr}
-  ${th==='f'?'<label class="rg">Χρώμα φόντου οργάνου<input type="color" id="f_fc" value="'+(w.fc||'#05070a')+'" style="width:56px;padding:2px"></label>':''}${th==='a'||th==='f'?'<label class="rg">Χωρίς φόντο (διάφανο)<input type="checkbox" id="f_nf"'+(w.nf?' checked':'')+' style="width:auto"></label>':''}
+  ${th==='f'?'<label class="rg">Χρώμα φόντου οργάνου<input type="color" id="f_fc" value="'+(w.fc||'#05070a')+'" style="width:56px;padding:2px"></label>':''}${th==='a'||th==='f'||th==='e'?'<label class="rg">Χωρίς φόντο (διάφανο)<input type="checkbox" id="f_nf"'+(w.nf?' checked':'')+' style="width:auto"></label>':''}
   ${th==='l'||th==='e'?'<label class="rg">Περίγραμμα οργάνου (στεφάνι και μαύρο φόντο)<input type="checkbox" id="f_nb"'+(w.nb?'':' checked')+' style="width:auto"></label>':''}
   <label class="rr">Πλαίσιο (border)<input type="checkbox" id="f_bb"${(w.bb??(th!=='l'))?' checked':''} style="width:auto"></label>
   <label class="rr">Εμφάνιση τιμής δεξιά<input type="checkbox" id="f_nv"${w.nv?'':' checked'} style="width:auto"></label>
@@ -621,6 +621,7 @@ function dlgW(w,isNew){
     if(mx){const gg=ty==='g';$('#r_xn').style.display=gg?'':'none';const n=+$('#f_xn').value;$('#r_x1').style.display=gg&&n>=1?'':'none';$('#r_x2').style.display=gg&&n>=2?'':'none'}
     if(ty==='r'&&$('#f_nb'))$('#f_nb').closest('label').style.display='none'; // μπάρα: αντί για "περίγραμμα" έχει "Πλαίσιο (border)"
     document.querySelectorAll('#dlg .rr').forEach(e=>e.style.display=ty==='r'?'':'none');
+    if(th==='e'&&ty!=='r'&&$('#f_nf'))$('#f_nf').closest('label').style.display='none'; // LCD: διάφανο φόντο μόνο για μπάρα
     };
   $('#f_t').onchange=syncT;if(mx)$('#f_xn').onchange=syncT;syncT();
   $('#f_k').onchange=()=>{const c=M[$('#f_k').value];$('#f_min').value=dmin(c);$('#f_max').value=dmax(c);syncT()};syncT();
