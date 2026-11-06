@@ -367,7 +367,7 @@ function ftheme(w){
   h+='<g class="pkm" opacity="0" transform="rotate('+A0+' 50 50)"><line x1="50" y1="12" x2="50" y2="2.7" stroke="#E6F4FA" stroke-width="1"/></g><circle class="wd" cx="50" cy="84" r="1.7"/>';
   const dc=dec(c),len=Math.max(w.max.toFixed(dc).length,w.min.toFixed(dc).length),fz=+Math.min(21.3,56/(len*.6)).toFixed(1);
   h+=T(50,31.5,4.3,'',UPx(nu[0]),'fill="#7F98A8" letter-spacing="1"');
-  h+=T(50,53,fz,'gv c1f','-','letter-spacing="-.3"');
+  h+=T(50,53,fz,'gv af','-','letter-spacing="-.3"');
   if(nu[1])h+=T(50,61,4.7,'',UPx(nu[1]),'fill="#7F98A8" letter-spacing=".7"');
   const x0=(w.xs||[])[0]||'peak';
   h+='<text x="50" y="74.7" font-size="4" text-anchor="middle" '+FC+' letter-spacing=".7"><tspan fill="#7F98A8">'+XL[x0]+'</tspan> <tspan class="xs" data-i="0" data-t="'+x0+'" fill="#E6F4FA">-</tspan></text>';
