@@ -143,7 +143,7 @@ const get=(c,f)=>{const v=(S.ch[c.k]||{})[f];return v!==undefined?v:c[f]};
 // Γλώσσα / Language
 if(!S.lang)S.lang=(navigator.language||'').slice(0,2)==='el'?'el':'en';
 const DICT=[
-['＋ Νέο αυτοκίνητο','＋ New car'],['Νέο αυτοκίνητο','New car'],['Το αυτοκίνητό μου','My car'],['Διαγραφή αυτοκινήτου','Delete car'],['Διαγραφή του αυτοκινήτου «','Delete car «'],['Όνομα / μοντέλο','Name / model'],['Βρες τα στοιχεία','Find the specs'],['6 ταχ.','6-spd'],['Το κουμπί ανοίγει αναζήτηση στον browser. Βρες βάρος, ελαστικό, σχέσεις κιβωτίου και τελική σχέση και συμπλήρωσέ τα από κάτω.','The button opens a web search. Find weight, tyre size, gear ratios and final drive and enter them below.'],[' Οι τιμές του προτύπου είναι από δημόσιες προδιαγραφές: έλεγξέ τες με τα δικά σου (π.χ. ελαστικά, διαφορικό).',' The preset values come from public specs: check them against your own car (e.g. tyres, final drive).'],['Αυτοκίνητο','Car'],
+['Περίγραμμα οργάνου (στεφάνι και μαύρο φόντο)','Gauge bezel (ring and black background)'],['＋ Νέο αυτοκίνητο','＋ New car'],['Νέο αυτοκίνητο','New car'],['Το αυτοκίνητό μου','My car'],['Διαγραφή αυτοκινήτου','Delete car'],['Διαγραφή του αυτοκινήτου «','Delete car «'],['Όνομα / μοντέλο','Name / model'],['Βρες τα στοιχεία','Find the specs'],['6 ταχ.','6-spd'],['Το κουμπί ανοίγει αναζήτηση στον browser. Βρες βάρος, ελαστικό, σχέσεις κιβωτίου και τελική σχέση και συμπλήρωσέ τα από κάτω.','The button opens a web search. Find weight, tyre size, gear ratios and final drive and enter them below.'],[' Οι τιμές του προτύπου είναι από δημόσιες προδιαγραφές: έλεγξέ τες με τα δικά σου (π.χ. ελαστικά, διαφορικό).',' The preset values come from public specs: check them against your own car (e.g. tyres, final drive).'],['Αυτοκίνητο','Car'],
 ['Χρώμα περιφερειακών γραμμάτων','Secondary text color'],['Τέλος τόξου από (%) (100 = όχι)','Arc end from (%) (100 = off)'],['Χρώμα τέλους τόξου','Arc end color'],['Χρώμα γραμμάτων','Text color'],['Χρώμα τόξου','Arc color'],['Χρώμα τιμής','Value color'],
 ['Επεξεργασία Layout','Edit Layout'],['Συναγερμοί','Alarms'],['Μονάδες εμφάνισης','Display Units'],['Συνδεσιμότητα','Connectivity'],['Σύνδεση Bluetooth','Bluetooth Connection'],['Προσανατολισμός οθόνης','Screen Orientation'],['Μονάδα θερμοκρασίας','Temperature Unit'],['Μονάδα ταχύτητας','Speed Unit'],['Μονάδα πίεσης','Pressure Unit'],['Ρυθμίσεις','Settings'],['Μενού','Menu'],['Κλειδωμένο','Locked'],['Ξεκλείδωτο','Unlocked'],['Κλείδωμα','Lock'],['Προσανατολισμός','Orientation'],['Μπαταρία (Volt)','Battery (Volt)'],['Έξτρα οθόνες','Extra screens'],['Οθόνη','Screen'],['Όχι','No'],
 ['Όταν είναι ενεργή, μπαίνει στο layout και τη μετακινείς ή τη μεγαλώνεις. Στην επεξεργασία, πάτα πάνω της για χρώματα και αριθμό LED.','When on, it is added to the layout and you can move or resize it. In edit mode, tap it for colors and LED count.'],
@@ -361,7 +361,7 @@ function gsvg(w,th){
   let h;
   if(th==='l'){
     const A0=-128,A1=128,fr=v=>A0+(A1-A0)*(v-w.min)/(w.max-w.min);
-    h=op(A0,A1)+'<circle cx="50" cy="50" r="49.5" fill="url(#bz1)"/><circle cx="50" cy="50" r="44.5" fill="#000" stroke="#222"/>'+hl(47.2,[[-70,-35],[28,58],[120,150],[-150,-120]],.3);
+    h=op(A0,A1)+(w.nb?'':'<circle cx="50" cy="50" r="49.5" fill="url(#bz1)"/><circle cx="50" cy="50" r="44.5" fill="#000" stroke="#222"/>'+hl(47.2,[[-70,-35],[28,58],[120,150],[-150,-120]],.3));
     for(let i=0;i<28;i++)h+=ln(36,41.5,A0+(A1-A0)*i/27,'sg '+(i>=Math.round(28*ep/100)?'es':'as'),2.7,'stroke-opacity=".14"');
     L.forEach(v=>{h+=ln(29,33.5,fr(v),'c2s',.9);if(v+f/2<=w.max)h+=ln(31,33.5,fr(v+f/2),'c2s',.6);const q=Q(24.5,fr(v));h+='<g class="c2f">'+seg7(String(+v.toFixed(2)),q[0],+(q[1]-2.35).toFixed(2),.24,.26,'c',-6)+'</g>'});
     h+=dig(50,41,.72,.83,'c',-6)+T(50,64.5,6,'c2f',nm,'font-weight="700"');
@@ -507,6 +507,7 @@ function dlgW(w,isNew){
   <label>Συναγερμός πάνω από<span><input id="f_hi" value="${w.hi??''}" style="width:72px"> <input type="color" id="f_hc" value="${w.hc||'#ff2d2d'}" style="width:44px;padding:2px"></span></label>
   <label id="r_min">Κλίμακα αναλογικού, από<input id="f_min" value="${w.min??dmin(c0)}"></label>
   <label id="r_max">Κλίμακα αναλογικού, έως<input id="f_max" value="${w.max??dmax(c0)}"></label>${xr}
+  ${th==='l'?'<label class="rg">Περίγραμμα οργάνου (στεφάνι και μαύρο φόντο)<input type="checkbox" id="f_nb"'+(w.nb?'':' checked')+' style="width:auto"></label>':''}
   <label class="rg">Χρώμα γραμμάτων<input type="color" id="f_tc" value="${w.tc||'#ffffff'}" style="width:56px;padding:2px"></label>
   <label class="rg">Χρώμα τόξου<input type="color" id="f_ac" value="${w.ac||S.c1||'#ff2d2d'}" style="width:56px;padding:2px"></label>
   <label class="rg">Χρώμα τέλους τόξου<input type="color" id="f_ec" value="${w.ec||w.ac||S.c1||'#ff2d2d'}" style="width:56px;padding:2px"></label>
@@ -526,7 +527,7 @@ function dlgW(w,isNew){
   $('#f_ok').onclick=()=>{
     const g=i=>{const v=$(i).value.trim();return v===''?null:Number(v)};
     w.t=$('#f_t').value;w.k=$('#f_k').value;w.lo=g('#f_lo');w.hi=g('#f_hi');w.lc=$('#f_lc').value;w.hc=$('#f_hc').value;
-    w.tc=$('#f_tc').value;w.ac=$('#f_ac').value;w.ec=$('#f_ec').value;w.ep=g('#f_ep')??100;
+    if($('#f_nb'))w.nb=$('#f_nb').checked?undefined:true;w.tc=$('#f_tc').value;w.ac=$('#f_ac').value;w.ec=$('#f_ec').value;w.ep=g('#f_ep')??100;
     w.vc=$('#f_vc').value==='#f2f2f2'?undefined:$('#f_vc').value;w.pc=$('#f_pc').value==='#8a8a8a'?undefined:$('#f_pc').value;if(mx){const n=+$('#f_xn').value;w.xs=[$('#f_x1').value,$('#f_x2').value].slice(0,n)}
     w.min=g('#f_min')??dmin(M[w.k]);w.max=g('#f_max')??dmax(M[w.k]);
     if(isNew){const a=S.pages[S.cur].w,n=a.length%6;Object.assign(w,w.t==='g'?{x:4+n*4,y:4+n*4,w:40,h:52}:{x:4+n*4,y:4+n*4,w:38,h:28});a.push(w)}
