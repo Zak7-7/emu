@@ -53,12 +53,12 @@ button{font-weight:600}
 .dt{display:block;width:min(86cqw,calc(86cqh/var(--n)));aspect-ratio:1;border-radius:50%;background:#5a5a5a}
 @container (min-aspect-ratio:1/1){.sl{flex-direction:row}.dt{width:min(86cqh,calc(86cqw/var(--n)))}}
 .bx{padding:3cqmin 5cqmin;height:100%;display:flex;flex-direction:column;justify-content:space-between}
-.bn{font-size:12cqmin;color:var(--pc,var(--mut))}
+.bn{font-size:12cqmin;color:var(--pc,var(--mut));text-align:center}.nmm .bm{display:none}
 .bv{color:var(--vc,var(--fg));font-size:40cqmin;font-weight:700;text-align:right;font-variant-numeric:tabular-nums;line-height:1}
 .bm{font-size:9cqmin;color:var(--pc,var(--mut));display:flex;justify-content:space-between}.bm b{color:var(--pc,var(--fg))}
 .w7 .bn{font-weight:700}.w7 .bv{height:40cqmin;display:flex;justify-content:flex-end}.w7 .bv svg{width:auto;height:100%;fill:currentColor}
 .w7 .bm b{display:inline-flex;height:1em;vertical-align:-.12em}.w7 .bm b svg{width:auto;height:100%;fill:currentColor}
-.wL .bn{height:10cqmin;display:flex}.wL .bn svg{width:auto;max-width:100%;height:100%;fill:currentColor}
+.wL .bn{height:10cqmin;display:flex;justify-content:center}.wL .bn svg{width:auto;max-width:100%;height:100%;fill:currentColor}
 .wL .bv{height:40cqmin;display:flex;justify-content:flex-end}.wL .bv svg{width:auto;height:100%;fill:currentColor}
 .wL .bm span{display:inline-flex;align-items:center;gap:.45em;height:1em}.wL .bm i,.wL .bm b{display:inline-flex;height:100%}.wL .bm i{height:80%}.wL .bm svg{width:auto;height:100%;fill:currentColor}
 .al .bn,.al .bv,.al .gv{color:var(--al,var(--bad));fill:var(--al,var(--bad))}.al .nd{stroke:var(--al,var(--bad))}
@@ -148,7 +148,7 @@ const get=(c,f)=>{const v=(S.ch[c.k]||{})[f];return v!==undefined?v:c[f]};
 // Γλώσσα / Language
 if(!S.lang)S.lang=(navigator.language||'').slice(0,2)==='el'?'el':'en';
 const DICT=[
-['Περίγραμμα οργάνου (στεφάνι και μαύρο φόντο)','Gauge bezel (ring and black background)'],['＋ Νέο αυτοκίνητο','＋ New car'],['Νέο αυτοκίνητο','New car'],['Το αυτοκίνητό μου','My car'],['Διαγραφή αυτοκινήτου','Delete car'],['Διαγραφή του αυτοκινήτου «','Delete car «'],['Όνομα / μοντέλο','Name / model'],['Βρες τα στοιχεία','Find the specs'],['6 ταχ.','6-spd'],['Το κουμπί ανοίγει αναζήτηση στον browser. Βρες βάρος, ελαστικό, σχέσεις κιβωτίου και τελική σχέση και συμπλήρωσέ τα από κάτω.','The button opens a web search. Find weight, tyre size, gear ratios and final drive and enter them below.'],[' Οι τιμές του προτύπου είναι από δημόσιες προδιαγραφές: έλεγξέ τες με τα δικά σου (π.χ. ελαστικά, διαφορικό).',' The preset values come from public specs: check them against your own car (e.g. tyres, final drive).'],['Αυτοκίνητο','Car'],
+['Εμφάνιση Min / Max','Show Min / Max'],['Περίγραμμα οργάνου (στεφάνι και μαύρο φόντο)','Gauge bezel (ring and black background)'],['＋ Νέο αυτοκίνητο','＋ New car'],['Νέο αυτοκίνητο','New car'],['Το αυτοκίνητό μου','My car'],['Διαγραφή αυτοκινήτου','Delete car'],['Διαγραφή του αυτοκινήτου «','Delete car «'],['Όνομα / μοντέλο','Name / model'],['Βρες τα στοιχεία','Find the specs'],['6 ταχ.','6-spd'],['Το κουμπί ανοίγει αναζήτηση στον browser. Βρες βάρος, ελαστικό, σχέσεις κιβωτίου και τελική σχέση και συμπλήρωσέ τα από κάτω.','The button opens a web search. Find weight, tyre size, gear ratios and final drive and enter them below.'],[' Οι τιμές του προτύπου είναι από δημόσιες προδιαγραφές: έλεγξέ τες με τα δικά σου (π.χ. ελαστικά, διαφορικό).',' The preset values come from public specs: check them against your own car (e.g. tyres, final drive).'],['Αυτοκίνητο','Car'],
 ['Χρώμα περιφερειακών γραμμάτων','Secondary text color'],['Τέλος τόξου από (%) (100 = όχι)','Arc end from (%) (100 = off)'],['Χρώμα τέλους τόξου','Arc end color'],['Χρώμα γραμμάτων','Text color'],['Χρώμα τόξου','Arc color'],['Χρώμα τιμής','Value color'],
 ['Επεξεργασία Layout','Edit Layout'],['Συναγερμοί','Alarms'],['Μονάδες εμφάνισης','Display Units'],['Συνδεσιμότητα','Connectivity'],['Σύνδεση Bluetooth','Bluetooth Connection'],['Προσανατολισμός οθόνης','Screen Orientation'],['Μονάδα θερμοκρασίας','Temperature Unit'],['Μονάδα ταχύτητας','Speed Unit'],['Μονάδα πίεσης','Pressure Unit'],['Ρυθμίσεις','Settings'],['Μενού','Menu'],['Κλειδωμένο','Locked'],['Ξεκλείδωτο','Unlocked'],['Κλείδωμα','Lock'],['Προσανατολισμός','Orientation'],['Μπαταρία (Volt)','Battery (Volt)'],['Έξτρα οθόνες','Extra screens'],['Οθόνη','Screen'],['Όχι','No'],
 ['Όταν είναι ενεργή, μπαίνει στο layout και τη μετακινείς ή τη μεγαλώνεις. Στην επεξεργασία, πάτα πάνω της για χρώματα και αριθμό LED.','When on, it is added to the layout and you can move or resize it. In edit mode, tap it for colors and LED count.'],
@@ -250,7 +250,7 @@ function s14(el,s){if(!el)return;s=String(s).replace(/ \?$/,'');el.innerHTML='<s
 const ghost=(w,c)=>Math.abs(w.max??dmax(c)).toFixed(dec(c)).replace(/[0-9]/g,'8');
 function mk(w){
   if(w.t==='s')return mkS(w);
-  const th=thm(),c=M[w.k],d=document.createElement('div');d.className='w'+(w.t==='g'?' g':'')+(w.t==='b'&&th==='l'?' w7':'')+(w.t==='b'&&th==='e'?' wL':'');pos(d,w);
+  const th=thm(),c=M[w.k],d=document.createElement('div');d.className='w'+(w.t==='g'?' g':'')+(w.t==='b'&&th==='l'?' w7':'')+(w.t==='b'&&th==='e'?' wL':'')+(w.t==='b'&&w.nm?' nmm':'');pos(d,w);
   d.innerHTML=(w.t==='g'
    ?gsvg(eff(w),th)
    :d.classList.contains('wL')
@@ -291,7 +291,7 @@ const SG14=Object.assign({},SG,{n:'M2 8H4.6L5 9L4.6 10H2L1 9Z',o:'M5.4 8H8L9 9L8
 const DG14={A:'abcefno',B:'abcdilo',C:'adef',D:'abcdil',E:'adefn',F:'aefn',G:'acdefo',H:'bcefno',I:'adil',J:'bcde',K:'efnjm',L:'def',M:'bcefhj',N:'bcefhm',O:'abcdef',P:'abefno',Q:'abcdefm',R:'abefnom',S:'acdfno',T:'ail',U:'bcdef',V:'efkj',W:'bcefkm',X:'hjkm',Y:'hjl',Z:'adjk',
   'Γ':'aef','Δ':'ikmd','Θ':'abcdefno','Λ':'ikm','Ξ':'adno','Π':'abcef','Σ':'adhk','Φ':'bfnoil','Ψ':'bfnol','Ω':'abcefkm',
   'Α':'abcefno','Β':'abcdilo','Ε':'adefn','Ζ':'adjk','Η':'bcefno','Ι':'adil','Κ':'efnjm','Μ':'bcefhj','Ν':'bcefhm','Ο':'abcdef','Ρ':'abefno','Τ':'ail','Υ':'hjl','Χ':'hjkm',
-  '-':'no','/':'jk','%':'jk','°':'abfno','+':'ilno','_':'d'};
+  '-':'no','/':'jk','%':'fjkc','°':'abfno','+':'ilno','_':'d'};
 function segTxt(str,x,y,sx,sy,al,sk){
   const s=String(str).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase();
   const adv=ch=>ch==='.'?4:ch===' '?7:12;
@@ -531,6 +531,7 @@ function dlgW(w,isNew){
   <label class="rg">Χρώμα τόξου<input type="color" id="f_ac" value="${w.ac||S.c1||'#ff2d2d'}" style="width:56px;padding:2px"></label>
   <label class="rg">Χρώμα τέλους τόξου<input type="color" id="f_ec" value="${w.ec||w.ac||S.c1||'#ff2d2d'}" style="width:56px;padding:2px"></label>
   <label class="rg">Τέλος τόξου από (%) (100 = όχι)<input id="f_ep" value="${w.ep??100}"></label>
+  <label class="rb">Εμφάνιση Min / Max<input type="checkbox" id="f_mm"${w.nm?'':' checked'} style="width:auto"></label>
   <label class="rb">Χρώμα τιμής<input type="color" id="f_vc" value="${w.vc||'#f2f2f2'}" style="width:56px;padding:2px"></label>
   <label class="rb">Χρώμα περιφερειακών γραμμάτων (IAT, Min, Max)<input type="color" id="f_pc" value="${w.pc||'#8a8a8a'}" style="width:56px;padding:2px"></label>
   <div><button id="f_ok">Αποθήκευση</button> ${isNew?'':'<button id="f_del">Διαγραφή</button> '}<button id="f_x">Κλείσιμο</button></div>`);
@@ -547,7 +548,7 @@ function dlgW(w,isNew){
     const g=i=>{const v=$(i).value.trim();return v===''?null:Number(v)};
     w.t=$('#f_t').value;w.k=$('#f_k').value;w.lo=g('#f_lo');w.hi=g('#f_hi');w.lc=$('#f_lc').value;w.hc=$('#f_hc').value;
     if($('#f_nb'))w.nb=$('#f_nb').checked?undefined:true;w.tc=$('#f_tc').value;w.ac=$('#f_ac').value;w.ec=$('#f_ec').value;w.ep=g('#f_ep')??100;
-    w.vc=$('#f_vc').value==='#f2f2f2'?undefined:$('#f_vc').value;w.pc=$('#f_pc').value==='#8a8a8a'?undefined:$('#f_pc').value;if(mx){const n=+$('#f_xn').value;w.xs=[$('#f_x1').value,$('#f_x2').value].slice(0,n)}
+    w.nm=$('#f_mm').checked?undefined:true;w.vc=$('#f_vc').value==='#f2f2f2'?undefined:$('#f_vc').value;w.pc=$('#f_pc').value==='#8a8a8a'?undefined:$('#f_pc').value;if(mx){const n=+$('#f_xn').value;w.xs=[$('#f_x1').value,$('#f_x2').value].slice(0,n)}
     w.min=g('#f_min')??dmin(M[w.k]);w.max=g('#f_max')??dmax(M[w.k]);
     if(isNew){const a=S.pages[S.cur].w,n=a.length%6;Object.assign(w,w.t==='g'?{x:4+n*4,y:4+n*4,w:40,h:52}:{x:4+n*4,y:4+n*4,w:38,h:28});a.push(w)}
     save();closeD();build();
