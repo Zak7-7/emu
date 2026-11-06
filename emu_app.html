@@ -357,12 +357,12 @@ function atheme(w){
   return h+'</svg>';
 }
 function ftheme(w){
-  const c=M[w.k],nu=nmU(c),A0=-135,A1=135,N=48,st=(A1-A0)/N,gp=1.8,rg=(w.max-w.min)||1;
+  const c=M[w.k],nu=nmU(c),A0=-135,A1=135,N=48,st=(A1-A0)/N,gp=1.8,rg=(w.max-w.min)||1,eN=Math.round(N*(w.ep==null?100:+w.ep)/100); // eN: από εδώ και πέρα "χρώμα τέλους τόξου"
   const FC='font-family="GChk,sans-serif" font-weight="600"';
   const T=(x,y,z,cl,t,ex)=>'<text'+(cl?' class="'+cl+'"':'')+' x="'+x+'" y="'+y+'" font-size="'+z+'" text-anchor="middle" '+FC+' '+(ex||'')+'>'+t+'</text>';
   let h='<svg viewBox="0 0 100 100" data-n="'+A0+','+A1+',50,50">'+(w.nf?'<circle cx="50" cy="50" r="49" fill="none" stroke="#1A1D22" stroke-width="1.4"/>':'<circle cx="50" cy="50" r="49.7" fill="#1A1D22"/><circle cx="50" cy="50" r="48" fill="'+(w.fc||'#05070A')+'"/>');
   for(let i=0;i<N;i++){const a0=A0+i*st+gp/2,a1=a0+st-gp,mid=w.min+rg*(i+.5)/N,hot=onV(w.hi)&&mid>=+w.hi,cold=onV(w.lo)&&mid<=+w.lo;
-    h+='<path class="sg'+(hot||cold?'':' as')+'" d="'+arcL(42.7,a0,a1)+'" fill="none" stroke-width="4.7" stroke-opacity=".14"'+(hot?' stroke="'+(w.hc||'#FF8A3D')+'"':cold?' stroke="'+(w.lc||'#2d7bff')+'"':'')+'/>'}
+    h+='<path class="sg'+(hot||cold?'':i>=eN?' es':' as')+'" d="'+arcL(42.7,a0,a1)+'" fill="none" stroke-width="4.7" stroke-opacity=".14"'+(hot?' stroke="'+(w.hc||'#FF8A3D')+'"':cold?' stroke="'+(w.lc||'#2d7bff')+'"':'')+'/>'}
   h+='<circle cx="50" cy="50" r="36.7" fill="none" stroke="#1C2430" stroke-width=".35"/>';
   h+='<g class="pkm" opacity="0" transform="rotate('+A0+' 50 50)"><line x1="50" y1="12" x2="50" y2="2.7" stroke="#E6F4FA" stroke-width="1"/></g><circle class="wd" cx="50" cy="84" r="1.7"/>';
   const dc=dec(c),len=Math.max(w.max.toFixed(dc).length,w.min.toFixed(dc).length),fz=+Math.min(21.3,56/(len*.6)).toFixed(1);
