@@ -344,7 +344,7 @@ function atheme(w){
   const k=Math.max(Math.abs(w.max),Math.abs(w.min))>=2000?1000:1,L=k>1?(()=>{const o=[];for(let v=Math.ceil(w.min/1000-1e-9)*1000;v<=w.max+1e-9;v+=1000)o.push(v);return o})():lbls(w.min,w.max),f=L.length>1?L[1]-L[0]:rg,un=UPx(k>1?(nu[1]?nu[1]+' ':'')+'×1000':nu[1]);
   const FB='font-family="GBar,\'Arial Narrow\',sans-serif" font-weight="600"';
   const T=(x,y,z,cl,t,ex)=>'<text'+(cl?' class="'+cl+'"':'')+' x="'+x+'" y="'+y+'" font-size="'+z+'" text-anchor="middle" '+FB+' '+(ex||'')+'>'+t+'</text>';
-  let h='<svg viewBox="0 0 100 100" data-n="'+A0+','+A1+',50,50">'+(w.nf?'<circle cx="50" cy="50" r="49" fill="none" stroke="#3A3C40" stroke-width="1.4"/><circle cx="50" cy="50" r="47.5" fill="none" stroke="#1E1F22" stroke-width="1.6"/>':'<circle cx="50" cy="50" r="49.7" fill="#3A3C40"/><circle cx="50" cy="50" r="48.3" fill="#1E1F22"/>')+(w.nf?'':'<circle cx="50" cy="50" r="46.7" fill="'+(w.fc||'#0A0A0B')+'"/>');
+  let h='<svg viewBox="0 0 100 100" data-n="'+A0+','+A1+',50,50">'+(w.nf?'<circle cx="50" cy="50" r="49" fill="none" stroke="#3A3C40" stroke-width="1.4"/><circle cx="50" cy="50" r="47.5" fill="none" stroke="#1E1F22" stroke-width="1.6"/>':'<circle cx="50" cy="50" r="49.7" fill="#3A3C40"/><circle cx="50" cy="50" r="48.3" fill="#1E1F22"/>')+(w.nf?'':'<circle cx="50" cy="50" r="46.7" fill="#0A0A0B"/>');
   const zone=(a,b,col)=>{a=Math.max(a,w.min);b=Math.min(b,w.max);if(b>a)h+='<path d="'+arcL(43.7,fr(a),fr(b))+'" fill="none" stroke="'+col+'" stroke-width="2.7"/>'};
   if(onV(w.hi))zone(+w.hi,w.max,w.hc||'#D6452E');if(onV(w.lo))zone(w.min,+w.lo,w.lc||'#2d7bff');
   const s=f/5;let mj='',mn='';
@@ -538,7 +538,7 @@ function dlgW(w,isNew){
   <label>Συναγερμός πάνω από<span><input id="f_hi" value="${w.hi??''}" style="width:72px"> <input type="color" id="f_hc" value="${w.hc||'#ff2d2d'}" style="width:44px;padding:2px"></span></label>
   <label id="r_min">Κλίμακα αναλογικού, από<input id="f_min" value="${w.min??dmin(c0)}"></label>
   <label id="r_max">Κλίμακα αναλογικού, έως<input id="f_max" value="${w.max??dmax(c0)}"></label>${xr}
-  ${th==='a'||th==='f'?'<label class="rg">Χρώμα φόντου οργάνου<input type="color" id="f_fc" value="'+(w.fc||(th==='f'?'#05070a':'#0a0a0b'))+'" style="width:56px;padding:2px"></label><label class="rg">Χωρίς φόντο (διάφανο)<input type="checkbox" id="f_nf"'+(w.nf?' checked':'')+' style="width:auto"></label>':''}
+  ${th==='f'?'<label class="rg">Χρώμα φόντου οργάνου<input type="color" id="f_fc" value="'+(w.fc||'#05070a')+'" style="width:56px;padding:2px"></label>':''}${th==='a'||th==='f'?'<label class="rg">Χωρίς φόντο (διάφανο)<input type="checkbox" id="f_nf"'+(w.nf?' checked':'')+' style="width:auto"></label>':''}
   ${th==='l'||th==='e'?'<label class="rg">Περίγραμμα οργάνου (στεφάνι και μαύρο φόντο)<input type="checkbox" id="f_nb"'+(w.nb?'':' checked')+' style="width:auto"></label>':''}
   <label class="rg">Χρώμα γραμμάτων<input type="color" id="f_tc" value="${w.tc||'#ffffff'}" style="width:56px;padding:2px"></label>
   <label class="rg">Χρώμα τόξου<input type="color" id="f_ac" value="${w.ac||S.c1||'#ff2d2d'}" style="width:56px;padding:2px"></label>
@@ -564,7 +564,7 @@ function dlgW(w,isNew){
   $('#f_ok').onclick=()=>{
     const g=i=>{const v=$(i).value.trim();return v===''?null:Number(v)};
     w.t=$('#f_t').value;w.k=$('#f_k').value;w.lo=g('#f_lo');w.hi=g('#f_hi');w.lc=$('#f_lc').value;w.hc=$('#f_hc').value;
-    if($('#f_nb'))w.nb=$('#f_nb').checked?undefined:true;if($('#f_fc')){const v=$('#f_fc').value.toLowerCase();w.fc=v===(th==='f'?'#05070a':'#0a0a0b')?undefined:v;w.nf=$('#f_nf').checked||undefined}w.tc=$('#f_tc').value;w.ac=$('#f_ac').value;w.ec=$('#f_ec').value;w.ep=g('#f_ep')??100;
+    if($('#f_nb'))w.nb=$('#f_nb').checked?undefined:true;if($('#f_fc')){const v=$('#f_fc').value.toLowerCase();w.fc=v==='#05070a'?undefined:v}if($('#f_nf'))w.nf=$('#f_nf').checked||undefined;w.tc=$('#f_tc').value;w.ac=$('#f_ac').value;w.ec=$('#f_ec').value;w.ep=g('#f_ep')??100;
     w.nm=$('#f_mm').checked?undefined:true;w.nh=$('#f_nh').checked?undefined:true;if(w.k==='clk')w.t='b';w.vc=$('#f_vc').value==='#f2f2f2'?undefined:$('#f_vc').value;w.pc=$('#f_pc').value==='#8a8a8a'?undefined:$('#f_pc').value;if(mx){const n=+$('#f_xn').value;w.xs=[$('#f_x1').value,$('#f_x2').value].slice(0,n)}
     w.min=g('#f_min')??dmin(M[w.k]);w.max=g('#f_max')??dmax(M[w.k]);
     if(isNew){const a=S.pages[S.cur].w,n=a.length%6;Object.assign(w,w.t==='g'?{x:4+n*4,y:4+n*4,w:40,h:52}:{x:4+n*4,y:4+n*4,w:38,h:28});a.push(w)}
