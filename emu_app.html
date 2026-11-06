@@ -378,7 +378,7 @@ function gsvg(w,th){
   if(th==='f')return ftheme(w);
   const ep=w.ep==null?100:+w.ep;
   const T=(x,y,z,cl,t,ex)=>'<text class="'+cl+'" x="'+x+'" y="'+y+'" font-size="'+z+'" text-anchor="middle" font-family="-apple-system,Helvetica,Arial,sans-serif" '+(ex||'')+'>'+t+'</text>';
-  const op=(a0,a1)=>'<svg viewBox="0 0 100 100" data-n="'+a0+','+a1+',50,50">'+DEFS;
+  const op=(a0,a1)=>'<svg viewBox="'+(w.nb?(th==='e'?'14 14 72 72':'8 8 84 84'):'0 0 100 100')+'" data-n="'+a0+','+a1+',50,50">'+DEFS; // χωρίς στεφάνι: zoom στο περιεχόμενο ώστε να γεμίζει το περίγραμμα
   const dig=(x,y,sx,sy,al,sk)=>'<g class="gv c1f" data-p="'+[x,y,sx,sy,al,sk].join(',')+'">'+seg7('-',x,y,sx,sy,al,sk)+'</g>';
   const L=lbls(w.min,w.max),f=L.length>1?L[1]-L[0]:1;
   let h;
