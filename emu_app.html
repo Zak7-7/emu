@@ -53,7 +53,7 @@ button{font-weight:600}
 .dt{display:block;width:min(86cqw,calc(86cqh/var(--n)));aspect-ratio:1;border-radius:50%;background:#5a5a5a}
 @container (min-aspect-ratio:1/1){.sl{flex-direction:row}.dt{width:min(86cqh,calc(86cqw/var(--n)))}}
 .bx{padding:3cqmin 5cqmin;height:100%;display:flex;flex-direction:column;justify-content:space-between}
-.bn{font-size:12cqmin;color:var(--pc,var(--mut));text-align:center}.nmm .bm{display:none}
+.bn{font-size:12cqmin;color:var(--pc,var(--mut));text-align:center}.nmm .bm{display:none}.nhd .bn{visibility:hidden}
 .bv{color:var(--vc,var(--fg));font-size:40cqmin;font-weight:700;text-align:right;font-variant-numeric:tabular-nums;line-height:1}
 .bm{font-size:9cqmin;color:var(--pc,var(--mut));display:flex;justify-content:space-between}.bm b{color:var(--pc,var(--fg))}
 .w7 .bn{font-weight:700}.w7 .bv{height:40cqmin;display:flex;justify-content:flex-end}.w7 .bv svg{width:auto;height:100%;fill:currentColor}
@@ -141,6 +141,8 @@ const DEF=[
 {k:'spd',n:'km/h ?',id:null,s:1,o:0,d:0,ok:0,min:0,max:260}
 ];
 const M={};DEF.forEach(c=>M[c.k]=c);
+const CLK={k:'clk',n:'Ώρα',d:0,min:0,max:0};M.clk=CLK; // ρολόι: μόνο για κουτάκια
+const hhmm=()=>{const n=new Date();return String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')};
 let S={};try{S=JSON.parse(localStorage.getItem('emudash2'))||{}}catch(e){}
 S.pages=S.pages||[{n:'Σελίδα 1',w:[]}];while(S.pages.length<3)S.pages.push({n:'Σελίδα '+(S.pages.length+1),w:[]});S.cur=S.cur||0;if(S.cur>=S.pages.length)S.cur=0;S.ch=S.ch||{};
 if(S.baro==null)S.baro=100;S.col=S.col||'#ff2d2d';
@@ -149,7 +151,7 @@ const get=(c,f)=>{const v=(S.ch[c.k]||{})[f];return v!==undefined?v:c[f]};
 // Γλώσσα / Language
 if(!S.lang)S.lang=(navigator.language||'').slice(0,2)==='el'?'el':'en';
 const DICT=[
-['Χρώμα φόντου οργάνου','Gauge face color'],['Χωρίς φόντο (διάφανο)','No face (transparent)'],['Εμφάνιση Min / Max','Show Min / Max'],['Περίγραμμα οργάνου (στεφάνι και μαύρο φόντο)','Gauge bezel (ring and black background)'],['＋ Νέο αυτοκίνητο','＋ New car'],['Νέο αυτοκίνητο','New car'],['Το αυτοκίνητό μου','My car'],['Διαγραφή αυτοκινήτου','Delete car'],['Διαγραφή του αυτοκινήτου «','Delete car «'],['Όνομα / μοντέλο','Name / model'],['Βρες τα στοιχεία','Find the specs'],['6 ταχ.','6-spd'],['Το κουμπί ανοίγει αναζήτηση στον browser. Βρες βάρος, ελαστικό, σχέσεις κιβωτίου και τελική σχέση και συμπλήρωσέ τα από κάτω.','The button opens a web search. Find weight, tyre size, gear ratios and final drive and enter them below.'],[' Οι τιμές του προτύπου είναι από δημόσιες προδιαγραφές: έλεγξέ τες με τα δικά σου (π.χ. ελαστικά, διαφορικό).',' The preset values come from public specs: check them against your own car (e.g. tyres, final drive).'],['Αυτοκίνητο','Car'],
+['Ρολόι (ώρα)','Clock (time)'],['Εμφάνιση επικεφαλίδας','Show title'],['Ώρα','Time'],['Χρώμα φόντου οργάνου','Gauge face color'],['Χωρίς φόντο (διάφανο)','No face (transparent)'],['Εμφάνιση Min / Max','Show Min / Max'],['Περίγραμμα οργάνου (στεφάνι και μαύρο φόντο)','Gauge bezel (ring and black background)'],['＋ Νέο αυτοκίνητο','＋ New car'],['Νέο αυτοκίνητο','New car'],['Το αυτοκίνητό μου','My car'],['Διαγραφή αυτοκινήτου','Delete car'],['Διαγραφή του αυτοκινήτου «','Delete car «'],['Όνομα / μοντέλο','Name / model'],['Βρες τα στοιχεία','Find the specs'],['6 ταχ.','6-spd'],['Το κουμπί ανοίγει αναζήτηση στον browser. Βρες βάρος, ελαστικό, σχέσεις κιβωτίου και τελική σχέση και συμπλήρωσέ τα από κάτω.','The button opens a web search. Find weight, tyre size, gear ratios and final drive and enter them below.'],[' Οι τιμές του προτύπου είναι από δημόσιες προδιαγραφές: έλεγξέ τες με τα δικά σου (π.χ. ελαστικά, διαφορικό).',' The preset values come from public specs: check them against your own car (e.g. tyres, final drive).'],['Αυτοκίνητο','Car'],
 ['Χρώμα περιφερειακών γραμμάτων','Secondary text color'],['Τέλος τόξου από (%) (100 = όχι)','Arc end from (%) (100 = off)'],['Χρώμα τέλους τόξου','Arc end color'],['Χρώμα γραμμάτων','Text color'],['Χρώμα τόξου','Arc color'],['Χρώμα τιμής','Value color'],
 ['Επεξεργασία Layout','Edit Layout'],['Συναγερμοί','Alarms'],['Μονάδες εμφάνισης','Display Units'],['Συνδεσιμότητα','Connectivity'],['Σύνδεση Bluetooth','Bluetooth Connection'],['Προσανατολισμός οθόνης','Screen Orientation'],['Μονάδα θερμοκρασίας','Temperature Unit'],['Μονάδα ταχύτητας','Speed Unit'],['Μονάδα πίεσης','Pressure Unit'],['Ρυθμίσεις','Settings'],['Μενού','Menu'],['Κλειδωμένο','Locked'],['Ξεκλείδωτο','Unlocked'],['Κλείδωμα','Lock'],['Προσανατολισμός','Orientation'],['Μπαταρία (Volt)','Battery (Volt)'],['Έξτρα οθόνες','Extra screens'],['Οθόνη','Screen'],['Όχι','No'],
 ['Όταν είναι ενεργή, μπαίνει στο layout και τη μετακινείς ή τη μεγαλώνεις. Στην επεξεργασία, πάτα πάνω της για χρώματα και αριθμό LED.','When on, it is added to the layout and you can move or resize it. In edit mode, tap it for colors and LED count.'],
@@ -246,14 +248,14 @@ const pos=(d,w)=>{d.style.left=w.x+'%';d.style.top=w.y+'%';d.style.width=w.w+'%'
 // Κουτάκι στο θέμα LED τόξο: αριθμοί 7-segment με την ίδια κλίση (-6°) όπως στα όργανα
 // sk = κλίση, gh = "σβηστά" 8άρια από πίσω (θέμα Ψηφιακό LCD)
 function s7(el,s,sk,gh){const key=s+'|'+(gh||'');if(!el||el._s===key)return;el._s=key;sk=sk==null?-6:sk;
-  const W=x=>{let t=0;for(const ch of x)t+=ch==='.'?4:12;return t-2},tw=Math.max(W(s),gh?W(gh):0);
+  const W=x=>{let t=0;for(const ch of x)t+=ch==='.'?4:ch===':'?5:12;return t-2},tw=Math.max(W(s),gh?W(gh):0);
   el.innerHTML='<svg viewBox="-1.5 -0.5 '+(tw+3).toFixed(1)+' 19">'+(gh?'<g fill-opacity=".13">'+seg7(gh,tw,0,1,1,'r',sk)+'</g>':'')+seg7(s,tw,0,1,1,'r',sk)+'</svg>'}
 // Κείμενο με ψηφιακά γράμματα 14-segment μέσα σε στοιχείο HTML (θέμα Ψηφιακό LCD)
 function s14(el,s){if(!el)return;s=String(s).replace(/ \?$/,'');el.innerHTML='<svg viewBox="-1 -0.5 '+(segW(s,1)+2).toFixed(1)+' 19">'+segTxt(s,0,0,1,1,'l',0)+'</svg>'}
 const ghost=(w,c)=>Math.abs(w.max??dmax(c)).toFixed(dec(c)).replace(/[0-9]/g,'8');
 function mk(w){
   if(w.t==='s')return mkS(w);
-  const th=thm(),c=M[w.k],d=document.createElement('div');d.className='w'+(w.t==='g'?' g':'')+(w.t==='b'&&th==='l'?' w7':'')+(w.t==='b'&&th==='e'?' wL':'')+(w.t==='b'&&th==='a'?' wA':'')+(w.t==='b'&&w.nm?' nmm':'');pos(d,w);
+  const th=thm(),c=M[w.k],d=document.createElement('div');d.className='w'+(w.t==='g'?' g':'')+(w.t==='b'&&th==='l'?' w7':'')+(w.t==='b'&&th==='e'?' wL':'')+(w.t==='b'&&th==='a'?' wA':'')+(w.t==='b'&&(w.nm||w.k==='clk')?' nmm':'')+(w.t==='b'&&w.nh?' nhd':'');pos(d,w);
   d.innerHTML=(w.t==='g'
    ?gsvg(eff(w),th)
    :d.classList.contains('wL')
@@ -275,10 +277,11 @@ function lbls(a,b){const r=b-a,m=Math.pow(10,Math.floor(Math.log10(r/6))),f=[1,2
 const SG={a:'M2 0H8L9 1L8 2H2L1 1Z',d:'M2 16H8L9 17L8 18H2L1 17Z',g:'M2 8H8L9 9L8 10H2L1 9Z',b:'M9 1L10 2V8L9 9L8 8V2Z',c:'M9 10L10 11V16L9 17L8 16V11Z',f:'M1 1L2 2V8L1 9L0 8V2Z',e:'M1 10L2 11V16L1 17L0 16V11Z'};
 const DG={'0':'abcdef','1':'bc','2':'abged','3':'abgcd','4':'fgbc','5':'afgcd','6':'afgedc','7':'abc','8':'abcdefg','9':'abcdfg','-':'g'};
 function seg7(str,x,y,sx,sy,al,sk){
-  let tw=0;for(const ch of str)tw+=ch==='.'?4:12;tw-=2;
+  let tw=0;for(const ch of str)tw+=ch==='.'?4:ch===':'?5:12;tw-=2;
   let cx=al==='c'?x-tw*sx/2:x-tw*sx,o='';
   for(const ch of str){
     if(ch==='.'){o+='<circle cx="'+(cx+1.2*sx).toFixed(1)+'" cy="'+(y+16.6*sy).toFixed(1)+'" r="'+(1.45*Math.min(sx,sy)).toFixed(2)+'"/>';cx+=4*sx;continue}
+    if(ch===':'){[5.5,12.5].forEach(yy=>o+='<circle cx="'+(cx+1.4*sx).toFixed(1)+'" cy="'+(y+yy*sy).toFixed(1)+'" r="'+(1.45*Math.min(sx,sy)).toFixed(2)+'"/>');cx+=5*sx;continue}
     const d=(DG[ch]||'').split('').map(k=>SG[k]).join('');
     if(d)o+='<path d="'+d+'" transform="translate('+cx.toFixed(1)+' '+y+') scale('+sx+' '+sy+')"/>';
     cx+=12*sx;
@@ -492,7 +495,9 @@ setInterval(()=>{
   if(demo)sim();
   for(const w of S.pages[S.cur].w){
     const d=refs.get(w);if(!d)continue;
-    if(w.t==='s'){const r=val(M.rpm);sup(d,w,r==null?0:r);continue}const c=M[w.k],v=val(c);if(v==null)continue;
+    if(w.t==='s'){const r=val(M.rpm);sup(d,w,r==null?0:r);continue}
+    if(w.k==='clk'){const s=hhmm(),bvv=d.querySelector('.bv');if(d.classList.contains('wL'))s7(bvv,s,0,'88:88');else if(d.classList.contains('w7'))s7(bvv,s);else if(bvv.textContent!==s)bvv.textContent=s;continue}
+    const c=M[w.k],v=val(c);if(v==null)continue;
     const m=mm[c.k]||(mm[c.k]={a:v,b:v});m.a=Math.min(m.a,v);m.b=Math.max(m.b,v);
     let ac=null;
     if(on(w.hi)&&v>w.hi)ac=w.hc||'#ff2d2d';else if(on(w.lo)&&v<w.lo)ac=w.lc||'#2d7bff';
@@ -527,7 +532,7 @@ function dlgW(w,isNew){
   const xr=mx?'<label id="r_xn">Έξτρα οθόνες<select id="f_xn">'+[...Array(mx+1).keys()].map(i=>'<option value="'+i+'"'+(xs.length===i?' selected':'')+'>'+(i?i:'Όχι')+'</option>').join('')+'</select></label><label id="r_x1">Οθόνη 1<select id="f_x1">'+op(xs[0])+'</select></label><label id="r_x2">Οθόνη 2<select id="f_x2">'+op(xs[1])+'</select></label>':'';
   D(`<h3>${isNew?'Νέο όργανο':'Όργανο'}</h3>
   <label>Τύπος<select id="f_t"><option value="b"${w.t==='b'?' selected':''}>Κουτάκι</option><option value="g"${w.t==='g'?' selected':''}>Αναλογικό</option></select></label>
-  <label>Κανάλι<select id="f_k">${o}</select></label>
+  <label>Κανάλι<select id="f_k">${o}<option value="clk"${w.k==='clk'?' selected':''}>Ρολόι (ώρα)</option></select></label>
   <label>Συναγερμός κάτω από<span><input id="f_lo" value="${w.lo??''}" style="width:72px"> <input type="color" id="f_lc" value="${w.lc||'#2d7bff'}" style="width:44px;padding:2px"></span></label>
   <label>Συναγερμός πάνω από<span><input id="f_hi" value="${w.hi??''}" style="width:72px"> <input type="color" id="f_hc" value="${w.hc||'#ff2d2d'}" style="width:44px;padding:2px"></span></label>
   <label id="r_min">Κλίμακα αναλογικού, από<input id="f_min" value="${w.min??dmin(c0)}"></label>
@@ -538,24 +543,25 @@ function dlgW(w,isNew){
   <label class="rg">Χρώμα τόξου<input type="color" id="f_ac" value="${w.ac||S.c1||'#ff2d2d'}" style="width:56px;padding:2px"></label>
   <label class="rg">Χρώμα τέλους τόξου<input type="color" id="f_ec" value="${w.ec||w.ac||S.c1||'#ff2d2d'}" style="width:56px;padding:2px"></label>
   <label class="rg">Τέλος τόξου από (%) (100 = όχι)<input id="f_ep" value="${w.ep??100}"></label>
+  <label class="rb">Εμφάνιση επικεφαλίδας<input type="checkbox" id="f_nh"${w.nh?'':' checked'} style="width:auto"></label>
   <label class="rb">Εμφάνιση Min / Max<input type="checkbox" id="f_mm"${w.nm?'':' checked'} style="width:auto"></label>
   <label class="rb">Χρώμα τιμής<input type="color" id="f_vc" value="${w.vc||'#f2f2f2'}" style="width:56px;padding:2px"></label>
   <label class="rb">Χρώμα περιφερειακών γραμμάτων (IAT, Min, Max)<input type="color" id="f_pc" value="${w.pc||'#8a8a8a'}" style="width:56px;padding:2px"></label>
   <div><button id="f_ok">Αποθήκευση</button> ${isNew?'':'<button id="f_del">Διαγραφή</button> '}<button id="f_x">Κλείσιμο</button></div>`);
-  const syncT=()=>{const g=$('#f_t').value==='g';
+  const syncT=()=>{let g=$('#f_t').value==='g';const ck=$('#f_k').querySelector('option[value="clk"]');ck.hidden=g;if(g&&$('#f_k').value==='clk'){$('#f_k').value='rpm';$('#f_k').onchange&&$('#f_k').onchange()}
     ['r_min','r_max'].forEach(i=>$('#'+i).style.display=g?'':'none');
     document.querySelectorAll('#dlg .rg').forEach(e=>e.style.display=g?'':'none');
     document.querySelectorAll('#dlg .rb').forEach(e=>e.style.display=g?'none':'');
     if(mx){$('#r_xn').style.display=g?'':'none';const n=+$('#f_xn').value;$('#r_x1').style.display=g&&n>=1?'':'none';$('#r_x2').style.display=g&&n>=2?'':'none'}};
   $('#f_t').onchange=syncT;if(mx)$('#f_xn').onchange=syncT;syncT();
-  $('#f_k').onchange=()=>{const c=M[$('#f_k').value];$('#f_min').value=dmin(c);$('#f_max').value=dmax(c)};
+  $('#f_k').onchange=()=>{const c=M[$('#f_k').value];$('#f_min').value=dmin(c);$('#f_max').value=dmax(c)};syncT();
   $('#f_x').onclick=closeD;
   if(!isNew)$('#f_del').onclick=()=>{const a=S.pages[S.cur].w;a.splice(a.indexOf(w),1);save();closeD();build()};
   $('#f_ok').onclick=()=>{
     const g=i=>{const v=$(i).value.trim();return v===''?null:Number(v)};
     w.t=$('#f_t').value;w.k=$('#f_k').value;w.lo=g('#f_lo');w.hi=g('#f_hi');w.lc=$('#f_lc').value;w.hc=$('#f_hc').value;
     if($('#f_nb'))w.nb=$('#f_nb').checked?undefined:true;if($('#f_fc')){const v=$('#f_fc').value.toLowerCase();w.fc=v==='#0a0a0b'?undefined:v;w.nf=$('#f_nf').checked||undefined}w.tc=$('#f_tc').value;w.ac=$('#f_ac').value;w.ec=$('#f_ec').value;w.ep=g('#f_ep')??100;
-    w.nm=$('#f_mm').checked?undefined:true;w.vc=$('#f_vc').value==='#f2f2f2'?undefined:$('#f_vc').value;w.pc=$('#f_pc').value==='#8a8a8a'?undefined:$('#f_pc').value;if(mx){const n=+$('#f_xn').value;w.xs=[$('#f_x1').value,$('#f_x2').value].slice(0,n)}
+    w.nm=$('#f_mm').checked?undefined:true;w.nh=$('#f_nh').checked?undefined:true;if(w.k==='clk')w.t='b';w.vc=$('#f_vc').value==='#f2f2f2'?undefined:$('#f_vc').value;w.pc=$('#f_pc').value==='#8a8a8a'?undefined:$('#f_pc').value;if(mx){const n=+$('#f_xn').value;w.xs=[$('#f_x1').value,$('#f_x2').value].slice(0,n)}
     w.min=g('#f_min')??dmin(M[w.k]);w.max=g('#f_max')??dmax(M[w.k]);
     if(isNew){const a=S.pages[S.cur].w,n=a.length%6;Object.assign(w,w.t==='g'?{x:4+n*4,y:4+n*4,w:40,h:52}:{x:4+n*4,y:4+n*4,w:38,h:28});a.push(w)}
     save();closeD();build();
