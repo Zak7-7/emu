@@ -58,6 +58,7 @@ button{font-weight:600}
 .bm{font-size:9cqmin;color:var(--pc,var(--mut));display:flex;justify-content:space-between}.bm b{color:var(--pc,var(--fg))}
 .w7 .bn{font-weight:700}.w7 .bv{height:40cqmin;display:flex;justify-content:flex-end}.w7 .bv svg{width:auto;height:100%;fill:currentColor}
 .w7 .bm b{display:inline-flex;height:1em;vertical-align:-.12em}.w7 .bm b svg{width:auto;height:100%;fill:currentColor}
+.wF .bx{font-family:GChk,sans-serif}.wF .bn{font-weight:600;letter-spacing:.16em}.wF .bv{font-weight:600;letter-spacing:-.02em}.wF .bm{font-weight:500;letter-spacing:.12em}
 .wA .bx{font-family:GBar,'Arial Narrow',sans-serif}.wA .bn{font-weight:600;letter-spacing:.12em}.wA .bv{font-weight:600}.wA .bm{font-weight:500;letter-spacing:.06em}
 .wL .bn{height:10cqmin;display:flex;justify-content:center}.wL .bn svg{width:auto;max-width:100%;height:100%;fill:currentColor}
 .wL .bv{height:40cqmin;display:flex;justify-content:flex-end}.wL .bv svg{width:auto;height:100%;fill:currentColor}
@@ -255,7 +256,7 @@ function s14(el,s){if(!el)return;s=String(s).replace(/ \?$/,'');el.innerHTML='<s
 const ghost=(w,c)=>Math.abs(w.max??dmax(c)).toFixed(dec(c)).replace(/[0-9]/g,'8');
 function mk(w){
   if(w.t==='s')return mkS(w);
-  const th=thm(),c=M[w.k],d=document.createElement('div');d.className='w'+(w.t==='g'?' g':'')+(w.t==='b'&&th==='l'?' w7':'')+(w.t==='b'&&th==='e'?' wL':'')+(w.t==='b'&&th==='a'?' wA':'')+(w.t==='b'&&(w.nm||w.k==='clk')?' nmm':'')+(w.t==='b'&&(w.nh||w.k==='clk')?' nhd':'');pos(d,w);
+  const th=thm(),c=M[w.k],d=document.createElement('div');d.className='w'+(w.t==='g'?' g':'')+(w.t==='b'&&th==='l'?' w7':'')+(w.t==='b'&&th==='e'?' wL':'')+(w.t==='b'&&th==='a'?' wA':'')+(w.t==='b'&&th==='f'?' wF':'')+(w.t==='b'&&(w.nm||w.k==='clk')?' nmm':'')+(w.t==='b'&&(w.nh||w.k==='clk')?' nhd':'');pos(d,w);
   d.innerHTML=(w.t==='g'
    ?gsvg(eff(w),th)
    :d.classList.contains('wL')
@@ -359,7 +360,7 @@ function ftheme(w){
   const c=M[w.k],nu=nmU(c),A0=-135,A1=135,N=48,st=(A1-A0)/N,gp=1.8,rg=(w.max-w.min)||1;
   const FC='font-family="GChk,sans-serif" font-weight="600"';
   const T=(x,y,z,cl,t,ex)=>'<text'+(cl?' class="'+cl+'"':'')+' x="'+x+'" y="'+y+'" font-size="'+z+'" text-anchor="middle" '+FC+' '+(ex||'')+'>'+t+'</text>';
-  let h='<svg viewBox="0 0 100 100" data-n="'+A0+','+A1+',50,50"><circle cx="50" cy="50" r="49.7" fill="#1A1D22"/><circle cx="50" cy="50" r="48" fill="#05070A"/>';
+  let h='<svg viewBox="0 0 100 100" data-n="'+A0+','+A1+',50,50">'+(w.nf?'<circle cx="50" cy="50" r="49" fill="none" stroke="#1A1D22" stroke-width="1.4"/>':'<circle cx="50" cy="50" r="49.7" fill="#1A1D22"/><circle cx="50" cy="50" r="48" fill="'+(w.fc||'#05070A')+'"/>');
   for(let i=0;i<N;i++){const a0=A0+i*st+gp/2,a1=a0+st-gp,mid=w.min+rg*(i+.5)/N,hot=onV(w.hi)&&mid>=+w.hi,cold=onV(w.lo)&&mid<=+w.lo;
     h+='<path class="sg'+(hot||cold?'':' as')+'" d="'+arcL(42.7,a0,a1)+'" fill="none" stroke-width="4.7" stroke-opacity=".14"'+(hot?' stroke="'+(w.hc||'#FF8A3D')+'"':cold?' stroke="'+(w.lc||'#2d7bff')+'"':'')+'/>'}
   h+='<circle cx="50" cy="50" r="36.7" fill="none" stroke="#1C2430" stroke-width=".35"/>';
@@ -537,7 +538,7 @@ function dlgW(w,isNew){
   <label>Συναγερμός πάνω από<span><input id="f_hi" value="${w.hi??''}" style="width:72px"> <input type="color" id="f_hc" value="${w.hc||'#ff2d2d'}" style="width:44px;padding:2px"></span></label>
   <label id="r_min">Κλίμακα αναλογικού, από<input id="f_min" value="${w.min??dmin(c0)}"></label>
   <label id="r_max">Κλίμακα αναλογικού, έως<input id="f_max" value="${w.max??dmax(c0)}"></label>${xr}
-  ${th==='a'?'<label class="rg">Χρώμα φόντου οργάνου<input type="color" id="f_fc" value="'+(w.fc||'#0a0a0b')+'" style="width:56px;padding:2px"></label><label class="rg">Χωρίς φόντο (διάφανο)<input type="checkbox" id="f_nf"'+(w.nf?' checked':'')+' style="width:auto"></label>':''}
+  ${th==='a'||th==='f'?'<label class="rg">Χρώμα φόντου οργάνου<input type="color" id="f_fc" value="'+(w.fc||(th==='f'?'#05070a':'#0a0a0b'))+'" style="width:56px;padding:2px"></label><label class="rg">Χωρίς φόντο (διάφανο)<input type="checkbox" id="f_nf"'+(w.nf?' checked':'')+' style="width:auto"></label>':''}
   ${th==='l'||th==='e'?'<label class="rg">Περίγραμμα οργάνου (στεφάνι και μαύρο φόντο)<input type="checkbox" id="f_nb"'+(w.nb?'':' checked')+' style="width:auto"></label>':''}
   <label class="rg">Χρώμα γραμμάτων<input type="color" id="f_tc" value="${w.tc||'#ffffff'}" style="width:56px;padding:2px"></label>
   <label class="rg">Χρώμα τόξου<input type="color" id="f_ac" value="${w.ac||S.c1||'#ff2d2d'}" style="width:56px;padding:2px"></label>
@@ -562,7 +563,7 @@ function dlgW(w,isNew){
   $('#f_ok').onclick=()=>{
     const g=i=>{const v=$(i).value.trim();return v===''?null:Number(v)};
     w.t=$('#f_t').value;w.k=$('#f_k').value;w.lo=g('#f_lo');w.hi=g('#f_hi');w.lc=$('#f_lc').value;w.hc=$('#f_hc').value;
-    if($('#f_nb'))w.nb=$('#f_nb').checked?undefined:true;if($('#f_fc')){const v=$('#f_fc').value.toLowerCase();w.fc=v==='#0a0a0b'?undefined:v;w.nf=$('#f_nf').checked||undefined}w.tc=$('#f_tc').value;w.ac=$('#f_ac').value;w.ec=$('#f_ec').value;w.ep=g('#f_ep')??100;
+    if($('#f_nb'))w.nb=$('#f_nb').checked?undefined:true;if($('#f_fc')){const v=$('#f_fc').value.toLowerCase();w.fc=v===(th==='f'?'#05070a':'#0a0a0b')?undefined:v;w.nf=$('#f_nf').checked||undefined}w.tc=$('#f_tc').value;w.ac=$('#f_ac').value;w.ec=$('#f_ec').value;w.ep=g('#f_ep')??100;
     w.nm=$('#f_mm').checked?undefined:true;w.nh=$('#f_nh').checked?undefined:true;if(w.k==='clk')w.t='b';w.vc=$('#f_vc').value==='#f2f2f2'?undefined:$('#f_vc').value;w.pc=$('#f_pc').value==='#8a8a8a'?undefined:$('#f_pc').value;if(mx){const n=+$('#f_xn').value;w.xs=[$('#f_x1').value,$('#f_x2').value].slice(0,n)}
     w.min=g('#f_min')??dmin(M[w.k]);w.max=g('#f_max')??dmax(M[w.k]);
     if(isNew){const a=S.pages[S.cur].w,n=a.length%6;Object.assign(w,w.t==='g'?{x:4+n*4,y:4+n*4,w:40,h:52}:{x:4+n*4,y:4+n*4,w:38,h:28});a.push(w)}
