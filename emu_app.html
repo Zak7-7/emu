@@ -196,7 +196,7 @@ function trNode(n){
   else if(n.nodeType===1&&n.tagName!=='SCRIPT'&&n.tagName!=='STYLE')n.childNodes.forEach(trNode);
 }
 new MutationObserver(ms=>{if(S.lang!=='en')return;for(const m of ms){if(m.type==='characterData')trNode(m.target);else m.addedNodes.forEach(trNode)}}).observe(document.body,{childList:true,subtree:true,characterData:true});
-function setLang(l){S.lang=l;save();document.documentElement.lang=l;if(l==='en')trNode(document.body);else{closeD();build();menu()}}
+function setLang(l){S.lang=l;save();document.documentElement.lang=l;if(l==='en'){build();trNode(document.body)}else{closeD();build();menu()}}
 let edit=false,demo=false,buf=[],cal=false,rot=false;const raw={},mm={},refs=new Map();
 function fit(){
   const b=document.body,w=innerWidth,h=innerHeight;const lk=S.olock!==false;b.classList.toggle('ls',lk?S.orient!=='p':w>h);
@@ -255,7 +255,7 @@ function mk(w){
    ?gsvg(eff(w),th)
    :d.classList.contains('wL')
    ?`<div class="bx"><div class="bn"></div><div class="bv"></div><div class="bm"><span><i></i><b></b></span><span><i></i><b></b></span></div></div>`
-   :`<div class="bx"><div class="bn">${cn(c)}</div><div class="bv">-</div><div class="bm"><span>Min <b>-</b></span><span>Max <b>-</b></span></div></div>`)
+   :`<div class="bx"><div class="bn">${UPx(t(cn(c)))}</div><div class="bv">-</div><div class="bm"><span>MIN <b>-</b></span><span>MAX <b>-</b></span></div></div>`)
    +'<div class="rz"></div>';
   if(d.classList.contains('w7')){s7(d.querySelector('.bv'),'-');d.querySelectorAll('.bm b').forEach(b=>s7(b,'-'))}
   if(d.classList.contains('wL')){s14(d.querySelector('.bn'),t(cn(c)));s7(d.querySelector('.bv'),'-',0,ghost(w,c));const i=d.querySelectorAll('.bm i');s14(i[0],'MIN');s14(i[1],'MAX');d.querySelectorAll('.bm b').forEach(b=>s7(b,'-',0))}
@@ -328,13 +328,13 @@ function stheme(w){
 const XL={peak:'PEAK',bat:'VOLT',afr:'AFR'};
 // --- Νέα θέματα: Αναλογικό (a) και Ψηφιακό LED (f). Γωνίες: 0 = πάνω, δεξιόστροφα.
 // Όνομα και μονάδα χωριστά ("MAP bar" -> ["MAP","bar"]), κεφαλαία χωρίς τόνους
-function nmU(c){const s=cn(c).replace(/ \?$/,''),m=s.match(/^(.*\S)\s+(kPa|bar|psi|%|°[CF]|km\/h|mph|V)$/);return m?[m[1],m[2]]:[s,'']}
+function nmU(c){const s=t(cn(c)).replace(/ \?$/,''),m=s.match(/^(.*\S)\s+(kPa|bar|psi|%|°[CF]|km\/h|mph|V)$/);return m?[m[1],m[2]]:[s,'']}
 const UPx=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase();
 const arcL=(r,a0,a1)=>{const p=Q(r,a0),q=Q(r,a1);return'M'+p[0]+' '+p[1]+'A'+r+' '+r+' 0 '+(a1-a0>180?1:0)+' 1 '+q[0]+' '+q[1]};
 const onV=x=>x!=null&&x!==''&&isFinite(x);
 function atheme(w){
   const c=M[w.k],nu=nmU(c),A0=-135,A1=135,rg=(w.max-w.min)||1,fr=v=>A0+(A1-A0)*(v-w.min)/rg;
-  const L=lbls(w.min,w.max),f=L.length>1?L[1]-L[0]:rg,k=Math.max(Math.abs(w.max),Math.abs(w.min))>=2000?1000:1,un=k>1?(nu[1]?nu[1]+' ':'')+'×1000':nu[1];
+  const L=lbls(w.min,w.max),f=L.length>1?L[1]-L[0]:rg,k=Math.max(Math.abs(w.max),Math.abs(w.min))>=2000?1000:1,un=UPx(k>1?(nu[1]?nu[1]+' ':'')+'×1000':nu[1]);
   const FB='font-family="GBar,\'Arial Narrow\',sans-serif" font-weight="600"';
   const T=(x,y,z,cl,t,ex)=>'<text'+(cl?' class="'+cl+'"':'')+' x="'+x+'" y="'+y+'" font-size="'+z+'" text-anchor="middle" '+FB+' '+(ex||'')+'>'+t+'</text>';
   let h='<svg viewBox="0 0 100 100" data-n="'+A0+','+A1+',50,50"><circle cx="50" cy="50" r="49.7" fill="#3A3C40"/><circle cx="50" cy="50" r="48.3" fill="#1E1F22"/><circle cx="50" cy="50" r="46.7" fill="#0A0A0B"/>';
@@ -361,7 +361,7 @@ function ftheme(w){
   const dc=dec(c),len=Math.max(w.max.toFixed(dc).length,w.min.toFixed(dc).length),fz=+Math.min(21.3,56/(len*.6)).toFixed(1);
   h+=T(50,31.5,4.3,'',UPx(nu[0]),'fill="#7F98A8" letter-spacing="1"');
   h+=T(50,53,fz,'gv c1f','-','letter-spacing="-.3"');
-  if(nu[1])h+=T(50,61,4.7,'',nu[1],'fill="#7F98A8" letter-spacing=".7"');
+  if(nu[1])h+=T(50,61,4.7,'',UPx(nu[1]),'fill="#7F98A8" letter-spacing=".7"');
   const x0=(w.xs||[])[0]||'peak';
   h+='<text x="50" y="74.7" font-size="4" text-anchor="middle" '+FC+' letter-spacing=".7"><tspan fill="#7F98A8">'+XL[x0]+'</tspan> <tspan class="xs" data-i="0" data-t="'+x0+'" fill="#E6F4FA">-</tspan></text>';
   return h+'</svg>';
@@ -381,7 +381,7 @@ function gsvg(w,th){
     h=op(A0,A1)+(w.nb?'':'<circle cx="50" cy="50" r="49.5" fill="url(#bz1)"/><circle cx="50" cy="50" r="44.5" fill="#000" stroke="#222"/>'+hl(47.2,[[-70,-35],[28,58],[120,150],[-150,-120]],.3));
     for(let i=0;i<28;i++)h+=ln(36,41.5,A0+(A1-A0)*i/27,'sg '+(i>=Math.round(28*ep/100)?'es':'as'),2.7,'stroke-opacity=".14"');
     L.forEach(v=>{h+=ln(29,33.5,fr(v),'c2s',.9);if(v+f/2<=w.max)h+=ln(31,33.5,fr(v+f/2),'c2s',.6);const q=Q(24.5,fr(v));h+='<g class="c2f">'+seg7(String(+v.toFixed(2)),q[0],+(q[1]-2.35).toFixed(2),.24,.26,'c',-6)+'</g>'});
-    h+=dig(50,41,.72,.83,'c',-6)+T(50,64.5,6,'c2f',nm,'font-weight="700"');
+    h+=dig(50,41,.72,.83,'c',-6)+T(50,64.5,6,'c2f',UPx(t(nm)),'font-weight="700"');
     if((w.xs||[]).length>=1)h+=T(50,74.6,2.6,'c2f',XL[w.xs[0]],'fill-opacity=".75"')+'<g class="xs c1f" data-i="0" data-p="50,76.2,.42,.42,c,0"></g>';
   }else{
     const A0=-128,A1=128,fr=v=>A0+(A1-A0)*(v-w.min)/(w.max-w.min),ghost=Math.abs(w.max).toFixed(dec(c)).replace(/[0-9]/g,'8');
