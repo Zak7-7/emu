@@ -56,6 +56,8 @@ button{font-weight:600}
 .bn{font-size:12cqmin;color:var(--pc,var(--mut))}
 .bv{color:var(--vc,var(--fg));font-size:40cqmin;font-weight:700;text-align:right;font-variant-numeric:tabular-nums;line-height:1}
 .bm{font-size:9cqmin;color:var(--pc,var(--mut));display:flex;justify-content:space-between}.bm b{color:var(--pc,var(--fg))}
+.w7 .bn{font-weight:700}.w7 .bv{height:40cqmin;display:flex;justify-content:flex-end}.w7 .bv svg{width:auto;height:100%;fill:currentColor}
+.w7 .bm b{display:inline-flex;height:1em;vertical-align:-.12em}.w7 .bm b svg{width:auto;height:100%;fill:currentColor}
 .al .bn,.al .bv,.al .gv{color:var(--al,var(--bad));fill:var(--al,var(--bad))}.al .nd{stroke:var(--al,var(--bad))}
 svg{width:100%;height:100%;display:block}
 .ta{fill:var(--arc,#ff2d2d);stroke:var(--arc,#ff2d2d)}.te{fill:var(--arce,#ff2d2d);stroke:var(--arce,#ff2d2d)}.ta,.te{stroke-width:.22;stroke-linejoin:round}
@@ -235,13 +237,17 @@ function val(c){return fromBase(c.k,bv(c))}
 const pt=a=>{const r=a*Math.PI/180;return(50+38*Math.sin(r)).toFixed(1)+' '+(55-38*Math.cos(r)).toFixed(1)};
 const pos=(d,w)=>{d.style.left=w.x+'%';d.style.top=w.y+'%';d.style.width=w.w+'%';d.style.height=w.h+'%'};
 
+// Κουτάκι στο θέμα LED τόξο: αριθμοί 7-segment με την ίδια κλίση (-6°) όπως στα όργανα
+function s7(el,s){if(!el||el._s===s)return;el._s=s;let tw=0;for(const ch of s)tw+=ch==='.'?4:12;tw-=2;
+  el.innerHTML='<svg viewBox="-1.5 -0.5 '+(tw+3).toFixed(1)+' 19">'+seg7(s,tw,0,1,1,'r',-6)+'</svg>'}
 function mk(w){
   if(w.t==='s')return mkS(w);
-  const c=M[w.k],d=document.createElement('div');d.className='w'+(w.t==='g'?' g':'');pos(d,w);
+  const c=M[w.k],d=document.createElement('div');d.className='w'+(w.t==='g'?' g':'')+(w.t==='b'&&thm()==='l'?' w7':'');pos(d,w);
   d.innerHTML=(w.t==='g'
    ?gsvg(eff(w),thm())
    :`<div class="bx"><div class="bn">${cn(c)}</div><div class="bv">-</div><div class="bm"><span>Min <b>-</b></span><span>Max <b>-</b></span></div></div>`)
    +'<div class="rz"></div>';
+  if(d.classList.contains('w7')){s7(d.querySelector('.bv'),'-');d.querySelectorAll('.bm b').forEach(b=>s7(b,'-'))}
   d.addEventListener('pointerdown',e=>drag(e,w,d));
   colors(d,w);d._w=w;refs.set(w,d);return d;
 }
@@ -479,6 +485,7 @@ setInterval(()=>{
     if(c.k==='afr'&&on(S.lean)&&bv(M.boost)>.2&&v>S.lean&&!ac)ac='#ff2d2d';
     d.classList.toggle('al',!!ac);if(ac)d.style.setProperty('--al',ac);
     if(w.t==='g')gupd(d,eff(w),c,v,m.b);
+    else if(d.classList.contains('w7')){s7(d.querySelector('.bv'),v.toFixed(dec(c)));const b=d.querySelectorAll('.bm b');s7(b[0],m.a.toFixed(dec(c)));s7(b[1],m.b.toFixed(dec(c)))}
     else{d.querySelector('.bv').textContent=v.toFixed(dec(c));const b=d.querySelectorAll('.bm b');b[0].textContent=m.a.toFixed(dec(c));b[1].textContent=m.b.toFixed(dec(c))}
   }
   const r=val(M.rpm);document.body.style.setProperty('--sl',S.col);
