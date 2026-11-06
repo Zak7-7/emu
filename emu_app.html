@@ -552,7 +552,8 @@ function dlgW(w,isNew){
     ['r_min','r_max'].forEach(i=>$('#'+i).style.display=g?'':'none');
     document.querySelectorAll('#dlg .rg').forEach(e=>e.style.display=g?'':'none');
     document.querySelectorAll('#dlg .rb').forEach(e=>e.style.display=g?'none':'');
-    if($('#f_k').value==='clk')['#f_nh','#f_mm'].forEach(i=>$(i).closest('label').style.display='none');
+    ['#f_lo','#f_hi'].forEach(i=>$(i).closest('label').style.display='');
+    if($('#f_k').value==='clk')['#f_nh','#f_mm','#f_lo','#f_hi','#f_pc'].forEach(i=>$(i).closest('label').style.display='none'); // ρολόι: χωρίς επικεφαλίδα, Min/Max, συναγερμούς, δεύτερο χρώμα
     if(mx){$('#r_xn').style.display=g?'':'none';const n=+$('#f_xn').value;$('#r_x1').style.display=g&&n>=1?'':'none';$('#r_x2').style.display=g&&n>=2?'':'none'}};
   $('#f_t').onchange=syncT;if(mx)$('#f_xn').onchange=syncT;syncT();
   $('#f_k').onchange=()=>{const c=M[$('#f_k').value];$('#f_min').value=dmin(c);$('#f_max').value=dmax(c);syncT()};syncT();
