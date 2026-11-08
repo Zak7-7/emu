@@ -556,11 +556,12 @@ function build(){
   pg.w.forEach(w=>st.appendChild(mk(w)));
 }
 // Τα στρογγυλά όργανα είναι τετράγωνα: το κουτί τους μικραίνει γύρω από το κέντρο ώστε να "αγκαλιάζει" το όργανο
+const ARW=w=>w.t==='g'?1:w.t==='r'?5:0; // αναλογία πλάτος/ύψος: στρογγυλό 1:1, μπάρα 5:1
 function sqG(w){
-  if(w.t!=='g')return false;
+  const A=ARW(w);if(!A)return false;
   const W=$('#stage').clientWidth,H=$('#stage').clientHeight;if(!W||!H)return false;
-  const pw=w.w*W/100,ph=w.h*H/100,s=Math.min(pw,ph);if(Math.abs(pw-ph)<2)return false;
-  const nw=s/W*100,nh=s/H*100;w.x+=(w.w-nw)/2;w.y+=(w.h-nh)/2;w.w=nw;w.h=nh;return true;
+  const pw=w.w*W/100,ph=w.h*H/100,qw=Math.min(pw,ph*A),qh=qw/A;if(Math.abs(pw-qw)<2&&Math.abs(ph-qh)<2)return false;
+  const nw=qw/W*100,nh=qh/H*100;w.x+=(w.w-nw)/2;w.y+=(w.h-nh)/2;w.w=nw;w.h=nh;return true;
 }
 function drag(e,w,d){
   if(!edit)return;
@@ -569,11 +570,11 @@ function drag(e,w,d){
   const m=ev=>{
     if(Math.abs(ev.clientX-sx)+Math.abs(ev.clientY-sy)>6)mv=true;
     const dx=rot?(ev.clientY-sy)/r.height*100:(ev.clientX-sx)/r.width*100,dy=rot?-(ev.clientX-sx)/r.width*100:(ev.clientY-sy)/r.height*100;
-    if(rz&&w.t==='g'){ // στρογγυλό όργανο: μεγαλώνει αναλογικά, το κουτί μένει τετράγωνο
-      const W=$('#stage').clientWidth,H=$('#stage').clientHeight;
-      let s=Math.max((o.w+dx)*W,(o.h+dy)*H)/100;
-      s=Math.max(Math.min(s,(100-w.x)*W/100,(100-w.y)*H/100),Math.min(W,H)*.15);
-      w.w=s/W*100;w.h=s/H*100}
+    if(rz&&ARW(w)){ // στρογγυλό όργανο / μπάρα: μεγαλώνει αναλογικά, το κουτί κρατάει το σχήμα του
+      const W=$('#stage').clientWidth,H=$('#stage').clientHeight,A=ARW(w);
+      let s=Math.max((o.w+dx)*W,(o.h+dy)*H*A)/100;
+      s=Math.max(Math.min(s,(100-w.x)*W/100,(100-w.y)*H/100*A),Math.min(W,H*A)*(A>1?.3:.15));
+      w.w=s/W*100;w.h=s/A/H*100}
     else if(rz){w.w=cl(sn(o.w+dx),10,100-w.x);w.h=cl(sn(o.h+dy),10,100-w.y)}
     else{w.x=cl(sn(o.x+dx),0,100-w.w);w.y=cl(sn(o.y+dy),0,100-w.h)}
     pos(d,w)};
