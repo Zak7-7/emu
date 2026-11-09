@@ -83,6 +83,11 @@ table{border-collapse:collapse;font-size:13px}th,td{padding:3px 4px;text-align:l
 .h{color:var(--mut);font-size:12px;margin:8px 0}
 #pa{font-size:24px;border:0;background:none;padding:2px 10px}
 #stage{touch-action:none}
+#rec{color:#ff3b30;font-size:12px;margin-left:10px;display:none;letter-spacing:1px}#rec.on{display:inline}
+.lgi{display:block;width:100%;text-align:left;background:#262626;border:1px solid #333;border-radius:12px;padding:10px 14px;margin:8px 0;color:#fff;font-size:15px}
+.lgi small{display:block;color:#9a9a9a;font-size:13px;margin-top:3px}
+.lgc{margin:10px 0 2px}.lgh{display:flex;gap:10px;align-items:baseline;font-size:13px;color:#cfcfcf;margin-bottom:3px}.lgh i{font-style:normal;color:#777;font-size:12px}.lgh b{margin-left:auto;color:#fff;font-variant-numeric:tabular-nums}
+.lgc svg{width:100%;height:70px;display:block;background:#161616;border-radius:8px;touch-action:pan-y}
 #tst{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#222;color:#fff;border:1px solid #555;border-radius:12px;padding:10px 16px;z-index:9;display:flex;gap:14px;align-items:center;font-size:15px;white-space:nowrap}
 #tst button{padding:6px 12px;font-size:14px;border-radius:9px;margin:0}
 .w.zf{animation:zf .7s}@keyframes zf{0%,100%{opacity:1}50%{opacity:.2}}
@@ -119,7 +124,7 @@ body.ls #mn button.mi{padding:8px 4px;font-size:16px}body.ls .mh img{width:54px}
 </head>
 <body>
 <div id="bgl"></div><div id="logo"></div><div id="splash"></div>
-<div id="top"><button id="hb">☰</button><button id="pa" style="display:none">＋</button><span id="st"></span></div>
+<div id="top"><button id="hb">☰</button><button id="pa" style="display:none">＋</button><span id="rec">● REC</span><span id="st"></span></div>
 <div id="stage"></div>
 <div id="mn"></div>
 <div id="dlg"></div><div id="sp"></div>
@@ -172,7 +177,40 @@ const TL={on:false,no:false,u:null,t:0,v:null,f:null,sp:null,spT:0,a:0,ecu:0,gps
     const p=cl(Math.tan(Math.atan2(uf,uu))*100,-60,60);this.v=this.v==null?p:this.v+k*(p-this.v)},
   zero(){if(!this.u)return false;const n=Math.hypot(...this.u);if(n<5)return false;S.grd0=this.u.map(q=>q/n);this.v=null;save();return true}
 };
-addEventListener('pointerdown',()=>{if(!TL.on&&TL.need())TL.start()},true); // iPhone: η άδεια θέλει άγγιγμα
+addEventListener('pointerdown',()=>{if(!TL.on&&TL.need())TL.start()},true);
+// ---- Καταγραφή διαδρομής (logs) ----
+const LCH=['rpm','map','boost','tps','ect','iat','afr','bat','spd','grd'];
+const LCOL={rpm:'#ff4d4d',map:'#ffa64d',boost:'#ffd24d',tps:'#7dd87d',ect:'#4dc3ff',iat:'#a78bfa',afr:'#ff7ab6',bat:'#cfcfcf',spd:'#4dffd2',grd:'#9ad04d'};
+const LOG={cur:null,runT:0,offT:0,lastS:0,lastF:0,db:null,MAX:50,
+  idb(){return this.db||(this.db=new Promise((ok,ko)=>{const r=indexedDB.open('emulogs',1);r.onupgradeneeded=()=>{const d=r.result;d.createObjectStore('logs',{keyPath:'id'});d.createObjectStore('meta',{keyPath:'id'})};r.onsuccess=()=>ok(r.result);r.onerror=()=>ko(r.error)}))},
+  async tx(st,mode,fn){const db=await this.idb();return new Promise((ok,ko)=>{const t=db.transaction(st,mode);const r=fn(...st.map(n=>t.objectStore(n)));t.oncomplete=()=>ok(r&&r.result);t.onerror=()=>ko(t.error)})},
+  put(c){const m={id:c.id,t0:c.t0,end:c.end,s:c.s};return this.tx(['logs','meta'],'readwrite',(l,me)=>{l.put(c);me.put(m)})},
+  del(id){return this.tx(['logs','meta'],'readwrite',(l,me)=>{l.delete(id);me.delete(id)})},
+  list(){return this.tx(['meta'],'readonly',me=>me.getAll())},
+  get(id){return this.tx(['logs'],'readonly',l=>l.get(id))},
+  live(){return demo?!!S.logDemo:Date.now()-BT.last<2000}, // υπάρχουν φρέσκα δεδομένα από τον εγκέφαλο
+  tick(){ // κάθε 100 ms από τον κύριο βρόχο
+    if(S.logOff){if(this.cur)this.stop();return}
+    const now=Date.now(),r=this.live()?bv(M.rpm):null,run=r!=null&&r>300;
+    if(!this.cur){if(run){if(!this.runT)this.runT=now;else if(now-this.runT>2000)this.start(now)}else this.runT=0;return}
+    if(run)this.offT=0;else{if(!this.offT)this.offT=now;else if(now-this.offT>3000){this.stop();return}} // σβηστός κινητήρας ή χωρίς σήμα για 3 s
+    if(now-this.lastS>=200){this.lastS=now;this.add(now)} // 5 δείγματα το δευτερόλεπτο
+    if(now-this.lastF>30000){this.lastF=now;this.flush()} // αποθήκευση κάθε 30 s, για να μη χαθεί αν κλείσει η εφαρμογή
+  },
+  start(now){const c={id:now,t0:now,end:now,t:[],ch:{}};LCH.forEach(k=>c.ch[k]=[]);this.cur=c;this.lastF=now;this.offT=0;recUI()},
+  add(now){const c=this.cur;c.t.push(now-c.t0);c.end=now;for(const k of LCH){const v=bv(M[k]);c.ch[k].push(v==null||isNaN(v)?null:Math.round(v*100)/100)}},
+  sum(c){const s={dur:(c.end-c.t0)/1000,mx:{},mn:{},km:0};
+    for(const k of LCH){let a=Infinity,b=-Infinity;for(const v of c.ch[k])if(v!=null){if(v<a)a=v;if(v>b)b=v}if(b>-Infinity){s.mn[k]=a;s.mx[k]=b}}
+    const sp=c.ch.spd;for(let i=1;i<c.t.length;i++)if(sp[i]!=null)s.km+=sp[i]*(c.t[i]-c.t[i-1])/3.6e6;c.s=s;return c},
+  flush(){if(this.cur&&this.cur.t.length)this.put(this.sum(this.cur)).catch(()=>{})},
+  async stop(){const c=this.cur;this.cur=null;this.runT=0;this.offT=0;recUI();if(!c)return;
+    while(c.t.length>1&&!(c.ch.rpm[c.t.length-1]>300)){c.t.pop();LCH.forEach(k=>c.ch[k].pop())}c.end=c.t0+(c.t[c.t.length-1]||0); // χωρίς τα δευτερόλεπτα με σβηστό κινητήρα
+    if(c.end-c.t0<20000){this.del(c.id).catch(()=>{});return} // κάτω από 20 s: δεν κρατιέται
+    try{await this.put(this.sum(c));const a=await this.list();a.sort((x,y)=>y.id-x.id);for(const m of a.slice(this.MAX))await this.del(m.id)}catch(e){toast('Η καταγραφή δεν αποθηκεύτηκε');return}
+    toast('Η διαδρομή αποθηκεύτηκε');if($('#lg_list'))logList()}
+};
+function recUI(){const e=$('#rec');if(e)e.classList.toggle('on',!!LOG.cur)}
+addEventListener('visibilitychange',()=>{if(document.hidden)LOG.flush()});addEventListener('pagehide',()=>LOG.flush()); // iPhone: η άδεια θέλει άγγιγμα
 const hhmm=()=>{const n=new Date();return String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')};
 let S={};try{S=JSON.parse(localStorage.getItem('emudash2'))||{}}catch(e){}
 S.pages=S.pages||[{n:'Σελίδα 1',w:[]}];while(S.pages.length<3)S.pages.push({n:'Σελίδα '+(S.pages.length+1),w:[]});S.cur=S.cur||0;if(S.cur>=S.pages.length)S.cur=0;S.ch=S.ch||{};
@@ -182,6 +220,7 @@ const get=(c,f)=>{const v=(S.ch[c.k]||{})[f];return v!==undefined?v:c[f]};
 // Γλώσσα / Language
 if(!S.lang)S.lang=(navigator.language||'').slice(0,2)==='el'?'el':'en';
 const DICT=[
+['Καταγραφές (logs)','Logs'],['Αυτόματη καταγραφή','Automatic logging'],['Καταγραφή και στο Demo (για δοκιμή)','Log in Demo too (for testing)'],['Αποθηκευμένες διαδρομές','Saved drives'],['Εγγραφή τώρα','Recording now'],['Η αυτόματη καταγραφή είναι κλειστή.','Automatic logging is off.'],['Αναμονή: η καταγραφή ξεκινάει μόλις πάρει μπροστά ο κινητήρας.','Waiting: logging starts as soon as the engine starts.'],['Η καταγραφή ξεκινάει μόνη της όταν πάρει μπροστά ο κινητήρας και αποθηκεύεται όταν σβήσει. Κρατιούνται οι τελευταίες 50 διαδρομές, οι παλιότερες σβήνονται αυτόματα.','Logging starts by itself when the engine starts and is saved when it stops. The last 50 drives are kept; older ones are deleted automatically.'],['Δεν υπάρχουν ακόμα καταγραφές.','No logs yet.'],['Διάρκεια','Duration'],['Απόσταση','Distance'],['Max νερό','Max coolant'],['‹ Λίστα','‹ List'],['Αποστολή CSV','Send CSV'],['Σύρε το δάχτυλο πάνω στα γραφήματα για να δεις τις τιμές.','Drag your finger over the charts to see the values.'],['Δεν υπάρχουν δεδομένα.','No data.'],['Διαγραφή αυτής της καταγραφής;','Delete this log?'],['Η καταγραφή είναι σε εξέλιξη','Logging is in progress'],['Η διαδρομή αποθηκεύτηκε','Drive saved'],['Η καταγραφή δεν αποθηκεύτηκε','The log could not be saved'],['Η καταγραφή δεν βρέθηκε','Log not found'],['Η αποστολή απέτυχε','Sending failed'],
 ['Μηδενισμός κλίσης','Zero grade'],['Σταμάτα πρώτα το αυτοκίνητο','Stop the car first'],['Κλίση: 0 ✓','Grade: 0 ✓'],['Αναίρεση','Undo'],['Ο μηδενισμός αναιρέθηκε','Zero undone'],['Γρήγορος μηδενισμός: κράτα πατημένο το κουτάκι της κλίσης για 1 δευτερόλεπτο, ή Μενού → «Μηδενισμός κλίσης».','Quick zero: hold the grade tile for 1 second, or Menu → “Zero grade”.'],
 ['Στεφάνι (ring)','Ring'],['Κλίση δρόμου %','Road grade %'],['Κλίση δρόμου','Road grade'],['Κλίση %','Grade %'],['Κλίση τώρα','Grade now'],['Μηδενισμός','Zero'],['Κάνε μηδενισμό','Press Zero'],['Το κινητό πρέπει να είναι σταθερό στη βάση του, με την οθόνη προς τον οδηγό. Σταμάτα το αυτοκίνητο σε επίπεδο σημείο και πάτα «Μηδενισμός». Ξανά μηδενισμός κάθε φορά που αλλάζεις τη θέση του κινητού.','The phone must be fixed in its mount, screen facing the driver. Stop the car on level ground and press “Zero”. Zero again whenever you move the phone.'],['Διόρθωση επιτάχυνσης με GPS','Acceleration correction with GPS'],['Χωρίς διόρθωση, στο γκάζι η κλίση δείχνει ανηφόρα και στο φρένο κατηφόρα. Αν ο εγκέφαλος στέλνει ταχύτητα, χρησιμοποιείται αυτή αντί για το GPS.','Without correction, throttle reads as uphill and braking as downhill. If the ECU sends speed, it is used instead of GPS.'],['Αντιστροφή (αν η ανηφόρα βγαίνει με μείον)','Invert (if uphill shows minus)'],['Για να τη δείξεις στην οθόνη: Επεξεργασία Layout → νέο Κουτάκι → Κανάλι «Κλίση δρόμου %».','To show it: Edit Layout → new Tile → Channel “Road grade %”.'],['Έγινε. Η τωρινή θέση είναι πλέον 0 %.','Done. The current position is now 0 %.'],['Δεν βρέθηκαν αισθητήρες κίνησης σε αυτή τη συσκευή.','No motion sensors found on this device.'],
 ['Πλαίσιο (border)','Border'],['Εμφάνιση τιμής δεξιά','Show value on the right'],['Μπάρα','Bar'],['Ρολόι (ώρα)','Clock (time)'],['Εμφάνιση επικεφαλίδας','Show title'],['Ώρα','Time'],['Χρώμα φόντου οργάνου','Gauge face color'],['Χωρίς φόντο (διάφανο)','No face (transparent)'],['Εμφάνιση Min / Max','Show Min / Max'],['Περίγραμμα οργάνου (στεφάνι και μαύρο φόντο)','Gauge bezel (ring and black background)'],['＋ Νέο αυτοκίνητο','＋ New car'],['Νέο αυτοκίνητο','New car'],['Το αυτοκίνητό μου','My car'],['Διαγραφή αυτοκινήτου','Delete car'],['Διαγραφή του αυτοκινήτου «','Delete car «'],['Όνομα / μοντέλο','Name / model'],['Βρες τα στοιχεία','Find the specs'],['6 ταχ.','6-spd'],['Το κουμπί ανοίγει αναζήτηση στον browser. Βρες βάρος, ελαστικό, σχέσεις κιβωτίου και τελική σχέση και συμπλήρωσέ τα από κάτω.','The button opens a web search. Find weight, tyre size, gear ratios and final drive and enter them below.'],[' Οι τιμές του προτύπου είναι από δημόσιες προδιαγραφές: έλεγξέ τες με τα δικά σου (π.χ. ελαστικά, διαφορικό).',' The preset values come from public specs: check them against your own car (e.g. tyres, final drive).'],['Αυτοκίνητο','Car'],
@@ -587,6 +626,7 @@ function drag(e,w,d){
 }
 setInterval(()=>{
   if(demo)sim();
+  LOG.tick();{const e=$('#lg_st');if(e)lgStat(e)}
   if(!TL.on&&!TL.ios&&TL.need())TL.start();
   if(TL.on&&!demo){const sv=bv(M.spd);if(sv!=null){TL.ecu=Date.now();TL.spd(sv/3.6,Date.now())}else if(Date.now()-TL.ecu>2000)TL.ecu=0}
   {const e=$('#gr_v');if(e){const v=bv(GRD);e.textContent=v==null?(S.grd0||demo?'-':t('Κάνε μηδενισμό')):(v>0?'+':'')+v.toFixed(1)+' %'}}
@@ -1132,6 +1172,7 @@ function dyHist(){
 
 // Μενού
 const IC={
+log:'<path d="M3 16l5-6 4 4 4-7 5 6"/><path d="M3 20.5h18"/>',
 grade:'<path d="M3 18L20 8.5"/><path d="M3 18h18"/><path d="M14.5 18a6 6 0 0 0-.9-3.1"/>',
 dyno:'<path d="M3.5 17a8.5 8.5 0 0 1 17 0"/><path d="M12 17l4.2-5.2"/><circle cx="12" cy="17" r="1.4"/><path d="M6 13.5l1 .6M8.5 9.6l.6 1M12 8.5v1.2M15.5 9.6l-.6 1"/>',
 edit:'<path d="M3 16a9 9 0 0 1 15-6"/><path d="M11 13l2-4"/><path d="M13 21l7-7 2 2-7 7h-2z"/>',
@@ -1151,7 +1192,8 @@ function menu(){
    ['conn','wifi','Συνδεσιμότητα',BT.want?[['c','Σύνδεση Bluetooth'],['x','Αποσύνδεση']]:[['c','Σύνδεση Bluetooth']]],
    ['skins','palette','Skins',[['t','Θέμα οργάνων'],['b','Φόντο και logo']]],
    ['set','gear','Ρυθμίσεις',[['o','Προσανατολισμός οθόνης'],['k','Βαθμονόμηση καναλιών'],['gr','Κλίση δρόμου'],['d','Demo'],['lg','🌐 Ελληνικά / English'],['r','Επαναφορά όλων']]],
-   ['dyno','dyno','Dyno / Ιπποδύναμη',[['dr','Νέα μέτρηση'],['dc','Στοιχεία αυτοκινήτου'],['dh','Αποθηκευμένες μετρήσεις']]]];
+   ['dyno','dyno','Dyno / Ιπποδύναμη',[['dr','Νέα μέτρηση'],['dc','Στοιχεία αυτοκινήτου'],['dh','Αποθηκευμένες μετρήσεις']]],
+   ['logs','log','Καταγραφές (logs)']];
   let h='<div class="mh">'+LOGO.replace(/style="[^"]*"/,'')+'<div class="ml"></div></div>';
   for(const [k,i,n,subs] of T){
     h+='<button class="mi" data-cat="'+k+'">'+ic(i)+'<span>'+n+'</span></button>';
@@ -1193,6 +1235,74 @@ function grdZero(d){TL.start();
     if(demo)raw.grd=0;
     const flash=()=>{for(const [w,el] of refs)if(w.k==='grd'&&el.isConnected){el.classList.remove('zf');void el.offsetWidth;el.classList.add('zf')}};flash();
     toast('Κλίση: 0 ✓','Αναίρεση',()=>{S.grd0=old;TL.f=null;TL.v=null;save();toast('Ο μηδενισμός αναιρέθηκε')},5000)},TL.u?0:600)}
+// ---- Σελίδες καταγραφής ----
+const fmtD=s=>{s=Math.max(0,Math.round(s));const hh=Math.floor(s/3600),mi=Math.floor(s%3600/60),ss=s%60;return(hh?hh+':'+String(mi).padStart(2,'0'):mi)+':'+String(ss).padStart(2,'0')};
+const fmtW=ms=>new Date(ms).toLocaleString(S.lang==='en'?'en-GB':'el-GR',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+const lfm=(k,v)=>v==null||isNaN(v)?'-':(+v).toFixed(dec(M[k]));
+function lgStat(e){const c=LOG.cur,k=c?'r':S.logOff?'o':'w';
+  if(e._k!==k){e._k=k;e.innerHTML=k==='r'?'<span style="color:#ff3b30">●</span> <span>Εγγραφή τώρα</span> <b></b>':k==='o'?'<span>Η αυτόματη καταγραφή είναι κλειστή.</span>':'<span>Αναμονή: η καταγραφή ξεκινάει μόλις πάρει μπροστά ο κινητήρας.</span>'}
+  if(c){const b=e.querySelector('b'),s=fmtD((c.end-c.t0)/1000);if(b.textContent!==s)b.textContent=s}}
+function logPage(){
+  const o=(v,l,c)=>'<option value="'+v+'"'+(c===v?' selected':'')+'>'+l+'</option>';
+  openSP('Καταγραφές (logs)','<div class="dym" id="lg_st"></div>'
+    +'<label>Αυτόματη καταγραφή</label><select id="lg_on">'+o('1','Ναι',S.logOff?'0':'1')+o('0','Όχι',S.logOff?'0':'1')+'</select>'
+    +'<div class="dym">Η καταγραφή ξεκινάει μόνη της όταν πάρει μπροστά ο κινητήρας και αποθηκεύεται όταν σβήσει. Κρατιούνται οι τελευταίες 50 διαδρομές, οι παλιότερες σβήνονται αυτόματα.</div>'
+    +'<label>Καταγραφή και στο Demo (για δοκιμή)</label><select id="lg_dm">'+o('0','Όχι',S.logDemo?'1':'0')+o('1','Ναι',S.logDemo?'1':'0')+'</select>'
+    +'<label>Αποθηκευμένες διαδρομές</label><div id="lg_list"></div>');
+  lgStat($('#lg_st'));
+  $('#lg_on').onchange=e=>{S.logOff=e.target.value==='0'||undefined;save()};
+  $('#lg_dm').onchange=e=>{S.logDemo=e.target.value==='1'||undefined;save()};
+  logList();
+}
+async function logList(){const e=$('#lg_list');if(!e)return;let a=[];try{a=await LOG.list()}catch(x){}
+  a.sort((x,y)=>y.id-x.id);
+  if(!a.length){e.innerHTML='<div class="dym">Δεν υπάρχουν ακόμα καταγραφές.</div>';return}
+  e.innerHTML='';for(const m of a){const s=m.s||{mx:{}},u=UN(),b=document.createElement('button');b.className='lgi';
+    const parts=[fmtD(s.dur)];if(s.km>.05)parts.push(fromBase('spd',s.km).toFixed(1)+(u.s==='mph'?' mi':' km'));
+    if(s.mx.rpm!=null)parts.push('max '+Math.round(s.mx.rpm)+' rpm');if(s.mx.boost!=null)parts.push('boost '+lfm('boost',fromBase('boost',s.mx.boost))+' '+u.p);
+    if(s.mx.ect!=null)parts.push(lfm('ect',fromBase('ect',s.mx.ect))+'°'+u.t);
+    b.innerHTML='<span></span>'+(LOG.cur&&LOG.cur.id===m.id?' <span style="color:#ff3b30">●</span>':'')+'<small></small>';b.firstChild.textContent=fmtW(m.t0);b.querySelector('small').textContent=parts.join(' · ');
+    b.onclick=()=>logView(m.id);e.appendChild(b)}}
+const LNM=()=>{const u=UN();return{rpm:'RPM',map:'MAP ('+u.p+' abs)',boost:'Boost ('+u.p+')',tps:'TPS (%)',ect:'ECT (°'+u.t+')',iat:'IAT (°'+u.t+')',afr:'AFR',bat:'Battery (V)',spd:'Speed ('+(u.s==='mph'?'mph':'km/h')+')',grd:'Grade (%)'}};
+async function logView(id){
+  let l=null;try{l=(LOG.cur&&LOG.cur.id===id)?LOG.sum(LOG.cur):await LOG.get(id)}catch(x){}
+  if(!l){toast('Η καταγραφή δεν βρέθηκε');return}
+  const s=l.s,n=l.t.length,u=UN(),ks=LCH.filter(k=>s.mx[k]!=null),B=Math.min(600,n),TT=l.t[n-1]||1,bk=new Int32Array(B+1); // κάδοι με βάση τον χρόνο
+  {let j=0;for(let b=0;b<=B;b++){const lim=b*TT/B;while(j<n&&l.t[j]<lim)j++;bk[b]=j}bk[B]=n}
+  const tl=(lab,v)=>'<div><small>'+lab+'</small><b>'+v+'</b></div>';
+  let sm=tl('Διάρκεια',fmtD(s.dur));if(s.km>.05)sm+=tl('Απόσταση',fromBase('spd',s.km).toFixed(1)+(u.s==='mph'?' mi':' km'));
+  if(s.mx.rpm!=null)sm+=tl('Max rpm',Math.round(s.mx.rpm));if(s.mx.boost!=null)sm+=tl('Max boost',lfm('boost',fromBase('boost',s.mx.boost))+' '+u.p);
+  if(s.mx.ect!=null)sm+=tl('Max νερό',lfm('ect',fromBase('ect',s.mx.ect))+'°'+u.t);if(s.mx.iat!=null)sm+=tl('Max IAT',lfm('iat',fromBase('iat',s.mx.iat))+'°'+u.t);
+  if(s.mx.afr!=null)sm+=tl('AFR min–max',lfm('afr',s.mn.afr)+' – '+lfm('afr',s.mx.afr));
+  let ch='';
+  for(const k of ks){const a=l.ch[k];let mn=fromBase(k,s.mn[k]),mx=fromBase(k,s.mx[k]);if(mx-mn<1e-9){mx+=1;mn-=1}
+    const Y=v=>(86-(fromBase(k,v)-mn)/(mx-mn)*82).toFixed(1);let p='';
+    for(let b=0;b<B;b++){const i0=bk[b],i1=bk[b+1];let a0=null,a1=null;
+      for(let i=i0;i<i1;i++){const v=a[i];if(v==null)continue;if(a0==null||v<a0)a0=v;if(a1==null||v>a1)a1=v}
+      if(a0==null)continue;const x=(B>1?(b+.5)/B*600:300).toFixed(1);p+=x+','+Y(a0)+' '+(a1!==a0?x+','+Y(a1)+' ':'')}
+    ch+='<div class="lgc"><div class="lgh"><span>'+cn(M[k])+'</span><i>'+lfm(k,mn)+' – '+lfm(k,mx)+'</i><b data-k="'+k+'">-</b></div><svg viewBox="0 0 600 90" preserveAspectRatio="none"><polyline points="'+p+'" fill="none" stroke="'+LCOL[k]+'" stroke-width="1.6" vector-effect="non-scaling-stroke"/><line class="lcur" x1="-10" x2="-10" y1="0" y2="90" stroke="#fff" stroke-opacity=".7" vector-effect="non-scaling-stroke"/></svg></div>'}
+  openSP(fmtW(l.t0),'<div class="dyb"><button id="lv_b">‹ Λίστα</button><button id="lv_csv" class="pri">Αποστολή CSV</button><button id="lv_del">Διαγραφή</button></div>'
+    +'<div class="dyt">'+sm+'</div><div class="dym"><span>Σύρε το δάχτυλο πάνω στα γραφήματα για να δεις τις τιμές.</span> <b id="lv_t"></b></div><div id="lv_c">'+(ch||'<div class="dym">Δεν υπάρχουν δεδομένα.</div>')+'</div>');
+  $('#lv_b').onclick=logPage;
+  $('#lv_del').onclick=async()=>{if(!confirm(t('Διαγραφή αυτής της καταγραφής;')))return;if(LOG.cur&&LOG.cur.id===id){toast('Η καταγραφή είναι σε εξέλιξη');return}await LOG.del(id).catch(()=>{});logPage()};
+  $('#lv_csv').onclick=()=>{const N=LNM(),rows=['time_s,'+ks.map(k=>N[k]).join(',')];
+    for(let i=0;i<n;i++)rows.push((l.t[i]/1000).toFixed(1)+','+ks.map(k=>{const v=l.ch[k][i];return v==null?'':(+fromBase(k,v).toFixed(3))}).join(','));
+    const d=new Date(l.t0),p2=x=>String(x).padStart(2,'0');
+    shareFile('ecu-log_'+d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())+'_'+p2(d.getHours())+p2(d.getMinutes())+'.csv',rows.join('\r\n'),'text/csv')};
+  const w=$('#lv_c'),upd=ev=>{const sv=w.querySelector('svg');if(!sv||!n)return;const r=sv.getBoundingClientRect(),q=cl((ev.clientX-r.left)/r.width,0,1),tq=q*TT;let i=0;{let lo=0,hi=n-1;while(lo<hi){const m=(lo+hi)>>1;if(l.t[m]<tq)lo=m+1;else hi=m}i=lo;if(i>0&&tq-l.t[i-1]<l.t[i]-tq)i--}
+    w.querySelectorAll('.lcur').forEach(L=>{L.setAttribute('x1',q*600);L.setAttribute('x2',q*600)});
+    w.querySelectorAll('b[data-k]').forEach(b=>{const k=b.dataset.k,v=l.ch[k][i];b.textContent=v==null?'-':lfm(k,fromBase(k,v))});
+    $('#lv_t').textContent=fmtD(l.t[i]/1000)};
+  w.onpointerdown=e=>{upd(e);w.onpointermove=upd};w.onpointerup=w.onpointercancel=()=>{w.onpointermove=null};
+}
+// Αποστολή αρχείου: στο Android με το παράθυρο κοινοποίησης (email, Drive, Viber…), αλλιώς share ή κατέβασμα
+async function shareFile(name,txt,type){const C=window.CapFS;
+  try{
+    if(isNative()&&C){const r=await C.Filesystem.writeFile({path:name,data:txt,directory:C.Directory.Cache,encoding:C.Encoding.UTF8});await C.Share.share({title:name,files:[r.uri]});return}
+    const fl=new File([txt],name,{type});
+    if(navigator.canShare&&navigator.canShare({files:[fl]})){try{await navigator.share({files:[fl],title:name});return}catch(e){if(e.name==='AbortError')return}}
+    const a=document.createElement('a');a.href=URL.createObjectURL(fl);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500)
+  }catch(e){if(!/cancel/i.test(String(e&&e.message)))toast('Η αποστολή απέτυχε')}}
 function gradePage(){
   const o=(v,l,c)=>'<option value="'+v+'"'+(c===v?' selected':'')+'>'+l+'</option>';TL.start();
   openSP('Κλίση δρόμου','<div class="dyt"><div><small>Κλίση τώρα</small><b id="gr_v">-</b></div></div>'
@@ -1237,6 +1347,7 @@ $('#mn').addEventListener('click',e=>{
   if(b.dataset.cat){const k=b.dataset.cat;
     if(k==='edit'){cm();edit=true;build()}
     else if(k==='grz'){cm();grdZero()}
+    else if(k==='logs'){cm();logPage()}
     else if(k==='units'){cm();unitsPage()}
     else{oc=oc===k?null:k;menu()}
     return}
