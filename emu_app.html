@@ -1238,6 +1238,7 @@ function grdZero(d){TL.start();
 // ---- Σελίδες καταγραφής ----
 const fmtD=s=>{s=Math.max(0,Math.round(s));const hh=Math.floor(s/3600),mi=Math.floor(s%3600/60),ss=s%60;return(hh?hh+':'+String(mi).padStart(2,'0'):mi)+':'+String(ss).padStart(2,'0')};
 const fmtW=ms=>new Date(ms).toLocaleString(S.lang==='en'?'en-GB':'el-GR',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+const hms=ms=>{const d=new Date(ms),p=x=>String(x).padStart(2,'0');return p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds())};
 const lfm=(k,v)=>v==null||isNaN(v)?'-':(+v).toFixed(dec(M[k]));
 function lgStat(e){const c=LOG.cur,k=c?'r':S.logOff?'o':'w';
   if(e._k!==k){e._k=k;e.innerHTML=k==='r'?'<span style="color:#ff3b30">●</span> <span>Εγγραφή τώρα</span> <b></b>':k==='o'?'<span>Η αυτόματη καταγραφή είναι κλειστή.</span>':'<span>Αναμονή: η καταγραφή ξεκινάει μόλις πάρει μπροστά ο κινητήρας.</span>'}
@@ -1285,14 +1286,14 @@ async function logView(id){
     +'<div class="dyt">'+sm+'</div><div class="dym"><span>Σύρε το δάχτυλο πάνω στα γραφήματα για να δεις τις τιμές.</span> <b id="lv_t"></b></div><div id="lv_c">'+(ch||'<div class="dym">Δεν υπάρχουν δεδομένα.</div>')+'</div>');
   $('#lv_b').onclick=logPage;
   $('#lv_del').onclick=async()=>{if(!confirm(t('Διαγραφή αυτής της καταγραφής;')))return;if(LOG.cur&&LOG.cur.id===id){toast('Η καταγραφή είναι σε εξέλιξη');return}await LOG.del(id).catch(()=>{});logPage()};
-  $('#lv_csv').onclick=()=>{const N=LNM(),rows=['time_s,'+ks.map(k=>N[k]).join(',')];
-    for(let i=0;i<n;i++)rows.push((l.t[i]/1000).toFixed(1)+','+ks.map(k=>{const v=l.ch[k][i];return v==null?'':(+fromBase(k,v).toFixed(3))}).join(','));
+  $('#lv_csv').onclick=()=>{const N=LNM(),rows=['time_s,clock,'+ks.map(k=>N[k]).join(',')];
+    for(let i=0;i<n;i++)rows.push((l.t[i]/1000).toFixed(1)+','+hms(l.t0+l.t[i])+','+ks.map(k=>{const v=l.ch[k][i];return v==null?'':(+fromBase(k,v).toFixed(3))}).join(','));
     const d=new Date(l.t0),p2=x=>String(x).padStart(2,'0');
     shareFile('ecu-log_'+d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())+'_'+p2(d.getHours())+p2(d.getMinutes())+'.csv',rows.join('\r\n'),'text/csv')};
   const w=$('#lv_c'),upd=ev=>{const sv=w.querySelector('svg');if(!sv||!n)return;const r=sv.getBoundingClientRect(),q=cl((ev.clientX-r.left)/r.width,0,1),tq=q*TT;let i=0;{let lo=0,hi=n-1;while(lo<hi){const m=(lo+hi)>>1;if(l.t[m]<tq)lo=m+1;else hi=m}i=lo;if(i>0&&tq-l.t[i-1]<l.t[i]-tq)i--}
     w.querySelectorAll('.lcur').forEach(L=>{L.setAttribute('x1',q*600);L.setAttribute('x2',q*600)});
     w.querySelectorAll('b[data-k]').forEach(b=>{const k=b.dataset.k,v=l.ch[k][i];b.textContent=v==null?'-':lfm(k,fromBase(k,v))});
-    $('#lv_t').textContent=fmtD(l.t[i]/1000)};
+    $('#lv_t').textContent=fmtD(l.t[i]/1000)+'  ·  '+hms(l.t0+l.t[i])}; // χρόνος από την αρχή + ώρα της ημέρας
   w.onpointerdown=e=>{upd(e);w.onpointermove=upd};w.onpointerup=w.onpointercancel=()=>{w.onpointermove=null};
 }
 // Αποστολή αρχείου: στο Android με το παράθυρο κοινοποίησης (email, Drive, Viber…), αλλιώς share ή κατέβασμα
