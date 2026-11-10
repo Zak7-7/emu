@@ -137,17 +137,30 @@ const on=x=>x!=null&&x!=='';
 const thm=()=>{const t=S.theme;return!t||t==='c'||t==='s'?'l':t};
 const eff=w=>w.k==='rpm'&&S.rpmMax?Object.assign({},w,{max:S.rpmMax}):w;
 const cl=(v,a,b)=>Math.max(a,Math.min(b,v)),sn=v=>Math.round(v/2)*2;
-// ok=1 σίγουρο, ok=0 υπόθεση. Τα ID είναι hex όπως στην αναφορά του καταγραφέα.
+// Χάρτης καναλιών από το XML του λογισμικού EMU (XML\Log\version1_xxx.xml, ίδιος σε όλα τα firmware). Τιμή = ωμή × s + o.
+// sg: 8 = προσημασμένο byte (sbyte), 16 = προσημασμένο 16-bit (sword). ID σε hex όπως στην αναφορά του καταγραφέα.
 const DEF=[
 {k:'rpm',n:'rpm',id:1,s:1,o:0,d:0,ok:1,min:0,max:8000},
 {k:'map',n:'MAP kPa',id:2,s:1,o:0,d:0,ok:1,min:0,max:300},
-{k:'boost',n:'Boost bar ?',d:2,ok:0,min:-1,max:2},
+{k:'boost',n:'Boost bar',d:2,ok:1,min:-1,max:2},
 {k:'tps',n:'TPS %',id:3,s:1,o:0,d:0,ok:1,min:0,max:100},
-{k:'ect',n:'Νερό °C ?',id:6,s:1,o:0,d:0,ok:0,min:40,max:120},
-{k:'iat',n:'IAT °C ?',id:4,s:1,o:0,d:0,ok:0,min:0,max:80},
-{k:'afr',n:'AFR ?',id:0x10,s:.1,o:0,d:1,ok:0,min:8,max:20},
-{k:'bat',n:'Μπαταρία V ?',id:5,s:.027,o:0,d:1,ok:0,min:8,max:16},
-{k:'spd',n:'km/h ?',id:null,s:1,o:0,d:0,ok:0,min:0,max:260}
+{k:'ect',n:'Νερό °C',id:0x18,sg:16,s:1,o:0,d:0,ok:1,min:40,max:120},
+{k:'iat',n:'IAT °C',id:4,sg:8,s:1,o:0,d:0,ok:1,min:0,max:80},
+{k:'afr',n:'AFR',id:0x0C,s:.1,o:0,d:1,ok:1,min:8,max:20},
+{k:'lam',n:'Lambda',id:0x1B,s:1/128,o:0,d:2,ok:1,min:.6,max:1.4},
+{k:'bat',n:'Μπαταρία V',id:5,s:1/37,o:0,d:1,ok:1,min:8,max:16},
+{k:'spd',n:'Ταχύτητα km/h',id:0x1C,s:.25,o:0,d:0,ok:1,min:0,max:260},
+{k:'gear',n:'Ταχύτητα κιβωτίου',id:0x0D,sg:8,s:1,o:0,d:0,ok:1,min:0,max:6},
+{k:'ign',n:'Ανάφλεξη °',id:6,sg:8,s:.5,o:0,d:1,ok:1,min:-10,max:50},
+{k:'knock',n:'Knock V',id:0x0A,s:1/51,o:0,d:2,ok:1,min:0,max:5},
+{k:'egt1',n:'EGT1 °C',id:8,s:1,o:0,d:0,ok:1,min:0,max:1100},
+{k:'egt2',n:'EGT2 °C',id:9,s:1,o:0,d:0,ok:1,min:0,max:1100},
+{k:'oilt',n:'Λάδι °C',id:0x16,s:1,o:0,d:0,ok:1,min:40,max:150},
+{k:'oilp',n:'Πίεση λαδιού bar',id:0x15,s:1/16,o:0,d:1,ok:1,min:0,max:8},
+{k:'fuelp',n:'Πίεση καυσίμου bar',id:0x17,s:1/32,o:0,d:1,ok:1,min:0,max:6},
+{k:'injdc',n:'Duty μπεκ %',id:0x13,s:.5,o:0,d:0,ok:1,min:0,max:100},
+{k:'emut',n:'Θερμ. εγκεφάλου °C',id:0x14,sg:8,s:1,o:0,d:0,ok:1,min:0,max:100},
+{k:'baro',n:'Baro kPa',id:0x0E,s:1,o:0,d:0,ok:1,min:80,max:110}
 ];
 const M={};DEF.forEach(c=>M[c.k]=c);
 const CLK={k:'clk',n:'Ώρα',d:0,min:0,max:0};M.clk=CLK; // ρολόι: μόνο για κουτάκια
@@ -179,8 +192,8 @@ const TL={on:false,no:false,u:null,t:0,v:null,f:null,sp:null,spT:0,a:0,ecu:0,gps
 };
 addEventListener('pointerdown',()=>{if(!TL.on&&TL.need())TL.start()},true);
 // ---- Καταγραφή διαδρομής (logs) ----
-const LCH=['rpm','map','boost','tps','ect','iat','afr','bat','spd','grd'];
-const LCOL={rpm:'#ff4d4d',map:'#ffa64d',boost:'#ffd24d',tps:'#7dd87d',ect:'#4dc3ff',iat:'#a78bfa',afr:'#ff7ab6',bat:'#cfcfcf',spd:'#4dffd2',grd:'#9ad04d'};
+const LCH=['rpm','map','boost','tps','ect','iat','afr','lam','bat','spd','gear','ign','knock','egt1','egt2','oilt','oilp','fuelp','injdc','emut','baro','grd'];
+const LCOL={lam:'#ff9ad0',gear:'#ffffff',ign:'#b0ff4d',knock:'#ff6a3d',egt1:'#ff8c1a',egt2:'#e07a10',oilt:'#d9b36c',oilp:'#c9a24d',fuelp:'#6cc6d9',injdc:'#8fa3ff',emut:'#9a9a9a',baro:'#7a8a99',rpm:'#ff4d4d',map:'#ffa64d',boost:'#ffd24d',tps:'#7dd87d',ect:'#4dc3ff',iat:'#a78bfa',afr:'#ff7ab6',bat:'#cfcfcf',spd:'#4dffd2',grd:'#9ad04d'};
 const LOG={cur:null,runT:0,offT:0,lastS:0,lastF:0,db:null,MAX:50,
   idb(){return this.db||(this.db=new Promise((ok,ko)=>{const r=indexedDB.open('emulogs',1);r.onupgradeneeded=()=>{const d=r.result;d.createObjectStore('logs',{keyPath:'id'});d.createObjectStore('meta',{keyPath:'id'})};r.onsuccess=()=>ok(r.result);r.onerror=()=>ko(r.error)}))},
   async tx(st,mode,fn){const db=await this.idb();return new Promise((ok,ko)=>{const t=db.transaction(st,mode);const r=fn(...st.map(n=>t.objectStore(n)));t.oncomplete=()=>ok(r&&r.result);t.onerror=()=>ko(t.error)})},
@@ -215,11 +228,13 @@ const hhmm=()=>{const n=new Date();return String(n.getHours()).padStart(2,'0')+'
 let S={};try{S=JSON.parse(localStorage.getItem('emudash2'))||{}}catch(e){}
 S.pages=S.pages||[{n:'Σελίδα 1',w:[]}];while(S.pages.length<3)S.pages.push({n:'Σελίδα '+(S.pages.length+1),w:[]});S.cur=S.cur||0;if(S.cur>=S.pages.length)S.cur=0;S.ch=S.ch||{};
 if(S.baro==null)S.baro=100;S.col=S.col||'#ff2d2d';
+if((S.chv||1)<2){['ect','iat','afr','bat','spd'].forEach(k=>delete S.ch[k]);S.chv=2;try{localStorage.setItem('emudash2',JSON.stringify(S))}catch(e){}}
 const save=()=>{try{localStorage.setItem('emudash2',JSON.stringify(S));return true}catch(e){return false}};
 const get=(c,f)=>{const v=(S.ch[c.k]||{})[f];return v!==undefined?v:c[f]};
 // Γλώσσα / Language
 if(!S.lang)S.lang=(navigator.language||'').slice(0,2)==='el'?'el':'en';
 const DICT=[
+['Ταχύτητα κιβωτίου','Gear'],['Ταχύτητα km/h','Speed km/h'],['Ανάφλεξη','Ignition'],['Πίεση λαδιού','Oil pressure'],['Πίεση καυσίμου','Fuel pressure'],['Duty μπεκ','Injector duty'],['Θερμ. εγκεφάλου','ECU temp'],['Λάδι','Oil'],
 ['Καταγραφές (logs)','Logs'],['Αυτόματη καταγραφή','Automatic logging'],['Καταγραφή και στο Demo (για δοκιμή)','Log in Demo too (for testing)'],['Αποθηκευμένες διαδρομές','Saved drives'],['Εγγραφή τώρα','Recording now'],['Η αυτόματη καταγραφή είναι κλειστή.','Automatic logging is off.'],['Αναμονή: η καταγραφή ξεκινάει μόλις πάρει μπροστά ο κινητήρας.','Waiting: logging starts as soon as the engine starts.'],['Η καταγραφή ξεκινάει μόνη της όταν πάρει μπροστά ο κινητήρας και αποθηκεύεται όταν σβήσει. Κρατιούνται οι τελευταίες 50 διαδρομές, οι παλιότερες σβήνονται αυτόματα.','Logging starts by itself when the engine starts and is saved when it stops. The last 50 drives are kept; older ones are deleted automatically.'],['Δεν υπάρχουν ακόμα καταγραφές.','No logs yet.'],['Διάρκεια','Duration'],['Απόσταση','Distance'],['Max νερό','Max coolant'],['‹ Λίστα','‹ List'],['Αποστολή CSV','Send CSV'],['Σύρε το δάχτυλο πάνω στα γραφήματα για να δεις τις τιμές.','Drag your finger over the charts to see the values.'],['Δεν υπάρχουν δεδομένα.','No data.'],['Διαγραφή αυτής της καταγραφής;','Delete this log?'],['Η καταγραφή είναι σε εξέλιξη','Logging is in progress'],['Η διαδρομή αποθηκεύτηκε','Drive saved'],['Η καταγραφή δεν αποθηκεύτηκε','The log could not be saved'],['Η καταγραφή δεν βρέθηκε','Log not found'],['Η αποστολή απέτυχε','Sending failed'],
 ['Μηδενισμός κλίσης','Zero grade'],['Σταμάτα πρώτα το αυτοκίνητο','Stop the car first'],['Κλίση: 0 ✓','Grade: 0 ✓'],['Αναίρεση','Undo'],['Ο μηδενισμός αναιρέθηκε','Zero undone'],['Γρήγορος μηδενισμός: κράτα πατημένο το κουτάκι της κλίσης για 1 δευτερόλεπτο, ή Μενού → «Μηδενισμός κλίσης».','Quick zero: hold the grade tile for 1 second, or Menu → “Zero grade”.'],
 ['Στεφάνι (ring)','Ring'],['Κλίση δρόμου %','Road grade %'],['Κλίση δρόμου','Road grade'],['Κλίση %','Grade %'],['Κλίση τώρα','Grade now'],['Μηδενισμός','Zero'],['Κάνε μηδενισμό','Press Zero'],['Το κινητό πρέπει να είναι σταθερό στη βάση του, με την οθόνη προς τον οδηγό. Σταμάτα το αυτοκίνητο σε επίπεδο σημείο και πάτα «Μηδενισμός». Ξανά μηδενισμός κάθε φορά που αλλάζεις τη θέση του κινητού.','The phone must be fixed in its mount, screen facing the driver. Stop the car on level ground and press “Zero”. Zero again whenever you move the phone.'],['Διόρθωση επιτάχυνσης με GPS','Acceleration correction with GPS'],['Χωρίς διόρθωση, στο γκάζι η κλίση δείχνει ανηφόρα και στο φρένο κατηφόρα. Αν ο εγκέφαλος στέλνει ταχύτητα, χρησιμοποιείται αυτή αντί για το GPS.','Without correction, throttle reads as uphill and braking as downhill. If the ECU sends speed, it is used instead of GPS.'],['Αντιστροφή (αν η ανηφόρα βγαίνει με μείον)','Invert (if uphill shows minus)'],['Για να τη δείξεις στην οθόνη: Επεξεργασία Layout → νέο Κουτάκι → Κανάλι «Κλίση δρόμου %».','To show it: Edit Layout → new Tile → Channel “Road grade %”.'],['Έγινε. Η τωρινή θέση είναι πλέον 0 %.','Done. The current position is now 0 %.'],['Δεν βρέθηκαν αισθητήρες κίνησης σε αυτή τη συσκευή.','No motion sensors found on this device.'],
@@ -282,18 +297,18 @@ function fit(){
 addEventListener('resize',fit);addEventListener('orientationchange',()=>setTimeout(fit,250));
 
 const UN=()=>S.u||(S.u={t:'C',s:'kmh',p:'bar'});
-const KIND={ect:'t',iat:'t',spd:'s',map:'p',boost:'p'};
+const KIND={ect:'t',iat:'t',egt1:'t',egt2:'t',oilt:'t',emut:'t',spd:'s',map:'p',boost:'p',oilp:'p',fuelp:'p'};
 function fromBase(k,v,u){u=u||UN();if(v==null)return v;const d=KIND[k];
   if(d==='t')return u.t==='F'?v*1.8+32:v;
   if(d==='s')return u.s==='mph'?v*.621371:v;
   if(k==='map')return u.p==='psi'?v*.145038:v/100;
-  if(k==='boost')return u.p==='psi'?v*14.5038:v;
+  if(k==='boost'||k==='oilp'||k==='fuelp')return u.p==='psi'?v*14.5038:v;
   return v}
 function toBase(k,v,u){u=u||UN();const d=KIND[k];
   if(d==='t')return u.t==='F'?(v-32)/1.8:v;
   if(d==='s')return u.s==='mph'?v/.621371:v;
   if(k==='map')return u.p==='psi'?v/.145038:v*100;
-  if(k==='boost')return u.p==='psi'?v/14.5038:v;
+  if(k==='boost'||k==='oilp'||k==='fuelp')return u.p==='psi'?v/14.5038:v;
   return v}
 function setUnit(kind,val){
   const old={...UN()},nu={...old,[kind]:val};
@@ -304,15 +319,15 @@ function setUnit(kind,val){
 const dec=c=>KIND[c.k]==='p'?(UN().p==='psi'?1:2):c.d;
 const dmin=c=>+fromBase(c.k,c.min).toFixed(2),dmax=c=>+fromBase(c.k,c.max).toFixed(2);
 function cn(c){let n=c.n;const u=UN();
-  if(c.k==='ect'||c.k==='iat')n=n.replace('°C','°'+u.t);else if(c.k==='spd')n=n.replace('km/h',u.s==='mph'?'mph':'km/h');
-  else if(c.k==='map')n=n.replace('kPa',u.p);else if(c.k==='boost')n=n.replace('bar',u.p);return n}
+  if(KIND[c.k]==='t')n=n.replace('°C','°'+u.t);else if(c.k==='spd')n=n.replace('km/h',u.s==='mph'?'mph':'km/h');
+  else if(c.k==='map')n=n.replace('kPa',u.p);else if(KIND[c.k]==='p')n=n.replace('bar',u.p);return n}
 function bv(c){
   if(c.k==='grd')return demo?(raw.grd??null):TL.v;
-  if(c.k==='boost'){const m=bv(M.map);return m==null?null:(m-S.baro)/100}
+  if(c.k==='boost'){const m=bv(M.map);if(m==null)return null;const b=bv(M.baro);return(m-(b!=null&&b>50&&b<120?b:S.baro))/100} // baro από τον εγκέφαλο, αλλιώς η ρύθμιση
   const id=get(c,'id');
-  if(id==null&&c.k==='spd')return demo&&raw.spd!=null?raw.spd:null; // ταχύτητα: άγνωστο ID, τιμή μόνο στο demo
   if(id==null||raw[id]===undefined)return null;
-  return raw[id]*get(c,'s')+get(c,'o');
+  let r=raw[id];if(c.sg===8){r&=255;if(r>127)r-=256}else if(c.sg===16&&r>32767)r-=65536; // προσημασμένα κανάλια
+  return r*get(c,'s')+get(c,'o');
 }
 function val(c){return fromBase(c.k,bv(c))}
 const pt=a=>{const r=a*Math.PI/180;return(50+38*Math.sin(r)).toFixed(1)+' '+(55-38*Math.cos(r)).toFixed(1)};
@@ -656,8 +671,11 @@ function sim(){if(DY.sim)return;const t=Date.now()/1000,w=Math.sin(t/2);
   raw[1]=Math.round(3500+3000*w);raw[2]=Math.round(100+80*Math.max(0,w));raw[3]=Math.round(40+40*w);
   // Demo: μπαταρία ~14.1V με τη μηχανή αναμμένη (μικρές διακυμάνσεις), νερό/IAT κινούνται λίγο, ταχύτητα από τις στροφές
   const bs=get(M.bat,'s')||.027,V=13.9+.3*Math.sin(t/3)+.08*Math.sin(t*2.3);
-  raw[5]=Math.round(V/bs);raw[6]=Math.round(86+4*Math.sin(t/9));raw[4]=Math.round(34+10*Math.max(0,w));
-  raw[0x10]=Math.round(125+20*Math.sin(t));raw.spd=Math.round(raw[1]*.03);raw.grd=+(4*Math.sin(t/7)+.6*Math.sin(t*1.3)).toFixed(1)}
+  raw[5]=Math.round(V/bs);raw[0x18]=Math.round(86+4*Math.sin(t/9));raw[4]=Math.round(34+10*Math.max(0,w));
+  const afr=12.5+2*Math.sin(t),kmh=raw[1]*.03;raw[0x0C]=Math.round(afr*10);raw[0x1B]=Math.round(afr/14.7*128);raw[0x1C]=Math.round(kmh*4);
+  raw[0x0D]=Math.max(1,Math.min(6,1+Math.floor((t/6)%6)));raw[6]=(Math.round(2*(18+12*Math.sin(t/2+1)))+256)%256;raw[0x0A]=Math.round(51*(.6+.3*Math.max(0,w)));
+  raw[8]=Math.round(650+200*Math.max(0,w));raw[9]=raw[8]-15;raw[0x16]=Math.round(92+3*Math.sin(t/11));raw[0x15]=Math.round(16*(1.5+2.5*raw[1]/7000));raw[0x17]=Math.round(32*(3+.8*Math.max(0,w)));
+  raw[0x13]=Math.round(2*(10+60*Math.max(0,w)));raw[0x14]=38;raw[0x0E]=101;raw.grd=+(4*Math.sin(t/7)+.6*Math.sin(t*1.3)).toFixed(1)}
 
 // Παράθυρο ρυθμίσεων οργάνου
 const D=h=>{$('#dlg').innerHTML=h;$('#dlg').classList.add('open')};
@@ -780,7 +798,7 @@ function bgPanel(){
 // Κατάσταση σύνδεσης. s: off | conn | live | re (επανασύνδεση) | lost
 const BT={s:'off',name:'',want:false,id:null,dev:null,n:0,fps:0,last:0,tries:0,timer:null,err:'',init:false};
 function parse(){while(buf.length>=5){
-  if(buf[1]===0xA3&&((buf[0]+buf[1]+buf[2]+buf[3])&255)===buf[4]){const i0=buf[0];raw[i0]=(buf[2]<<8)|buf[3];buf.splice(0,5);BT.n++;BT.last=Date.now();dyS(i0)}else buf.shift()}}
+  if(buf[1]===0xA3&&(((buf[0]+buf[1]+buf[2]+buf[3])&255)===buf[4]||(buf[0]+buf[1]+buf[2]+buf[3])%255===buf[4])){const i0=buf[0];raw[i0]=(buf[2]<<8)|buf[3];buf.splice(0,5);BT.n++;BT.last=Date.now();dyS(i0)}else buf.shift()}}
 const onData=d=>{for(let i=0;i<d.byteLength;i++)buf.push(d.getUint8(i));parse()};
 const isNative=()=>!!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform()&&window.BleClient);
 const U16=n=>'0000'+n+'-0000-1000-8000-00805f9b34fb',SV=U16('ffe0'),CH=U16('ffe1');
@@ -1264,11 +1282,11 @@ async function logList(){const e=$('#lg_list');if(!e)return;let a=[];try{a=await
     if(s.mx.ect!=null)parts.push(lfm('ect',fromBase('ect',s.mx.ect))+'°'+u.t);
     b.innerHTML='<span></span>'+(LOG.cur&&LOG.cur.id===m.id?' <span style="color:#ff3b30">●</span>':'')+'<small></small>';b.firstChild.textContent=fmtW(m.t0);b.querySelector('small').textContent=parts.join(' · ');
     b.onclick=()=>logView(m.id);e.appendChild(b)}}
-const LNM=()=>{const u=UN();return{rpm:'RPM',map:'MAP ('+u.p+' abs)',boost:'Boost ('+u.p+')',tps:'TPS (%)',ect:'ECT (°'+u.t+')',iat:'IAT (°'+u.t+')',afr:'AFR',bat:'Battery (V)',spd:'Speed ('+(u.s==='mph'?'mph':'km/h')+')',grd:'Grade (%)'}};
+const LNM=()=>{const u=UN();return{rpm:'RPM',map:'MAP ('+u.p+' abs)',boost:'Boost ('+u.p+')',tps:'TPS (%)',ect:'ECT (°'+u.t+')',iat:'IAT (°'+u.t+')',afr:'AFR',bat:'Battery (V)',spd:'Speed ('+(u.s==='mph'?'mph':'km/h')+')',grd:'Grade (%)',lam:'Lambda',gear:'Gear',ign:'Ignition (deg)',knock:'Knock (V)',egt1:'EGT1 (°'+u.t+')',egt2:'EGT2 (°'+u.t+')',oilt:'Oil temp (°'+u.t+')',oilp:'Oil pressure ('+u.p+')',fuelp:'Fuel pressure ('+u.p+')',injdc:'Injector DC (%)',emut:'ECU temp (°'+u.t+')',baro:'Baro (kPa)'}};
 async function logView(id){
   let l=null;try{l=(LOG.cur&&LOG.cur.id===id)?LOG.sum(LOG.cur):await LOG.get(id)}catch(x){}
   if(!l){toast('Η καταγραφή δεν βρέθηκε');return}
-  const s=l.s,n=l.t.length,u=UN(),ks=LCH.filter(k=>s.mx[k]!=null),B=Math.min(600,n),TT=l.t[n-1]||1,bk=new Int32Array(B+1); // κάδοι με βάση τον χρόνο
+  const s=l.s,n=l.t.length,u=UN(),ks=LCH.filter(k=>s.mx[k]!=null&&!(s.mx[k]===0&&s.mn[k]===0)),B=Math.min(600,n),TT=l.t[n-1]||1,bk=new Int32Array(B+1); // κάδοι με βάση τον χρόνο
   {let j=0;for(let b=0;b<=B;b++){const lim=b*TT/B;while(j<n&&l.t[j]<lim)j++;bk[b]=j}bk[B]=n}
   const tl=(lab,v)=>'<div><small>'+lab+'</small><b>'+v+'</b></div>';
   let sm=tl('Διάρκεια',fmtD(s.dur));if(s.km>.05)sm+=tl('Απόσταση',fromBase('spd',s.km).toFixed(1)+(u.s==='mph'?' mi':' km'));
