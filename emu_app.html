@@ -873,7 +873,7 @@ function dlgW(w,isNew){
     if(isNew)Object.assign(p,{w:38,h:28});try{rdF(p)}catch(x){return}
     if(p.t==='g')Object.assign(p,{w:40,h:52});else if(p.t==='r'&&(isNew||w.t!=='r'))Object.assign(p,{w:70,h:24});
     if(PV)refs.delete(PV.w);const d=mk(p);refs.delete(p);d.style.position='absolute';
-    const st=$('#stage'),SW=st.clientWidth||400,SH=st.clientHeight||300,ar=p.t==='g'?1:p.t==='r'?5:(p.w*SW)/(p.h*SH||1);
+    const st=$('#stage'),SW=st.clientWidth||400,SH=st.clientHeight||300,ar=isGm(p)||p.t==='g'?1:p.t==='r'?5:(p.w*SW)/(p.h*SH||1);
     const L=document.body.classList.contains('ls'),AW=L?innerWidth*.42-40:$('#dlg').clientWidth-24,AH=L?(rot?innerWidth:innerHeight)-40:Math.min(220,(rot?innerWidth:innerHeight)*.3);
     const ww=Math.min(AW,AH*ar);b.style.width=ww+'px';b.style.height=ww/ar+'px';b.innerHTML='';b.appendChild(d);if(CQP)CQP.observe(d);PV={w:p,d}};
   $('#dlg').addEventListener('input',pv);$('#dlg').addEventListener('change',()=>setTimeout(pv));pv();
