@@ -745,7 +745,7 @@ function GD(){const st=$('#stage'),W=st.clientWidth,H=st.clientHeight,C=W>=H?24:
 const gSq=w=>w.t==='g'||isGm(w); // στρογγυλά: τετράγωνα κελιά
 function gPct(w,G){w.x=w.gx/G.C*100;w.w=w.gw/G.C*100;w.y=w.gy*G.cs/G.H*100;w.h=w.gh*G.cs/G.H*100}
 function gCand(w,G){G=G||GD();let gw=Math.max(1,Math.round(w.w/100*G.C)),gh=Math.max(1,Math.round(w.h/100*G.H/G.cs));
-  if(gSq(w))gw=gh=Math.max(1,Math.round((gw+gh)/2));gw=Math.min(gw,G.C);gh=Math.min(gh,G.R);
+  if(gSq(w))gw=gh=Math.max(1,Math.round((gw+gh)/2));if(w.t==='r')gh=Math.max(1,Math.round(gw/5));gw=Math.min(gw,G.C);gh=Math.min(gh,G.R);
   return{gx:cl(Math.round(w.x/100*G.C),0,G.C-gw),gy:cl(Math.round(w.y/100*G.H/G.cs),0,G.R-gh),gw,gh}}
 function gOk(w,c,G,pg){G=G||GD();pg=pg||S.pages[S.cur];if(c.gx<0||c.gy<0||c.gx+c.gw>G.C||c.gy+c.gh>G.R)return false;
   return!pg.w.some(o=>o!==w&&o.gx!=null&&c.gx<o.gx+o.gw&&o.gx<c.gx+c.gw&&c.gy<o.gy+o.gh&&o.gy<c.gy+c.gh)}
@@ -756,7 +756,7 @@ function gPrep(pg){const G=GD();if(!G.W||!G.H)return G;
   if(pg.gc!==G.C){if(!S.gridBak)try{S.gridBak=JSON.stringify({pages:S.pages,pagesAlt:S.pagesAlt||null,t:Date.now()})}catch(e){}
     pg.w.forEach(w=>{delete w.gx});pg.gc=G.C}
   for(const w of pg.w){if(w.gx!=null)continue;let c=gCand(w,G);
-    if(!gOk(w,c,G,pg)){let n=null;for(let k=0;k<12&&!n;k++){const gw=Math.max(2,c.gw-k),gh=gSq(w)?gw:Math.max(1,c.gh-k);n=gSpot(w,gw,gh,c.gx,c.gy,G,pg)}if(n)c=n}
+    if(!gOk(w,c,G,pg)){let n=null;for(let k=10;k>=2&&!n;k--){const f=k/10,gw=Math.max(2,Math.round(c.gw*f)),gh=gSq(w)?gw:w.t==='r'?Math.max(1,Math.round(gw/5)):Math.max(1,Math.round(c.gh*f));n=gSpot(w,gw,gh,c.gx,c.gy,G,pg)}if(n)c=n} // μικραίνει αναλογικά, η μπάρα μένει μακρόστενη
     Object.assign(w,c)}
   for(const w of pg.w){if(gSq(w)&&w.gw!==w.gh)w.gw=w.gh=Math.min(w.gw,w.gh);gPct(w,G)}
   return G}
