@@ -724,6 +724,7 @@ function build(){
     e.innerHTML='<div><button data-l="el">Ελληνικά</button> <button data-l="en">English</button></div><div class="dym" style="max-width:320px;text-align:center">Γύρνα το κινητό οριζόντια ή κάθετα: κάθε θέση έχει το δικό της layout.</div>';
     e.onclick=ev=>{const l=ev.target.dataset.l;if(l){S.setup=1;setLang(l);build();return}const o=ev.target.dataset.o;if(o){S.orient=o;save();fit();build()}};st.appendChild(e);return}
   if(!pg.w.length){if(edit){const e=document.createElement('div');e.id='empty';e.textContent='Tap and hold';st.appendChild(e)}return}
+  if(pg.lk&&typeof LAYS!=='undefined'&&LAYS[pg.lk]&&st.clientWidth&&st.clientHeight){const G=LAYS[pg.lk].geo(st.clientWidth,st.clientHeight);if(G.length===pg.w.length)pg.w.forEach((w,i)=>Object.assign(w,G[i]))} // κλειδωμένη σελίδα: θέσεις πάντα από το layout
   pg.w.forEach(w=>st.appendChild(mk(w)));
 }
 // Τα στρογγυλά όργανα είναι τετράγωνα: το κουτί τους μικραίνει γύρω από το κέντρο ώστε να "αγκαλιάζει" το όργανο
@@ -1398,15 +1399,15 @@ function openSP(title,html){
 // Τριπλέτα: 3 αναλογικά (μεσαίο μεγάλο), 2 κουτάκια πάνω από κάθε πλαϊνό όργανο. Γεωμετρία σε pixels της σκηνής → %.
 const LAYS={t1:{n:'Τριπλέτα οργάνων',
   geo(W,H){const g=6,R=[];const P=(x,y,w,h)=>({x:x/W*100,y:y/H*100,w:w/W*100,h:h/H*100});
-    if(W>=H){const B=Math.min(H,W*.42),bx=(W-B)/2,Sw=bx-2*g,s=Math.min(Sw,H*.62),th=(H-s-2*g)/2;
-      R.push(P(g+(Sw-s)/2,H-s,s,s),P(bx,H-B,B,B),P(W-g-Sw+(Sw-s)/2,H-s,s,s));
-      R.push(P(g,0,Sw,th),P(g,th+g,Sw,th),P(W-g-Sw,0,Sw,th),P(W-g-Sw,th+g,Sw,th))}
-    else{const tw=(W-3*g)/2,th=Math.min(H*.11,tw*.45),y0=2*th+2*g,B=Math.min(W-2*g,(H-y0-2*g)*.6),s=Math.min((W-3*g)/2,H-y0-B-2*g);
-      R.push(P(g,H-s,s,s),P((W-B)/2,y0,B,B),P(W-g-s,H-s,s,s));
-      R.push(P(g,0,tw,th),P(g,th+g,tw,th),P(2*g+tw,0,tw,th),P(2*g+tw,th+g,tw,th))}
+    if(W>=H){const B=Math.min(H,W*.42),bx=(W-B)/2,Sw=bx-2*g,th=H*.17,s=Math.min(Sw,H-2*th-2*g),sy=(H-s)/2; // κάθε πλαϊνή στήλη: κουτάκι, όργανο, κουτάκι
+      R.push(P(g+(Sw-s)/2,sy,s,s),P(bx,(H-B)/2,B,B),P(W-g-Sw+(Sw-s)/2,sy,s,s));
+      R.push(P(g,0,Sw,th),P(g,H-th,Sw,th),P(W-g-Sw,0,Sw,th),P(W-g-Sw,H-th,Sw,th))}
+    else{const tw=(W-3*g)/2,th=Math.min(H*.1,tw*.45),y0=th+g,A=H-2*th-4*g,B=Math.min(W-2*g,A*.6),s=Math.min((W-3*g)/2,A-B),ys=y0+B+g+(A-B-s)/2;
+      R.push(P(g,ys,s,s),P((W-B)/2,y0,B,B),P(W-g-s,ys,s,s));
+      R.push(P(g,0,tw,th),P(g,H-th,tw,th),P(2*g+tw,0,tw,th),P(2*g+tw,H-th,tw,th))}
     return R},
   w:[['g','afr'],['g','boost'],['g','oilt'],['b','iat'],['b','ect'],['b','bat'],['b','oilp']],
-  svg:'<svg viewBox="0 0 160 70" style="width:100%;max-width:340px;display:block;margin:6px auto"><g fill="none" stroke="#ff2d2d" stroke-width="1.5"><circle cx="24" cy="51" r="17"/><circle cx="80" cy="37" r="31"/><circle cx="136" cy="51" r="17"/></g><g fill="none" stroke="#888" stroke-width="1.2"><rect x="4" y="3" width="40" height="13" rx="2"/><rect x="4" y="18" width="40" height="13" rx="2"/><rect x="116" y="3" width="40" height="13" rx="2"/><rect x="116" y="18" width="40" height="13" rx="2"/></g><g fill="#aaa" font-size="6" text-anchor="middle" font-family="sans-serif"><text x="24" y="53">AFR</text><text x="80" y="39">BOOST</text><text x="136" y="53">OIL</text><text x="24" y="11.5">IAT</text><text x="24" y="26.5">WATER</text><text x="136" y="11.5">VOLT</text><text x="136" y="26.5">OIL P</text></g></svg>'}};
+  svg:'<svg viewBox="0 0 160 70" style="width:100%;max-width:340px;display:block;margin:6px auto"><g fill="none" stroke="#ff2d2d" stroke-width="1.5"><circle cx="24" cy="35" r="17"/><circle cx="80" cy="35" r="32"/><circle cx="136" cy="35" r="17"/></g><g fill="none" stroke="#888" stroke-width="1.2"><rect x="4" y="2" width="40" height="12" rx="2"/><rect x="4" y="56" width="40" height="12" rx="2"/><rect x="116" y="2" width="40" height="12" rx="2"/><rect x="116" y="56" width="40" height="12" rx="2"/></g><g fill="#aaa" font-size="6" text-anchor="middle" font-family="sans-serif"><text x="24" y="37">AFR</text><text x="80" y="37">BOOST</text><text x="136" y="37">OIL</text><text x="24" y="10">IAT</text><text x="24" y="64">WATER</text><text x="136" y="10">VOLT</text><text x="136" y="64">OIL P</text></g></svg>'}};
 // Δύο μεγάλα: 2 αναλογικά, 3 κουτάκια πάνω και 3 κάτω (κάθετα: τα όργανα το ένα κάτω από το άλλο)
 LAYS.t2={n:'Δύο μεγάλα όργανα',
   geo(W,H){const g=6,R=[];const P=(x,y,w,h)=>({x:x/W*100,y:y/H*100,w:w/W*100,h:h/H*100}),tw=(W-4*g)/3;
