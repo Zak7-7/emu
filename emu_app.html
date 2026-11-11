@@ -132,6 +132,13 @@ body.ls #mn button.mi{padding:8px 4px;font-size:16px}body.ls .mh img{width:54px}
 <script src="ble.js" onerror="this.remove()"></script>
 <script>
 const $=q=>document.querySelector(q);
+// Παλιό WebView (Chrome < 105, π.χ. Android 7–9): δεν ξέρει τις μονάδες cq*. Τις μετατρέπουμε σε μεταβλητές που υπολογίζει ένα ResizeObserver σε κάθε όργανο.
+const CQP=!(window.CSS&&CSS.supports&&CSS.supports('width','1cqw'))&&window.ResizeObserver?(()=>{
+  for(const st of document.querySelectorAll('style'))if(/cq(min|max|w|h)/.test(st.textContent))st.textContent=st.textContent.split(/(url\(data:[^)]*\))/).map((p,i)=>i%2?p:p.replace(/(\d*\.?\d+)cq(min|max|w|h)\b/g,(m,n,u)=>'calc(var(--cq'+u+',1vmin)*'+n+')')).join(''); // οι ενσωματωμένες γραμματοσειρές (data:) δεν αγγίζονται
+  const ro=new ResizeObserver(es=>{for(const e of es){const el=e.target,w=el.clientWidth/100,hh=el.clientHeight/100,s=el.style;s.setProperty('--cqw',w+'px');s.setProperty('--cqh',hh+'px');s.setProperty('--cqmin',Math.min(w,hh)+'px');s.setProperty('--cqmax',Math.max(w,hh)+'px')}});
+  const add=n=>{if(n.nodeType===1&&n.classList.contains('w'))ro.observe(n)};
+  new MutationObserver(ms=>{for(const m of ms)m.addedNodes.forEach(add)}).observe($('#stage'),{childList:true});
+  document.querySelectorAll('#stage .w').forEach(add);return ro})():null;
 const hx=n=>Number(n).toString(16).toUpperCase().padStart(2,'0');
 const on=x=>x!=null&&x!=='';
 const thm=()=>{const t=S.theme;return!t||t==='c'||t==='s'?'l':t};
