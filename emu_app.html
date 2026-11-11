@@ -83,6 +83,13 @@ table{border-collapse:collapse;font-size:13px}th,td{padding:3px 4px;text-align:l
 .h{color:var(--mut);font-size:12px;margin:8px 0}
 #pa{font-size:24px;border:0;background:none;padding:2px 10px}
 #stage{touch-action:none}
+#rpb{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:8;background:rgba(20,20,20,.94);border:1px solid #444;border-radius:14px;padding:6px 10px;display:flex;gap:8px;align-items:center;width:min(94vw,680px);color:#fff;font-size:13px}
+#rpb button{margin:0;padding:6px 10px;font-size:14px;border-radius:9px;min-width:38px}#rpb input{flex:1;min-width:60px}#rpb span{font-variant-numeric:tabular-nums;white-space:nowrap}
+.pfv{font-size:64px;line-height:1;font-variant-numeric:tabular-nums;text-align:center;margin:6px 0}.pfv small{font-size:18px;color:#9a9a9a;margin-left:6px}
+.gmw{display:flex;justify-content:center}#gm_cv{width:min(86vw,340px);height:min(86vw,340px)}
+#cel,#ttm{display:none;font-size:12px;margin-left:10px;letter-spacing:1px;padding:2px 8px;border-radius:9px;cursor:pointer;white-space:nowrap}#cel.on,#ttm.on{display:inline-flex;align-items:center;gap:5px}
+#cel{color:#111;background:#ffb020}#cel svg{width:15px;height:15px;fill:none;stroke:#111;stroke-width:2}#ttm{color:#ffb020;border:1px solid #ffb020}#ttm.ok{color:#4cd07d;border-color:#4cd07d}
+.celt{font-size:min(22cqh,11cqw)!important;font-weight:700;letter-spacing:.02em;align-items:center;text-align:center;line-height:1.05}
 #rec{color:#ff3b30;font-size:12px;margin-left:10px;display:none;letter-spacing:1px}#rec.on{display:inline}
 .lgi{display:block;width:100%;text-align:left;background:#262626;border:1px solid #333;border-radius:12px;padding:10px 14px;margin:8px 0;color:#fff;font-size:15px}
 .lgi small{display:block;color:#9a9a9a;font-size:13px;margin-top:3px}
@@ -124,7 +131,7 @@ body.ls #mn button.mi{padding:8px 4px;font-size:16px}body.ls .mh img{width:54px}
 </head>
 <body>
 <div id="bgl"></div><div id="logo"></div><div id="splash"></div>
-<div id="top"><button id="hb">☰</button><button id="pa" style="display:none">＋</button><span id="rec">● REC</span><span id="st"></span></div>
+<div id="top"><button id="hb">☰</button><button id="pa" style="display:none">＋</button><span id="rec">● REC</span><span id="cel"><svg viewBox="0 0 24 24"><path d="M4 10h2l2-3h6l2 3h2v2h2v4h-2v2h-3l-2 2H9l-2-2H5v-4H3v-4h1z"/></svg>CHECK</span><span id="ttm"></span><span id="st"></span></div>
 <div id="stage"></div>
 <div id="mn"></div>
 <div id="dlg"></div><div id="sp"></div>
@@ -171,12 +178,54 @@ const DEF=[
 ];
 const M={};DEF.forEach(c=>M[c.k]=c);
 const CLK={k:'clk',n:'Ώρα',d:0,min:0,max:0};M.clk=CLK; // ρολόι: μόνο για κουτάκια
-const GRD={k:'grd',n:'Κλίση %',d:1,min:-20,max:20};M.grd=GRD; // κλίση δρόμου από τους αισθητήρες του κινητού: μόνο για κουτάκια
+const GRD={k:'grd',n:'Κλίση %',d:1,min:-20,max:20};M.grd=GRD;
+// Check engine (κανάλι 255, bitfield) · turbo timer (δευτερόλεπτα ρελαντί) · επιταχύνσεις σε G από τους αισθητήρες του κινητού
+M.cel={k:'cel',n:'Check engine',id:255,d:0,min:0,max:0};
+M.turbo={k:'turbo',n:'Turbo timer s',d:0,min:0,max:120};
+M.glon={k:'glon',n:'G διαμήκης',d:2,min:-1.2,max:1.2};
+M.glat={k:'glat',n:'G πλευρική',d:2,min:-1.2,max:1.2};
+const RP={on:false,cur:{},l:null,i:0,pos:0,sp:1,play:false,lt:0,
+  start(l){this.l=l;this.i=0;this.pos=0;this.sp=1;this.play=true;this.on=true;this.lt=Date.now();for(const k in mm)delete mm[k];
+    $('#sp').classList.remove('open');$('#mn').classList.remove('open');this.bar();this.apply()},
+  apply(){const l=this.l,n=l.t.length;let i=this.i;if(l.t[i]>this.pos)i=0;while(i<n-1&&l.t[i+1]<=this.pos)i++;this.i=i;
+    const c={};for(const k of LCH){const a=l.ch[k];c[k]=a&&a[i]!=null?a[i]:null}this.cur=c;this.upd()},
+  step(){const now=Date.now(),dt=now-this.lt;this.lt=now;if(this.play){const end=this.l.t[this.l.t.length-1]||0;this.pos=Math.min(end,this.pos+dt*this.sp);if(this.pos>=end)this.play=false}this.apply()},
+  stop(){this.on=false;this.play=false;this.cur={};this.l=null;const b=$('#rpb');if(b)b.remove();for(const k in mm)delete mm[k]},
+  bar(){let b=$('#rpb');if(b)b.remove();b=document.createElement('div');b.id='rpb';
+    b.innerHTML='<button data-r="p">⏸</button><input type="range" min="0" max="1000" value="0"><span></span><button data-r="s">1×</button><button data-r="x">✕</button>';
+    document.body.appendChild(b);const rg=b.querySelector('input');
+    b.onclick=e=>{const r=e.target.dataset.r;if(r==='p'){const end=this.l.t[this.l.t.length-1]||0;if(!this.play&&this.pos>=end)this.pos=0;this.play=!this.play;this.lt=Date.now()}else if(r==='s'){this.sp=this.sp>=8?1:this.sp*2}else if(r==='x')this.stop();this.upd()};
+    rg.oninput=()=>{const end=this.l.t[this.l.t.length-1]||0;this.pos=rg.value/1000*end;this.i=0;this.apply()}},
+  upd(){const b=$('#rpb');if(!b||!this.l)return;const end=this.l.t[this.l.t.length-1]||1,rg=b.querySelector('input');
+    if(document.activeElement!==rg)rg.value=Math.round(this.pos/end*1000);
+    b.querySelector('[data-r="p"]').textContent=this.play?'⏸':'▶';b.querySelector('[data-r="s"]').textContent=this.sp+'×';
+    const s=fmtD(this.pos/1000)+' / '+fmtD(end/1000)+' · '+hms(this.l.t0+this.pos);const sp=b.querySelector('span');if(sp.textContent!==s)sp.textContent=s}};
+const TILEONLY=['clk','grd','cel']; // μόνο για κουτάκια
+const CELN=['CLT','IAT','MAP','WBO','EGT1','EGT2','EGT ALARM','KNOCK','FF SENSOR','DBW','FPR']; // bit 0 = CLT (από το XML του EMU· ο ακριβής χάρτης bit θέλει επιβεβαίωση)
+const celTxt=v=>{const a=CELN.filter((n,i)=>v&(1<<i));return a.length?a.join(' '):'ERR '+v};
+const allW=()=>[...S.pages,...(S.pagesAlt||[])].flatMap(p=>p.w);
+// Ταχύτητα από GPS (μόνο όταν χρειάζεται: υπολογισμός ταχύτητας κιβωτίου ή χρονόμετρο)
+const GP={id:null,v:null,t:0,
+  need(){return S.gpsOff!==true&&(allW().some(w=>w.k==='gear')||(typeof PF!=='undefined'&&PF.open))},
+  tick(){const n=this.need();if(n&&this.id==null&&navigator.geolocation){try{this.id=navigator.geolocation.watchPosition(p=>{const s=p.coords.speed;if(s!=null&&!isNaN(s)){this.v=s*3.6;this.t=p.timestamp||Date.now()}},()=>{},{enableHighAccuracy:true,maximumAge:0})}catch(e){this.id=null}}
+    else if(!n&&this.id!=null){try{navigator.geolocation.clearWatch(this.id)}catch(e){}this.id=null}},
+  kmh(){return this.v!=null&&Date.now()-this.t<3000?this.v:null}};
+// Ταχύτητα σε km/h: από τον εγκέφαλο (αισθητήρας VSS) ή, αν δείχνει 0 ενώ το GPS κινείται, από το GPS
+function spdK(){const e=bv(M.spd),g=GP.kmh();if(e!=null&&(e>1||g==null||g<5))return e;return g}
+// Ταχύτητα κιβωτίου από στροφές + ταχύτητα + σχέσεις του ενεργού αυτοκινήτου (Dyno)
+function gearCalc(){const r=bv(M.rpm),v=spdK();if(r==null||v==null||v<7||r<800)return 0;const c=dCar(),ms=v/3.6;let b=0,be=1;
+  dGears(c).forEach(g=>{const e=ms/dK(c,g),er=Math.abs(r-e)/e;if(er<be){be=er;b=g}});return be<.12?b:0}
+// Turbo timer: "θερμότητα" 0..1 που ανεβαίνει με boost και πέφτει στο ρελαντί· αναμονή = έως 90 s
+const TT={H:0,lt:0,okT:0,shown:false,
+  tick(){const now=Date.now(),dt=this.lt?Math.min(1,(now-this.lt)/1000):0;this.lt=now;
+    if(RP.on)return;const r=bv(M.rpm),b=bv(M.boost);if(r==null||r<300)return;
+    if(b!=null&&b>.2)this.H=Math.min(1,this.H+dt*(b/1.5)/20);else this.H=Math.max(0,this.H-dt/(r>1500?240:90))},
+  wait(){return Math.ceil(this.H*90)}}; // κλίση δρόμου από τους αισθητήρες του κινητού: μόνο για κουτάκια
 // Κλίση: u = φιλτραρισμένο διάνυσμα βαρύτητας (devicemotion), S.grd0 = "πάνω" σε επίπεδο σημείο (μηδενισμός).
 // Μπροστά = πίσω από την οθόνη (η οθόνη κοιτάει τον οδηγό). Η επιτάχυνση του αυτοκινήτου (από GPS ή ταχύτητα ECU) αφαιρείται.
 const TL={on:false,no:false,u:null,t:0,v:null,f:null,sp:null,spT:0,a:0,ecu:0,gps:null,
   ios:/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1),
-  need(){return S.pages.some(p=>p.w.some(w=>w.k==='grd'))},
+  need(){return allW().some(w=>w.k==='grd'||w.k==='glon'||w.k==='glat')||(typeof GM!=='undefined'&&GM.open)||(typeof DY!=='undefined'&&(DY.st==='armed'||DY.st==='rec'))},
   start(){if(this.on||this.no)return;this.on=true;
     const go=()=>addEventListener('devicemotion',e=>this.mot(e));
     if(typeof DeviceMotionEvent!=='undefined'&&DeviceMotionEvent.requestPermission)DeviceMotionEvent.requestPermission().then(r=>{if(r==='granted')go();else{this.on=false;this.no=true}}).catch(()=>{this.on=false});
@@ -188,13 +237,16 @@ const TL={on:false,no:false,u:null,t:0,v:null,f:null,sp:null,spT:0,a:0,ecu:0,gps
   mot(e){const g=e.accelerationIncludingGravity;if(!g||g.x==null)return;const sg=(this.ios?-1:1)*(S.grdInv?-1:1),x=g.x*sg,y=g.y*sg,z=g.z*sg;
     const now=performance.now(),dt=this.t?Math.min(.2,(now-this.t)/1000):.02;this.t=now;const k=dt/(.8+dt);
     if(!this.u)this.u=[x,y,z];else{this.u[0]+=k*(x-this.u[0]);this.u[1]+=k*(y-this.u[1]);this.u[2]+=k*(z-this.u[2])}
-    const u0=S.grd0;if(!u0){this.v=null;return}
+    {const kq=dt/(.25+dt);if(!this.q)this.q=[x,y,z];else{this.q[0]+=kq*(x-this.q[0]);this.q[1]+=kq*(y-this.q[1]);this.q[2]+=kq*(z-this.q[2])}}
+    const u0=S.grd0;if(!u0){this.v=null;this.gx=this.gy=null;return}
     if(!this.f||this.f.u0!==u0){let fw=[-u0[0]*-u0[2],-u0[1]*-u0[2],-1-u0[2]*-u0[2]];let n=Math.hypot(...fw); // -z χωρίς τη συνιστώσα της βαρύτητας
       if(n<.3){fw=[-u0[0]*u0[1],1-u0[1]*u0[1],-u0[2]*u0[1]];n=Math.hypot(...fw)} // κινητό ξαπλωτό: μπροστά = πάνω μέρος του κινητού
       this.f={u0,v:fw.map(q=>q/n)}}
     if(Date.now()-this.spT>3000)this.a*=.9; // καμία ταχύτητα: σβήνει η διόρθωση
     const F=this.f.v,u=this.u,uf=u[0]*F[0]+u[1]*F[1]+u[2]*F[2]-(S.grdGps===false&&!this.ecu?0:this.a),uu=u[0]*u0[0]+u[1]*u0[1]+u[2]*u0[2];
-    const p=cl(Math.tan(Math.atan2(uf,uu))*100,-60,60);this.v=this.v==null?p:this.v+k*(p-this.v)},
+    const p=cl(Math.tan(Math.atan2(uf,uu))*100,-60,60);this.v=this.v==null?p:this.v+k*(p-this.v);
+    {const q=this.q,R=[F[1]*u0[2]-F[2]*u0[1],F[2]*u0[0]-F[0]*u0[2],F[0]*u0[1]-F[1]*u0[0]]; // R = μπροστά × πάνω = δεξιά
+     this.gx=(q[0]*F[0]+q[1]*F[1]+q[2]*F[2])/9.81;this.gy=(q[0]*R[0]+q[1]*R[1]+q[2]*R[2])/9.81}},
   zero(){if(!this.u)return false;const n=Math.hypot(...this.u);if(n<5)return false;S.grd0=this.u.map(q=>q/n);this.v=null;save();return true}
 };
 addEventListener('pointerdown',()=>{if(!TL.on&&TL.need())TL.start()},true);
@@ -210,6 +262,7 @@ const LOG={cur:null,runT:0,offT:0,lastS:0,lastF:0,db:null,MAX:50,
   get(id){return this.tx(['logs'],'readonly',l=>l.get(id))},
   live(){return demo?!!S.logDemo:Date.now()-BT.last<2000}, // υπάρχουν φρέσκα δεδομένα από τον εγκέφαλο
   tick(){ // κάθε 100 ms από τον κύριο βρόχο
+    if(RP.on)return; // όχι καταγραφή όσο παίζει αναπαραγωγή
     if(S.logOff){if(this.cur)this.stop();return}
     const now=Date.now(),r=this.live()?bv(M.rpm):null,run=r!=null&&r>300;
     if(!this.cur){if(run){if(!this.runT)this.runT=now;else if(now-this.runT>2000)this.start(now)}else this.runT=0;return}
@@ -229,8 +282,16 @@ const LOG={cur:null,runT:0,offT:0,lastS:0,lastF:0,db:null,MAX:50,
     try{await this.put(this.sum(c));const a=await this.list();a.sort((x,y)=>y.id-x.id);for(const m of a.slice(this.MAX))await this.del(m.id)}catch(e){toast('Η καταγραφή δεν αποθηκεύτηκε');return}
     toast('Η διαδρομή αποθηκεύτηκε');if($('#lg_list'))logList()}
 };
+// Check engine και turbo timer στην πάνω μπάρα
+function topInd(){
+  const c=$('#cel'),v=bv(M.cel),live=demo||RP.on||Date.now()-BT.last<2000;if(c){const on=!!(live&&v);c.classList.toggle('on',on);c._v=v}
+  const e=$('#ttm');if(!e)return;const r=bv(M.rpm),w=TT.wait(),idle=r!=null&&r>300&&r<1400&&!(spdK()>3);
+  if(idle&&w>0){TT.shown=true;e.className='on';e.textContent='TURBO '+w+'s'}
+  else if(TT.shown&&idle&&w===0){TT.shown=false;TT.okT=Date.now()+5000}
+  if(!(idle&&w>0)){if(Date.now()<TT.okT){e.className='on ok';e.textContent='TURBO OK'}else e.className=''}}
 function recUI(){const e=$('#rec');if(e)e.classList.toggle('on',!!LOG.cur)}
-addEventListener('visibilitychange',()=>{if(document.hidden)LOG.flush()});addEventListener('pagehide',()=>LOG.flush()); // iPhone: η άδεια θέλει άγγιγμα
+addEventListener('visibilitychange',()=>{if(document.hidden)LOG.flush()});
+document.addEventListener('click',e=>{if(e.target.closest('#cel')){const v=$('#cel')._v;toast('Check engine: '+(v?celTxt(v):'OK'),null,null,6000)}else if(e.target.closest('#ttm'))toast('Άφησε τη μηχανή στο ρελαντί μέχρι να γράψει OK, για να κρυώσει το turbo.',null,null,6000)});addEventListener('pagehide',()=>LOG.flush()); // iPhone: η άδεια θέλει άγγιγμα
 const hhmm=()=>{const n=new Date();return String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')};
 let S={};try{S=JSON.parse(localStorage.getItem('emudash2'))||{}}catch(e){}
 S.pages=S.pages||[{n:'Σελίδα 1',w:[]}];while(S.pages.length<3)S.pages.push({n:'Σελίδα '+(S.pages.length+1),w:[]});S.cur=S.cur||0;if(S.cur>=S.pages.length)S.cur=0;S.ch=S.ch||{};
@@ -241,6 +302,8 @@ const get=(c,f)=>{const v=(S.ch[c.k]||{})[f];return v!==undefined?v:c[f]};
 // Γλώσσα / Language
 if(!S.lang)S.lang=(navigator.language||'').slice(0,2)==='el'?'el':'en';
 const DICT=[
+['Χρονόμετρο επιδόσεων','Performance timer'],['Περιμένω ταχύτητα (GPS ή αισθητήρας)…','Waiting for speed (GPS or sensor)…'],['Έτοιμο: φύγε όποτε θέλεις.','Ready: launch whenever you want.'],['Μέτρηση…','Measuring…'],['Σταμάτα το αυτοκίνητο για νέα μέτρηση από στάση.','Stop the car for a new standing-start run.'],['ρεκόρ','best'],['Μηδενισμός ρεκόρ','Reset bests'],['Μηδενισμός όλων των ρεκόρ;','Reset all bests?'],['Μετράει μόνο του: 0–100 και 400 m ξεκινώντας από στάση, 100–200 και 60–130 και εν κινήσει. Οι χρόνοι είναι σε km/h. Η ταχύτητα έρχεται από τον αισθητήρα του εγκεφάλου ή, αν δεν υπάρχει, από το GPS του κινητού (λιγότερο ακριβές, περίπου ±0.2 s). Μόνο σε κλειστή πίστα, με ασφάλεια.','Measures automatically: 0–100 and 400 m from a standing start, 100–200 and 60–130 while rolling. Thresholds are in km/h. Speed comes from the ECU sensor or, if missing, from the phone GPS (less accurate, about ±0.2 s). Closed track only, safely.'],['Επιτάχυνση','Acceleration'],['Φρένο','Braking'],['Αριστερά','Left'],['Δεξιά','Right'],['Μηδενισμός μέγιστων','Reset peaks'],['Μηδενισμός θέσης κινητού','Zero phone position'],['Χρειάζεται μηδενισμός θέσης: σταμάτα σε επίπεδο σημείο με το κινητό στη βάση του και πάτα «Μηδενισμός θέσης κινητού».','Needs zeroing: stop on level ground with the phone in its mount and press “Zero phone position”.'],['Χρησιμοποιεί τους αισθητήρες του κινητού και τον ίδιο μηδενισμό με την κλίση δρόμου. Πάνω = επιτάχυνση, κάτω = φρένο, πλάι = στροφές. Υπάρχουν και κουτάκια «G διαμήκης» και «G πλευρική».','Uses the phone sensors and the same zero as road grade. Up = acceleration, down = braking, sides = corners. There are also “Long. G” and “Lat. G” tiles.'],['Διόρθωση για την κλίση του δρόμου','Road grade correction'],['μέγιστη ισχύς','peak power'],['μέγιστη ροπή','peak torque'],['Διαφορά','Difference'],['Στις','At'],['▶ Αναπαραγωγή','▶ Replay'],['Η κάθετη και η οριζόντια θέση έχουν','Portrait and landscape have a'],['ξεχωριστό layout','separate layout'],['. Με «Ξεκλείδωτο», όταν γυρίζεις το κινητό αλλάζει και το layout. Με «Κλειδωμένο», διαλέγεις εδώ ποιο layout θα φαίνεται (και ποιο επεξεργάζεσαι).','. When “Unlocked”, rotating the phone switches the layout. When “Locked”, choose here which layout is shown (and edited).'],
+['G διαμήκης (επιτάχυνση/φρένο)','Longitudinal G (accel/brake)'],['G πλευρική (στροφές)','Lateral G (corners)'],['G διαμήκης','Long. G'],['G πλευρική','Lat. G'],['Turbo timer (δευτ.)','Turbo timer (s)'],['Άφησε τη μηχανή στο ρελαντί μέχρι να γράψει OK, για να κρυώσει το turbo.','Let the engine idle until it shows OK, so the turbo cools down.'],
 ['Όνομα (κενό = προεπιλογή)','Name (empty = default)'],['Ταχύτητα κιβωτίου','Gear'],['Ταχύτητα km/h','Speed km/h'],['Ανάφλεξη','Ignition'],['Πίεση λαδιού','Oil pressure'],['Πίεση καυσίμου','Fuel pressure'],['Duty μπεκ','Injector duty'],['Θερμ. εγκεφάλου','ECU temp'],['Λάδι','Oil'],
 ['Καταγραφές (logs)','Logs'],['Αυτόματη καταγραφή','Automatic logging'],['Καταγραφή και στο Demo (για δοκιμή)','Log in Demo too (for testing)'],['Αποθηκευμένες διαδρομές','Saved drives'],['Εγγραφή τώρα','Recording now'],['Η αυτόματη καταγραφή είναι κλειστή.','Automatic logging is off.'],['Αναμονή: η καταγραφή ξεκινάει μόλις πάρει μπροστά ο κινητήρας.','Waiting: logging starts as soon as the engine starts.'],['Η καταγραφή ξεκινάει μόνη της όταν πάρει μπροστά ο κινητήρας και αποθηκεύεται όταν σβήσει. Κρατιούνται οι τελευταίες 50 διαδρομές, οι παλιότερες σβήνονται αυτόματα.','Logging starts by itself when the engine starts and is saved when it stops. The last 50 drives are kept; older ones are deleted automatically.'],['Δεν υπάρχουν ακόμα καταγραφές.','No logs yet.'],['Διάρκεια','Duration'],['Απόσταση','Distance'],['Max νερό','Max coolant'],['‹ Λίστα','‹ List'],['Αποστολή CSV','Send CSV'],['Σύρε το δάχτυλο πάνω στα γραφήματα για να δεις τις τιμές.','Drag your finger over the charts to see the values.'],['Δεν υπάρχουν δεδομένα.','No data.'],['Διαγραφή αυτής της καταγραφής;','Delete this log?'],['Η καταγραφή είναι σε εξέλιξη','Logging is in progress'],['Η διαδρομή αποθηκεύτηκε','Drive saved'],['Η καταγραφή δεν αποθηκεύτηκε','The log could not be saved'],['Η καταγραφή δεν βρέθηκε','Log not found'],['Η αποστολή απέτυχε','Sending failed'],
 ['Μηδενισμός κλίσης','Zero grade'],['Σταμάτα πρώτα το αυτοκίνητο','Stop the car first'],['Κλίση: 0 ✓','Grade: 0 ✓'],['Αναίρεση','Undo'],['Ο μηδενισμός αναιρέθηκε','Zero undone'],['Γρήγορος μηδενισμός: κράτα πατημένο το κουτάκι της κλίσης για 1 δευτερόλεπτο, ή Μενού → «Μηδενισμός κλίσης».','Quick zero: hold the grade tile for 1 second, or Menu → “Zero grade”.'],
@@ -300,6 +363,12 @@ function fit(){
   rot=lk&&S.orient!=='p'&&h>w;
   if(rot)Object.assign(b.style,{position:'fixed',left:'0',top:'0',width:h+'px',height:w+'px',transformOrigin:'0 0',transform:'translateX('+w+'px) rotate(90deg)'});
   else b.removeAttribute('style');
+  // Κάθε προσανατολισμός έχει το δικό του layout: S.pages = τωρινό, S.pagesAlt = του άλλου προσανατολισμού
+  const so=screen.orientation&&screen.orientation.type,eo=lk?(S.orient==='p'?'p':'l'):(so?(so.startsWith('portrait')?'p':'l'):(h>w?'p':'l'));
+  if(S.orient&&S.pages){if(!S.pagesOr)S.pagesOr=eo;
+    if(S.pagesOr!==eo){if(!S.pagesAlt)S.pagesAlt=JSON.parse(JSON.stringify(S.pages));
+      const a=S.pages;S.pages=S.pagesAlt;S.pagesAlt=a;const c=S.cur;S.cur=S.curAlt||0;S.curAlt=c;S.pagesOr=eo;if(S.cur>=S.pages.length)S.cur=0;
+      save();if($('#stage'))build()}}
 }
 addEventListener('resize',fit);addEventListener('orientationchange',()=>setTimeout(fit,250));
 
@@ -319,7 +388,7 @@ function toBase(k,v,u){u=u||UN();const d=KIND[k];
   return v}
 function setUnit(kind,val){
   const old={...UN()},nu={...old,[kind]:val};
-  for(const p of S.pages)for(const w of p.w){if(w.t==='s'||KIND[w.k]!==kind)continue;
+  for(const p of [...S.pages,...(S.pagesAlt||[])])for(const w of p.w){if(w.t==='s'||KIND[w.k]!==kind)continue;
     for(const f of ['lo','hi','min','max'])if(on(w[f]))w[f]=+fromBase(w.k,toBase(w.k,w[f],old),nu).toFixed(2)}
   S.u=nu;for(const k in mm)delete mm[k];save();build();
 }
@@ -330,7 +399,13 @@ function cn(c){let n=c.n;const u=UN();
   if(KIND[c.k]==='t')n=n.replace('°C','°'+u.t);else if(c.k==='spd')n=n.replace('km/h',u.s==='mph'?'mph':'km/h');
   else if(c.k==='map')n=n.replace('kPa',u.p);else if(KIND[c.k]==='p')n=n.replace('bar',u.p);return n}
 function bv(c){
+  if(RP.on&&c.k in RP.cur)return RP.cur[c.k]; // αναπαραγωγή καταγραφής
   if(c.k==='grd')return demo?(raw.grd??null):TL.v;
+  if(c.k==='glon')return demo?(raw.glon??null):TL.gx;
+  if(c.k==='glat')return demo?(raw.glat??null):TL.gy;
+  if(c.k==='turbo')return TT.wait();
+  if(c.k==='cel')return raw[255]===undefined?null:raw[255];
+  if(c.k==='gear'){const id=get(c,'id');let e=null;if(id!=null&&raw[id]!==undefined){e=raw[id]&255;if(e>127)e-=256}return e>0?e:(spdK()!=null?gearCalc():e)}
   if(c.k==='boost'){const m=bv(M.map);if(m==null)return null;const b=bv(M.baro);return(m-(b!=null&&b>50&&b<120?b:S.baro))/100} // baro από τον εγκέφαλο, αλλιώς η ρύθμιση
   const id=get(c,'id');
   if(id==null||raw[id]===undefined)return null;
@@ -355,7 +430,7 @@ function s14(el,s){if(!el)return;s=String(s).replace(/ \?$/,'');el.innerHTML='<s
 const ghost=(w,c)=>Math.abs(w.max??dmax(c)).toFixed(dec(c)).replace(/[0-9]/g,'8');
 function mk(w){
   if(w.t==='s')return mkS(w);
-  const th=thm(),c=MW(w),d=document.createElement('div');d.className='w'+(w.t==='g'?' g':'')+(w.t==='r'?' r':'')+(w.t==='b'&&th==='l'?' w7':'')+(w.t==='b'&&th==='e'?' wL':'')+(w.t==='b'&&th==='a'?' wA':'')+(w.t==='b'&&th==='f'?' wF':'')+(w.t==='b'&&(w.nm||w.k==='clk')?' nmm':'')+(w.t==='b'&&(w.nh||w.k==='clk')?' nhd':'');pos(d,w);
+  const th=thm(),c=MW(w),d=document.createElement('div');d.className='w'+(w.t==='g'?' g':'')+(w.t==='r'?' r':'')+(w.t==='b'&&th==='l'?' w7':'')+(w.t==='b'&&th==='e'?' wL':'')+(w.t==='b'&&th==='a'?' wA':'')+(w.t==='b'&&th==='f'?' wF':'')+(w.t==='b'&&(w.nm||w.k==='clk'||w.k==='cel')?' nmm':'')+(w.t==='b'&&(w.nh||w.k==='clk')?' nhd':'');pos(d,w);
   d.innerHTML=w.t==='r'?bsvg(eff(w),th)+'<div class="rz"></div>':(w.t==='g'
    ?gsvg(eff(w),th)
    :d.classList.contains('wL')
@@ -651,13 +726,16 @@ function drag(e,w,d){
 }
 setInterval(()=>{
   if(demo)sim();
+  if(RP.on)RP.step();
   LOG.tick();{const e=$('#lg_st');if(e)lgStat(e)}
+  GP.tick();TT.tick();topInd();if(typeof PF!=='undefined')PF.tick();if(typeof GM!=='undefined'&&GM.open)GM.draw();
   if(!TL.on&&!TL.ios&&TL.need())TL.start();
   if(TL.on&&!demo){const sv=bv(M.spd);if(sv!=null){TL.ecu=Date.now();TL.spd(sv/3.6,Date.now())}else if(Date.now()-TL.ecu>2000)TL.ecu=0}
   {const e=$('#gr_v');if(e){const v=bv(GRD);e.textContent=v==null?(S.grd0||demo?'-':t('Κάνε μηδενισμό')):(v>0?'+':'')+v.toFixed(1)+' %'}}
   for(const w of S.pages[S.cur].w){
     const d=refs.get(w);if(!d)continue;
     if(w.t==='s'){const r=val(M.rpm);sup(d,w,r==null?0:r);continue}
+    if(w.k==='cel'){const v=bv(M.cel),s=v==null?'-':v?celTxt(v):'OK',e=d.querySelector('.bv');if(e._c!==s){e._c=s;e._s=null;e.classList.add('celt');if(d.classList.contains('wL'))s14(e,s);else e.textContent=s}d.classList.toggle('al',!!v);if(v)d.style.setProperty('--al','#ffb020');continue}
     if(w.k==='clk'){const s=hhmm(),bvv=d.querySelector('.bv');if(d.classList.contains('wL'))s7(bvv,s,0,'88:88');else if(d.classList.contains('w7'))s7(bvv,s);else if(bvv.textContent!==s)bvv.textContent=s;continue}
     const c=M[w.k],v=val(c);if(v==null)continue;
     const m=mm[c.k]||(mm[c.k]={a:v,b:v});m.a=Math.min(m.a,v);m.b=Math.max(m.b,v);
@@ -685,7 +763,7 @@ function sim(){if(DY.sim)return;const t=Date.now()/1000,w=Math.sin(t/2);
   const afr=12.5+2*Math.sin(t),kmh=raw[1]*.03;raw[0x0C]=Math.round(afr*10);raw[0x1B]=Math.round(afr/14.7*128);raw[0x1C]=Math.round(kmh*4);
   raw[0x0D]=Math.max(1,Math.min(6,1+Math.floor((t/6)%6)));raw[6]=(Math.round(2*(18+12*Math.sin(t/2+1)))+256)%256;raw[0x0A]=Math.round(51*(.6+.3*Math.max(0,w)));
   raw[8]=Math.round(650+200*Math.max(0,w));raw[9]=raw[8]-15;raw[0x16]=Math.round(92+3*Math.sin(t/11));raw[0x15]=Math.round(16*(1.5+2.5*raw[1]/7000));raw[0x17]=Math.round(32*(3+.8*Math.max(0,w)));
-  raw[0x13]=Math.round(2*(10+60*Math.max(0,w)));raw[0x14]=38;raw[0x0E]=101;raw.grd=+(4*Math.sin(t/7)+.6*Math.sin(t*1.3)).toFixed(1)}
+  raw[0x13]=Math.round(2*(10+60*Math.max(0,w)));raw[0x14]=38;raw[0x0E]=101;raw[255]=(t%30)<4?(1<<7):0;raw.glon=+(.35*Math.cos(t/2)).toFixed(2);raw.glat=+(.5*Math.sin(t/3.3)).toFixed(2);raw.grd=+(4*Math.sin(t/7)+.6*Math.sin(t*1.3)).toFixed(1)}
 
 // Παράθυρο ρυθμίσεων οργάνου
 const D=h=>{$('#dlg').innerHTML=h;$('#dlg').classList.add('open')};
@@ -698,7 +776,7 @@ function dlgW(w,isNew){
   const xr=mx?'<label id="r_xn">Έξτρα οθόνες<select id="f_xn">'+[...Array(mx+1).keys()].map(i=>'<option value="'+i+'"'+(xs.length===i?' selected':'')+'>'+(i?i:'Όχι')+'</option>').join('')+'</select></label><label id="r_x1">Οθόνη 1<select id="f_x1">'+op(xs[0])+'</select></label><label id="r_x2">Οθόνη 2<select id="f_x2">'+op(xs[1])+'</select></label>':'';
   D(`<h3>${isNew?'Νέο όργανο':'Όργανο'}</h3>
   <label>Τύπος<select id="f_t"><option value="b"${w.t==='b'?' selected':''}>Κουτάκι</option><option value="g"${w.t==='g'?' selected':''}>Αναλογικό</option><option value="r"${w.t==='r'?' selected':''}>Μπάρα</option></select></label>
-  <label>Κανάλι<select id="f_k">${o}<option value="clk"${w.k==='clk'?' selected':''}>Ρολόι (ώρα)</option><option value="grd"${w.k==='grd'?' selected':''}>Κλίση δρόμου %</option></select></label>
+  <label>Κανάλι<select id="f_k">${o}<option value="clk"${w.k==='clk'?' selected':''}>Ρολόι (ώρα)</option><option value="grd"${w.k==='grd'?' selected':''}>Κλίση δρόμου %</option>${['cel','turbo','glon','glat'].map(k=>'<option value="'+k+'"'+(w.k===k?' selected':'')+'>'+({cel:'Check engine',turbo:'Turbo timer (δευτ.)',glon:'G διαμήκης (επιτάχυνση/φρένο)',glat:'G πλευρική (στροφές)'})[k]+'</option>').join('')}</select></label>
   <label>Όνομα (κενό = προεπιλογή)<input id="f_lb" value="${(w.lbl||'').replace(/"/g,'')}" placeholder="${t(cn(c0))}" maxlength="24"></label>
   <label>Συναγερμός κάτω από<span><input id="f_lo" value="${w.lo??''}" style="width:72px"> <input type="color" id="f_lc" value="${w.lc||'#2d7bff'}" style="width:44px;padding:2px"></span></label>
   <label>Συναγερμός πάνω από<span><input id="f_hi" value="${w.hi??''}" style="width:72px"> <input type="color" id="f_hc" value="${w.hc||'#ff2d2d'}" style="width:44px;padding:2px"></span></label>
@@ -717,13 +795,14 @@ function dlgW(w,isNew){
   <label class="rb">Χρώμα τιμής<input type="color" id="f_vc" value="${w.vc||'#f2f2f2'}" style="width:56px;padding:2px"></label>
   <label class="rb">Χρώμα περιφερειακών γραμμάτων (IAT, Min, Max)<input type="color" id="f_pc" value="${w.pc||'#8a8a8a'}" style="width:56px;padding:2px"></label>
   <div><button id="f_ok">Αποθήκευση</button> ${isNew?'':'<button id="f_del">Διαγραφή</button> '}<button id="f_x">Κλείσιμο</button></div>`);
-  const syncT=()=>{const ty=$('#f_t').value;let g=ty==='g'||ty==='r';const ck=$('#f_k').querySelector('option[value="clk"]');ck.hidden=g;$('#f_k').querySelector('option[value="grd"]').hidden=g;if(g&&($('#f_k').value==='clk'||$('#f_k').value==='grd')){$('#f_k').value='rpm';$('#f_k').onchange&&$('#f_k').onchange()}
+  const syncT=()=>{const ty=$('#f_t').value;let g=ty==='g'||ty==='r';TILEONLY.forEach(k=>{const op=$('#f_k').querySelector('option[value="'+k+'"]');if(op)op.hidden=g});if(g&&TILEONLY.includes($('#f_k').value)){$('#f_k').value='rpm';$('#f_k').onchange&&$('#f_k').onchange()}
     ['r_min','r_max'].forEach(i=>$('#'+i).style.display=g?'':'none');
     document.querySelectorAll('#dlg .rg').forEach(e=>e.style.display=g?'':'none');
     if(th==='a')['#f_ac','#f_ec','#f_ep'].forEach(i=>$(i).closest('label').style.display='none'); // Αναλογικό: όλα από το χρώμα γραμμάτων
     document.querySelectorAll('#dlg .rb').forEach(e=>e.style.display=g?'none':'');
     ['#f_lo','#f_hi'].forEach(i=>$(i).closest('label').style.display='');
     if($('#f_lb'))$('#f_lb').closest('label').style.display=$('#f_k').value==='clk'?'none':''; // το ρολόι δεν έχει επικεφαλίδα
+    if($('#f_k').value==='cel')['#f_mm','#f_lo','#f_hi'].forEach(i=>$(i).closest('label').style.display='none'); // check engine: κείμενο
     if($('#f_k').value==='clk')['#f_nh','#f_mm','#f_lo','#f_hi','#f_pc'].forEach(i=>$(i).closest('label').style.display='none'); // ρολόι: χωρίς επικεφαλίδα, Min/Max, συναγερμούς, δεύτερο χρώμα
     if(mx){const gg=ty==='g';$('#r_xn').style.display=gg?'':'none';const n=+$('#f_xn').value;$('#r_x1').style.display=gg&&n>=1?'':'none';$('#r_x2').style.display=gg&&n>=2?'':'none'}
     if(ty==='r'&&$('#f_nb'))$('#f_nb').closest('label').style.display='none'; // μπάρα: αντί για "περίγραμμα" έχει "Πλαίσιο (border)"
@@ -939,10 +1018,11 @@ function dyCalc(s0,c){
   const T0=s[0].t,T1=s[s.length-1].t;
   if(T1-T0<1)return{err:'Η μέτρηση ήταν πολύ σύντομη. Χρησιμοποίησε μεγαλύτερη ταχύτητα (π.χ. 3η ή 4η).'};
   const k=dK(c),gr=c.g[c.gear-1]*c.fd,me=c.m*(1.04+.0025*gr*gr),rho=dRho(c),W=Math.max(.25,Math.min(.6,(T1-T0)/12)),B={};
+  const gs=s.map(x=>x.g).filter(x=>x!=null&&isFinite(x)),gA=gs.length>s.length*.5?gs.reduce((a,b)=>a+b,0)/gs.length:null,sinG=gA==null?0:Math.sin(Math.atan(gA/100)); // μέση κλίση δρόμου
   s.forEach((x,i)=>{
     if(x.t-T0<W*.5||T1-x.t<W*.5)return;
     const f=lq(s,i,W);if(!f||f.d<50)return;
-    const v=f.r*k,a=f.d*k,Pw=me*a*v+.5*rho*c.cd*c.fa*v*v*v+c.crr*c.m*9.81*v;
+    const v=f.r*k,a=f.d*k,Pw=me*a*v+.5*rho*c.cd*c.fa*v*v*v+c.crr*c.m*9.81*v+c.m*9.81*sinG*v; // + ισχύς για την ανηφόρα (ή − για κατηφόρα)
     const b=Math.round(f.r/100)*100,o=B[b]||(B[b]={n:0,w:0,a:0,an:0,b:0,bn:0});
     o.n++;o.w+=Pw;if(x.a!=null){o.a+=x.a;o.an++}if(x.b!=null){o.b+=x.b;o.bn++}
   });
@@ -952,7 +1032,7 @@ function dyCalc(s0,c){
   pts=pts.map((p,i)=>{let sw=0,sx=0;K.forEach((kk,j)=>{const q=pts[i+j-2];if(q&&Math.abs(q.r-p.r)<=250){sw+=kk;sx+=kk*q.w}});return Object.assign({},p,{w:sx/sw})});
   const lf=1-c.loss/100;
   pts.forEach(p=>{p.p=p.w/lf;p.q=p.p/(p.r*Math.PI/30)});
-  return{pts};
+  return{pts,gr:gA==null?null:+gA.toFixed(1)};
 }
 
 // Καταγραφή: καλείται για κάθε πλαίσιο που φτάνει από τον EMU
@@ -961,7 +1041,7 @@ function dyS(id){
   const r=bv(M.rpm),p=bv(M.tps),t=performance.now()/1000,c=dCar();
   if(r==null)return;
   if(DY.st==='armed'){if(r<700||(p!=null&&p<c.tps))return;DY.st='rec';DY.s=[];DY.mx=r;DY.mn=r;DY.mt=t}
-  DY.s.push({t,r,p,a:bv(M.afr),b:bv(M.boost)});
+  DY.s.push({t,r,p,a:bv(M.afr),b:bv(M.boost),g:TL.v}); // g: κλίση δρόμου % (αν έχει γίνει μηδενισμός)
   if(r>DY.mx+20){DY.mx=r;DY.mt=t}
   if(r<DY.mn)DY.mn=r;
   const dur=t-DY.s[0].t,pulled=DY.mx-DY.mn>800;
@@ -1051,6 +1131,10 @@ function dyBind(runs){
       runs.forEach(x=>{let q=null;x.pts.forEach(p=>{if(Math.abs(p.r-cur)<=150&&(!q||Math.abs(p.r-cur)<Math.abs(q.r-cur)))q=p});
         if(q)h+='<span><i style="background:'+x.col+'"></i>'+(q.p/u[1]).toFixed(1)+' '+u[0]+' · '+q.q.toFixed(0)+' Nm'+(q.a!=null?' · AFR '+q.a.toFixed(1):'')+(q.b!=null&&q.b>.05?' · '+fromBase('boost',q.b).toFixed(2)+' '+UN().p:'')+'</span>'});
       h+='</div>'}else h+='<div class="h">Πάτα πάνω στο γράφημα για τιμές σε κάθε στροφή.</div>';
+    if(runs.length===2){const A=dPk(runs[0].pts),B=dPk(runs[1].pts),sg=x=>(x>=0?'+':'')+x;let d='<b>'+t('Διαφορά')+' (2 − 1)</b> '+t('μέγιστη ισχύς')+' '+sg(((B.P.p-A.P.p)/u[1]).toFixed(1))+' '+u[0]+' · '+t('μέγιστη ροπή')+' '+sg((B.Q.q-A.Q.q).toFixed(0))+' Nm';
+      if(cur!=null){const at=x=>{let q=null;x.pts.forEach(p=>{if(Math.abs(p.r-cur)<=150&&(!q||Math.abs(p.r-cur)<Math.abs(q.r-cur)))q=p});return q},a=at(runs[0]),b=at(runs[1]);
+        if(a&&b)d+='<br>'+t('Στις')+' '+Math.round(cur)+' rpm: '+sg(((b.p-a.p)/u[1]).toFixed(1))+' '+u[0]+' · '+sg((b.q-a.q).toFixed(0))+' Nm'}
+      h+='<div class="dym">'+d+'</div>'}
     ro.innerHTML=h};
   const hit=(el,ev)=>{const rc=el.getBoundingClientRect(),x=rot?ev.clientY-rc.top:ev.clientX-rc.left;return cv._r?cv._r(x):null};
   [cv,cv2].forEach(el=>{let dn=false;
@@ -1109,13 +1193,14 @@ function dyShowRes(){
   e.innerHTML='<div class="dyt dyt2"><div><small>Μέγιστη ισχύς κινητήρα</small><b>'+(P.p/u[1]).toFixed(1)+' '+u[0]+'</b><small>@ '+P.r+' rpm</small></div>'
     +'<div><small>Στους τροχούς</small><b>'+(P.w/u[1]).toFixed(1)+' '+u[0]+'</b><small>@ '+P.r+' rpm</small></div>'
     +'<div><small>Μέγιστη ροπή κινητήρα</small><b>'+Q.q.toFixed(0)+' Nm</b><small>@ '+Q.r+' rpm</small></div></div>'
+    +(R.gr!=null&&Math.abs(R.gr)>=.1?'<div class="dym">'+t('Διόρθωση για την κλίση του δρόμου')+': '+(R.gr>0?'+':'')+R.gr+' %</div>':'')
     +dyChartHtml
     +'<label>Όνομα μέτρησης</label><input id="dy_n" class="dyi" value="'+nm+'">'
     +'<div class="dyb"><button id="dy_sv" class="pri">Αποθήκευση</button><button id="dy_hs">Αποθηκευμένες μετρήσεις</button></div>';
   dyBind([{n:nm,col:S.c1||DCOL[0],pts:R.pts}]);
   $('#dy_hs').onclick=()=>{dyLeave();dyHist()};
   $('#dy_sv').onclick=()=>{
-    const L=dyS0().runs,run={id:Date.now(),n:($('#dy_n').value||nm).slice(0,40),d:Date.now(),g:c.gear,car:dyS0().car.name||'',
+    const L=dyS0().runs,run={id:Date.now(),n:($('#dy_n').value||nm).slice(0,40),d:Date.now(),g:c.gear,car:dyS0().car.name||'',gr:R.gr,
       pts:R.pts.map(p=>({r:p.r,w:Math.round(p.w),p:Math.round(p.p),q:+p.q.toFixed(1),a:p.a==null?null:+p.a.toFixed(2),b:p.b==null?null:+p.b.toFixed(3)}))};
     L.push(run);while(L.length>30)L.shift();
     if(!save()){L.pop();alert(t('Η μνήμη είναι γεμάτη. Διέγραψε παλιές μετρήσεις.'));return}
@@ -1202,6 +1287,8 @@ function dyHist(){
 
 // Μενού
 const IC={
+timer:'<circle cx="12" cy="13.5" r="7.5"/><path d="M12 13.5l3-3M10 3h4M12 3v3"/>',
+gmeter:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="14.5" cy="9.5" r="1.6" fill="currentColor"/>',
 log:'<path d="M3 16l5-6 4 4 4-7 5 6"/><path d="M3 20.5h18"/>',
 grade:'<path d="M3 18L20 8.5"/><path d="M3 18h18"/><path d="M14.5 18a6 6 0 0 0-.9-3.1"/>',
 dyno:'<path d="M3.5 17a8.5 8.5 0 0 1 17 0"/><path d="M12 17l4.2-5.2"/><circle cx="12" cy="17" r="1.4"/><path d="M6 13.5l1 .6M8.5 9.6l.6 1M12 8.5v1.2M15.5 9.6l-.6 1"/>',
@@ -1223,7 +1310,9 @@ function menu(){
    ['skins','palette','Skins',[['t','Θέμα οργάνων'],['b','Φόντο και logo']]],
    ['set','gear','Ρυθμίσεις',[['o','Προσανατολισμός οθόνης'],['k','Βαθμονόμηση καναλιών'],['gr','Κλίση δρόμου'],['d','Demo'],['lg','🌐 Ελληνικά / English'],['r','Επαναφορά όλων']]],
    ['dyno','dyno','Dyno / Ιπποδύναμη',[['dr','Νέα μέτρηση'],['dc','Στοιχεία αυτοκινήτου'],['dh','Αποθηκευμένες μετρήσεις']]],
-   ['logs','log','Καταγραφές (logs)']];
+   ['logs','log','Καταγραφές (logs)'],
+   ['perf','timer','Χρονόμετρο επιδόσεων'],
+   ['gm','gmeter','G-meter']];
   let h='<div class="mh">'+LOGO.replace(/style="[^"]*"/,'')+'<div class="ml"></div></div>';
   for(const [k,i,n,subs] of T){
     h+='<button class="mi" data-cat="'+k+'">'+ic(i)+'<span>'+n+'</span></button>';
@@ -1312,9 +1401,10 @@ async function logView(id){
       for(let i=i0;i<i1;i++){const v=a[i];if(v==null)continue;if(a0==null||v<a0)a0=v;if(a1==null||v>a1)a1=v}
       if(a0==null)continue;const x=(B>1?(b+.5)/B*600:300).toFixed(1);p+=x+','+Y(a0)+' '+(a1!==a0?x+','+Y(a1)+' ':'')}
     ch+='<div class="lgc"><div class="lgh"><span>'+cn(M[k])+'</span><i>'+lfm(k,mn)+' – '+lfm(k,mx)+'</i><b data-k="'+k+'">-</b></div><svg viewBox="0 0 600 90" preserveAspectRatio="none"><polyline points="'+p+'" fill="none" stroke="'+LCOL[k]+'" stroke-width="1.6" vector-effect="non-scaling-stroke"/><line class="lcur" x1="-10" x2="-10" y1="0" y2="90" stroke="#fff" stroke-opacity=".7" vector-effect="non-scaling-stroke"/></svg></div>'}
-  openSP(fmtW(l.t0),'<div class="dyb"><button id="lv_b">‹ Λίστα</button><button id="lv_csv" class="pri">Αποστολή CSV</button><button id="lv_del">Διαγραφή</button></div>'
+  openSP(fmtW(l.t0),'<div class="dyb"><button id="lv_b">‹ Λίστα</button><button id="lv_rp" class="pri">▶ Αναπαραγωγή</button><button id="lv_csv">Αποστολή CSV</button><button id="lv_del">Διαγραφή</button></div>'
     +'<div class="dyt">'+sm+'</div><div class="dym"><span>Σύρε το δάχτυλο πάνω στα γραφήματα για να δεις τις τιμές.</span> <b id="lv_t"></b></div><div id="lv_c">'+(ch||'<div class="dym">Δεν υπάρχουν δεδομένα.</div>')+'</div>');
   $('#lv_b').onclick=logPage;
+  $('#lv_rp').onclick=()=>{if(!n){toast('Δεν υπάρχουν δεδομένα.');return}RP.start(l)};
   $('#lv_del').onclick=async()=>{if(!confirm(t('Διαγραφή αυτής της καταγραφής;')))return;if(LOG.cur&&LOG.cur.id===id){toast('Η καταγραφή είναι σε εξέλιξη');return}await LOG.del(id).catch(()=>{});logPage()};
   $('#lv_csv').onclick=()=>{const N=LNM(),rows=['time_s,clock,'+ks.map(k=>N[k]).join(',')];
     for(let i=0;i<n;i++)rows.push((l.t[i]/1000).toFixed(1)+','+hms(l.t0+l.t[i])+','+ks.map(k=>{const v=l.ch[k][i];return v==null?'':(+fromBase(k,v).toFixed(3))}).join(','));
@@ -1334,6 +1424,59 @@ async function shareFile(name,txt,type){const C=window.CapFS;
     if(navigator.canShare&&navigator.canShare({files:[fl]})){try{await navigator.share({files:[fl],title:name});return}catch(e){if(e.name==='AbortError')return}}
     const a=document.createElement('a');a.href=URL.createObjectURL(fl);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500)
   }catch(e){if(!/cancel/i.test(String(e&&e.message)))toast('Η αποστολή απέτυχε')}}
+// ---- Χρονόμετρο επιδόσεων ----
+const PF={open:false,st:'wait',lv:null,lt:0,gt:0,still:0,t0:0,d:0,x100:null,r:{},roll:null,mx:0,
+  sample(){const e=demo?null:bv(M.spd),g=GP.kmh();
+    if(e!=null&&(e>1||g==null||g<5))return{v:e,t:Date.now(),src:'ECU'};
+    if(g!=null&&GP.t!==this.gt){this.gt=GP.t;return{v:g,t:GP.t,src:'GPS'}}return null},
+  tick(){if(RP.on)return;const s=this.sample();if(!s)return;this.src=s.src;const v=s.v,t=s.t,p=this.lv,pt=this.lt;this.lv=v;this.lt=t;
+    if(p==null)return;const dt=(t-pt)/1000;if(dt<=0||dt>3)return;
+    const X=a=>p<a&&v>=a?pt+(a-p)/(v-p)*(t-pt):null; // χρονική στιγμή που πέρασε την τιμή a (γραμμική παρεμβολή)
+    if(v<1){this.still+=dt;if(this.still>1&&this.st!=='ready'){this.st='ready';this.r={}}}else this.still=0;
+    if(this.st==='ready'&&v>=1){this.st='run';this.t0=X(1)??pt;this.d=0;this.x100=null;this.mx=v;this.r={}}
+    if(this.st==='run'){const d0=this.d;this.d+=(p+v)/2/3.6*dt;this.mx=Math.max(this.mx,v);
+      const a=X(100);if(a&&this.r.t100==null){this.r.t100=(a-this.t0)/1000;this.x100=a;this.res('0–100',this.r.t100)}
+      const b=X(200);if(b&&this.x100&&this.r.t200==null){this.r.t200=(b-this.x100)/1000;this.res('100–200',this.r.t200)}
+      if(d0<400&&this.d>=400){const q=pt+(400-d0)/(this.d-d0)*(t-pt);this.r.q=(q-this.t0)/1000;this.r.qv=v;this.res('400 m',this.r.q)}
+      if(v<this.mx-15||(this.d>2000))this.end()}
+    if(this.roll==null){const a=X(60);if(a)this.roll=a}else{const b=X(130);if(b){this.r.t60=(b-this.roll)/1000;this.res('60–130',this.r.t60);this.roll=null}else if(v<55)this.roll=null}
+    if($('#pf_v'))this.ui()},
+  res(n,v){const P=S.perf||(S.perf={best:{},hist:[]}),k={'0–100':'t100','100–200':'t200','400 m':'q','60–130':'t60'}[n];
+    const nb=P.best[k]==null||v<P.best[k];if(nb){P.best[k]=+v.toFixed(2);if(k==='q')P.best.qv=Math.round(this.r.qv)}
+    P.hist.unshift({d:Date.now(),k,v:+v.toFixed(2),src:this.src});P.hist.length=Math.min(P.hist.length,30);save();
+    toast(n+': '+v.toFixed(2)+' s'+(nb?'  🏆':''),null,null,5000)},
+  end(){this.st='wait'},
+  ui(){const e=$('#pf_v');if(!e)return;const v=this.lv;e.innerHTML=(v==null?'-':Math.round(fromBase('spd',v)))+'<small>'+spU()+'</small>';
+    $('#pf_s').textContent=t(this.lv==null?'Περιμένω ταχύτητα (GPS ή αισθητήρας)…':this.st==='ready'?'Έτοιμο: φύγε όποτε θέλεις.':this.st==='run'?'Μέτρηση…':'Σταμάτα το αυτοκίνητο για νέα μέτρηση από στάση.')+(this.src?'  ·  '+this.src:'');
+    const P=S.perf||{best:{},hist:[]},f=x=>x==null?'-':x.toFixed(2)+' s',r=this.r,B=P.best;
+    $('#pf_r').innerHTML='<div><small>0–100</small><b>'+f(r.t100)+'</b><small>'+t('ρεκόρ')+' '+f(B.t100)+'</small></div><div><small>100–200</small><b>'+f(r.t200)+'</b><small>'+t('ρεκόρ')+' '+f(B.t200)+'</small></div>'
+      +'<div><small>60–130</small><b>'+f(r.t60)+'</b><small>'+t('ρεκόρ')+' '+f(B.t60)+'</small></div><div><small>400 m</small><b>'+f(r.q)+'</b><small>'+(r.qv?Math.round(fromBase('spd',r.qv))+' '+spU()+' · ':'')+t('ρεκόρ')+' '+f(B.q)+'</small></div>'}};
+function perfPage(){PF.open=true;
+  openSP('Χρονόμετρο επιδόσεων','<div class="pfv" id="pf_v">-</div><div class="dym" id="pf_s"></div><div class="dyt" id="pf_r"></div>'
+    +'<div class="dym">Μετράει μόνο του: 0–100 και 400 m ξεκινώντας από στάση, 100–200 και 60–130 και εν κινήσει. Οι χρόνοι είναι σε km/h. Η ταχύτητα έρχεται από τον αισθητήρα του εγκεφάλου ή, αν δεν υπάρχει, από το GPS του κινητού (λιγότερο ακριβές, περίπου ±0.2 s). Μόνο σε κλειστή πίστα, με ασφάλεια.</div>'
+    +'<div class="dyb"><button id="pf_x">Μηδενισμός ρεκόρ</button></div>');
+  $('#pf_x').onclick=()=>{if(confirm(t('Μηδενισμός όλων των ρεκόρ;'))){S.perf={best:{},hist:[]};save();PF.ui()}};
+  const b=$('#sb'),o=b.onclick;b.onclick=()=>{PF.open=false;o()};PF.ui()}
+// ---- G-meter ----
+const GM={open:false,tr:[],mx:{a:0,b:0,l:0,r:0},
+  draw(){const cv=$('#gm_cv');if(!cv){this.open=false;return}const gx=bv(M.glon),gy=bv(M.glat),msg=$('#gm_m');
+    if(msg)msg.style.display=gx==null?'':'none';
+    const dpr=devicePixelRatio||1,W=cv.clientWidth,H=cv.clientHeight;if(!W)return;if(cv.width!==W*dpr){cv.width=W*dpr;cv.height=H*dpr}
+    const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,W,H);const cx=W/2,cy=H/2,R=Math.min(W,H)/2-14,S1=R/1.2;
+    g.strokeStyle='#333';g.lineWidth=1;g.fillStyle='#777';g.font='11px system-ui,sans-serif';g.textAlign='left';
+    [.4,.8,1.2].forEach(r=>{g.beginPath();g.arc(cx,cy,r*S1,0,7);g.stroke();g.fillText(r.toFixed(1)+'g',cx+4,cy-r*S1+12)});
+    g.beginPath();g.moveTo(cx-R,cy);g.lineTo(cx+R,cy);g.moveTo(cx,cy-R);g.lineTo(cx,cy+R);g.stroke();
+    if(gx==null)return;this.tr.push([gy,gx]);if(this.tr.length>40)this.tr.shift();
+    const m=this.mx;m.a=Math.max(m.a,gx);m.b=Math.max(m.b,-gx);m.l=Math.max(m.l,-gy);m.r=Math.max(m.r,gy);
+    g.strokeStyle='rgba(255,45,45,.45)';g.lineWidth=2;g.beginPath();this.tr.forEach(([y,x],i)=>{const px=cx+cl(y,-1.3,1.3)*S1,py=cy-cl(x,-1.3,1.3)*S1;i?g.lineTo(px,py):g.moveTo(px,py)});g.stroke();
+    const px=cx+cl(gy,-1.3,1.3)*S1,py=cy-cl(gx,-1.3,1.3)*S1;g.fillStyle=S.col||'#ff2d2d';g.beginPath();g.arc(px,py,8,0,7);g.fill();
+    const e=$('#gm_mx');if(e)e.innerHTML='<div><small>'+t('Επιτάχυνση')+'</small><b>'+m.a.toFixed(2)+' g</b></div><div><small>'+t('Φρένο')+'</small><b>'+m.b.toFixed(2)+' g</b></div><div><small>'+t('Αριστερά')+'</small><b>'+m.l.toFixed(2)+' g</b></div><div><small>'+t('Δεξιά')+'</small><b>'+m.r.toFixed(2)+' g</b></div>'}};
+function gPage(){GM.open=true;TL.start();GM.tr=[];
+  openSP('G-meter','<div class="gmw"><canvas id="gm_cv"></canvas></div><div class="dyw" id="gm_m" style="display:none">Χρειάζεται μηδενισμός θέσης: σταμάτα σε επίπεδο σημείο με το κινητό στη βάση του και πάτα «Μηδενισμός θέσης κινητού».</div><div class="dyt" id="gm_mx"></div>'
+    +'<div class="dyb"><button id="gm_r">Μηδενισμός μέγιστων</button><button id="gm_z">Μηδενισμός θέσης κινητού</button></div>'
+    +'<div class="dym">Χρησιμοποιεί τους αισθητήρες του κινητού και τον ίδιο μηδενισμό με την κλίση δρόμου. Πάνω = επιτάχυνση, κάτω = φρένο, πλάι = στροφές. Υπάρχουν και κουτάκια «G διαμήκης» και «G πλευρική».</div>');
+  $('#gm_r').onclick=()=>{GM.mx={a:0,b:0,l:0,r:0};GM.tr=[]};$('#gm_z').onclick=()=>grdZero();
+  const b=$('#sb'),o=b.onclick;b.onclick=()=>{GM.open=false;o()}}
 function gradePage(){
   const o=(v,l,c)=>'<option value="'+v+'"'+(c===v?' selected':'')+'>'+l+'</option>';TL.start();
   openSP('Κλίση δρόμου','<div class="dyt"><div><small>Κλίση τώρα</small><b id="gr_v">-</b></div></div>'
@@ -1349,7 +1492,8 @@ function gradePage(){
 }
 function orientPage(){
   const o=(v,l,c)=>'<option value="'+v+'"'+(c===v?' selected':'')+'>'+l+'</option>',cur=S.orient==='p'?'p':'l',lk=S.olock===false?'0':'1';
-  openSP('Προσανατολισμός οθόνης','<label>Προσανατολισμός</label><select id="o_s">'+o('l','Οριζόντια',cur)+o('p','Κάθετη',cur)+'</select><label>Κλείδωμα</label><select id="o_l">'+o('1','Κλειδωμένο',lk)+o('0','Ξεκλείδωτο',lk)+'</select>');
+  openSP('Προσανατολισμός οθόνης','<label>Προσανατολισμός</label><select id="o_s">'+o('l','Οριζόντια',cur)+o('p','Κάθετη',cur)+'</select><label>Κλείδωμα</label><select id="o_l">'+o('1','Κλειδωμένο',lk)+o('0','Ξεκλείδωτο',lk)+'</select>'
+    +'<div class="dym">Η κάθετη και η οριζόντια θέση έχουν <b>ξεχωριστό layout</b>. Με «Ξεκλείδωτο», όταν γυρίζεις το κινητό αλλάζει και το layout. Με «Κλειδωμένο», διαλέγεις εδώ ποιο layout θα φαίνεται (και ποιο επεξεργάζεσαι).</div>');
   $('#o_s').onchange=e=>{S.orient=e.target.value;save();fit();build()};
   $('#o_l').onchange=e=>{S.olock=e.target.value==='1';save();fit();build()};
 }
@@ -1379,6 +1523,8 @@ $('#mn').addEventListener('click',e=>{
     if(k==='edit'){cm();edit=true;build()}
     else if(k==='grz'){cm();grdZero()}
     else if(k==='logs'){cm();logPage()}
+    else if(k==='perf'){cm();perfPage()}
+    else if(k==='gm'){cm();gPage()}
     else if(k==='units'){cm();unitsPage()}
     else{oc=oc===k?null:k;menu()}
     return}
