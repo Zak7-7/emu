@@ -46,8 +46,8 @@ button{font-weight:600}
 .ed .w{outline:1.5px dashed rgba(255,255,255,.5);outline-offset:-2px}
 .ed .w.g{outline:none}
 .ed .w.g::before{content:'';position:absolute;inset:1px;border:1.5px dashed rgba(255,255,255,.5);border-radius:50%;pointer-events:none;z-index:1}
-.rz{display:none;position:absolute;right:0;bottom:0;width:32px;height:32px;z-index:2}
-.rz::after{content:'';position:absolute;right:3px;bottom:3px;width:14px;height:14px;border-radius:50%;background:var(--ac);border:2px solid #000;box-shadow:0 0 0 1px rgba(255,255,255,.5)}
+.rz{display:none;position:absolute;right:0;bottom:0;width:48px;height:48px;z-index:2}
+.rz::after{content:'';position:absolute;right:3px;bottom:3px;width:18px;height:18px;border-radius:50%;background:var(--ac);border:2px solid #000;box-shadow:0 0 0 1px rgba(255,255,255,.5)}
 .ed .rz{display:block}
 .sl{width:100%;height:100%;display:flex;flex-direction:column-reverse;align-items:center;justify-content:space-evenly}
 .dt{display:block;width:min(86cqw,calc(86cqh/var(--n)));aspect-ratio:1;border-radius:50%;background:#5a5a5a}
@@ -313,7 +313,7 @@ const DICT=[
 ['Επεξεργασία Layout','Edit Layout'],['Συναγερμοί','Alarms'],['Μονάδες εμφάνισης','Display Units'],['Συνδεσιμότητα','Connectivity'],['Σύνδεση Bluetooth','Bluetooth Connection'],['Προσανατολισμός οθόνης','Screen Orientation'],['Μονάδα θερμοκρασίας','Temperature Unit'],['Μονάδα ταχύτητας','Speed Unit'],['Μονάδα πίεσης','Pressure Unit'],['Ρυθμίσεις','Settings'],['Μενού','Menu'],['Κλειδωμένο','Locked'],['Ξεκλείδωτο','Unlocked'],['Κλείδωμα','Lock'],['Προσανατολισμός','Orientation'],['Μπαταρία (Volt)','Battery (Volt)'],['Έξτρα οθόνες','Extra screens'],['Οθόνη','Screen'],['Όχι','No'],
 ['Όταν είναι ενεργή, μπαίνει στο layout και τη μετακινείς ή τη μεγαλώνεις. Στην επεξεργασία, πάτα πάνω της για χρώματα και αριθμό LED.','When on, it is added to the layout and you can move or resize it. In edit mode, tap it for colors and LED count.'],
 ['ID σε hex όπως στην αναφορά. Τιμή = ωμή × (πολλαπλ.) + (σταθερά).','IDs in hex as in the report. Value = raw × (multiplier) + (offset).'],
-['Σύρε · τράβα τη γωνία · πάτα για ρυθμίσεις · ✓ αποθήκευση','Drag · pull the corner · tap for settings · ✓ save'],
+['Σύρε · γωνία ή 2 δάχτυλα για μέγεθος · πάτα για ρυθμίσεις · ✓','Drag · corner or 2 fingers to resize · tap for settings · ✓'],
 ['Η φωτογραφία δεν χωράει στη μνήμη. Δοκίμασε μικρότερη.','The photo does not fit in memory. Try a smaller one.'],
 ['Διαγραφή όλων των ρυθμίσεων και των οργάνων;','Delete all settings and gauges?'],
 ['Πώς θες να χρησιμοποιείς την εφαρμογή;','How do you want to use the app?'],
@@ -706,11 +706,23 @@ function sqG(w){
   const pw=w.w*W/100,ph=w.h*H/100,qw=Math.min(pw,ph*A),qh=qw/A;if(Math.abs(pw-qw)<2&&Math.abs(ph-qh)<2)return false;
   const nw=qw/W*100,nh=qh/H*100;w.x+=(w.w-nw)/2;w.y+=(w.h-nh)/2;w.w=nw;w.h=nh;return true;
 }
+let DRG=null; // ενεργό σύρσιμο οργάνου (για δεύτερο δάχτυλο)
 function drag(e,w,d){
   if(!edit){if(w.k==='grd')grdHold(e,d);return}
-  const r=$('#stage').getBoundingClientRect(),rz=e.target.classList.contains('rz');
-  const sx=e.clientX,sy=e.clientY,o={...w};let mv=false;d.setPointerCapture(e.pointerId);
+  if(DRG){DRG.add(e);return} // δεύτερο δάχτυλο: τσίμπημα
+  const r=$('#stage').getBoundingClientRect(),br=d.getBoundingClientRect(),cz=Math.min(56,br.width*.4,br.height*.45);
+  const rz=e.target.classList.contains('rz')||(br.right-e.clientX<cz&&br.bottom-e.clientY<cz); // και η περιοχή κοντά στη γωνία
+  const sx=e.clientX,sy=e.clientY,o={...w},P={};let mv=false,pz=null;d.setPointerCapture(e.pointerId);P[e.pointerId]=[sx,sy];
+  const dist=()=>{const a=Object.values(P);return Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1])||1};
+  DRG={add(ev){P[ev.pointerId]=[ev.clientX,ev.clientY];try{d.setPointerCapture(ev.pointerId)}catch(x){}
+    if(Object.keys(P).length===2){pz={d0:dist(),o:{...w}};mv=true}}};
   const m=ev=>{
+    if(P[ev.pointerId])P[ev.pointerId]=[ev.clientX,ev.clientY];
+    if(pz){if(Object.keys(P).length<2)return; // δύο δάχτυλα: μεγάλωμα/μίκρεμα γύρω από το κέντρο
+      const o=pz.o,k=cl(dist()/pz.d0,.1,10),mx=Math.min(100/o.w,100/o.h),mn=Math.max(10/o.w,10/o.h);
+      const kk=cl(k,Math.min(mn,1),mx),cx=o.x+o.w/2,cy=o.y+o.h/2;
+      w.w=o.w*kk;w.h=o.h*kk;w.x=cl(cx-w.w/2,0,100-w.w);w.y=cl(cy-w.h/2,0,100-w.h);pos(d,w);return}
+    if(ev.pointerId!==e.pointerId)return;
     if(Math.abs(ev.clientX-sx)+Math.abs(ev.clientY-sy)>6)mv=true;
     const dx=rot?(ev.clientY-sy)/r.height*100:(ev.clientX-sx)/r.width*100,dy=rot?-(ev.clientX-sx)/r.width*100:(ev.clientY-sy)/r.height*100;
     if(rz&&ARW(w)){ // στρογγυλό όργανο / μπάρα: μεγαλώνει αναλογικά, το κουτί κρατάει το σχήμα του
@@ -721,9 +733,10 @@ function drag(e,w,d){
     else if(rz){w.w=cl(sn(o.w+dx),10,100-w.x);w.h=cl(sn(o.h+dy),10,100-w.y)}
     else{w.x=cl(sn(o.x+dx),0,100-w.w);w.y=cl(sn(o.y+dy),0,100-w.h)}
     pos(d,w)};
-  const u=()=>{d.removeEventListener('pointermove',m);d.removeEventListener('pointerup',u);d.removeEventListener('pointercancel',u);save();if(!mv&&!rz)dlgW(w,false)};
+  const u=ev=>{delete P[ev.pointerId];if(Object.keys(P).length)return;DRG=null;d.removeEventListener('pointermove',m);d.removeEventListener('pointerup',u);d.removeEventListener('pointercancel',u);save();if(!mv&&!rz)dlgW(w,false)};
   d.addEventListener('pointermove',m);d.addEventListener('pointerup',u);d.addEventListener('pointercancel',u);
 }
+$('#stage').addEventListener('pointerdown',e=>{if(edit&&DRG&&!e.target.closest('.w')){DRG.add(e)}},true);
 setInterval(()=>{
   if(demo)sim();
   if(RP.on)RP.step();
@@ -903,7 +916,7 @@ function stSet(){
   else if(BT.s==='lost'){c='r';l='Αποσυνδέθηκε'}
   else if(BT.err){c='r';l=BT.err}
   e.dataset.l=l;e.dataset.c=(edit||demo)?'':c;
-  const x=edit?'Σύρε · τράβα τη γωνία · πάτα για ρυθμίσεις · ✓ αποθήκευση':(demo?'Demo':l);
+  const x=edit?'Σύρε · γωνία ή 2 δάχτυλα για μέγεθος · πάτα για ρυθμίσεις · ✓':(demo?'Demo':l);
   if(e.dataset.x!==x){e.dataset.x=x;e.textContent=x}
 }
 setInterval(()=>{BT.fps=BT.n;BT.n=0;if(BT.s==='live')stSet()},1000);
