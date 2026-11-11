@@ -48,7 +48,7 @@ button{font-weight:600}
 .ed .w.g::before{content:'';position:absolute;inset:1px;border:1.5px dashed rgba(255,255,255,.5);border-radius:50%;pointer-events:none;z-index:1}
 .rz{display:none;position:absolute;right:0;bottom:0;width:48px;height:48px;z-index:2}
 .rz::after{content:'';position:absolute;right:3px;bottom:3px;width:18px;height:18px;border-radius:50%;background:var(--ac);border:2px solid #000;box-shadow:0 0 0 1px rgba(255,255,255,.5)}
-.ed .rz{display:block}
+.ed .rz{display:block}.ed.lk .rz{display:none}.ed.lk .w{border-style:dotted}
 .sl{width:100%;height:100%;display:flex;flex-direction:column-reverse;align-items:center;justify-content:space-evenly}
 .dt{display:block;width:min(86cqw,calc(86cqh/var(--n)));aspect-ratio:1;border-radius:50%;background:#5a5a5a}
 @container (min-aspect-ratio:1/1){.sl{flex-direction:row}.dt{width:min(86cqh,calc(86cqw/var(--n)))}}
@@ -311,7 +311,7 @@ const get=(c,f)=>{const v=(S.ch[c.k]||{})[f];return v!==undefined?v:c[f]};
 // Γλώσσα / Language
 if(!S.lang)S.lang=(navigator.language||'').slice(0,2)==='el'?'el':'en';
 const DICT=[
-['Μέγεθος ','Size '],['G-meter (κύκλος)','G-meter (circle)'],['Μηδενισμός;','Zero?'],['Γύρνα το κινητό οριζόντια ή κάθετα: κάθε θέση έχει το δικό της layout.','Turn the phone landscape or portrait: each position has its own layout.'],['Κράτα πατημένο για ρυθμίσεις','Press and hold for settings'],['Σύρε · γωνία ή 2 δάχτυλα: μέγεθος · κράτα πατημένο: ρυθμίσεις · ✓','Drag · corner or 2 fingers: size · press and hold: settings · ✓'],['Το Safari του iPhone δεν επιτρέπει σύνδεση Bluetooth από ιστοσελίδες.','Safari on iPhone does not allow Bluetooth connections from web pages.'],['Αυτός ο browser δεν υποστηρίζει σύνδεση Bluetooth.','This browser does not support Bluetooth connections.'],[' Άνοιξε την εφαρμογή στον δωρεάν browser ',' Open the app in the free browser '],['1. Κατέβασε το Bluefy από το App Store.','1. Download Bluefy from the App Store.'],['2. Αντίγραψε τη διεύθυνση και άνοιξέ τη στο Bluefy.','2. Copy the address and open it in Bluefy.'],['3. Μενού → Σύνδεση → Bluetooth, διάλεξε τη συσκευή EMU.','3. Menu → Connection → Bluetooth, pick the EMU device.'],['Η TunerView πρέπει να είναι κλειστή.','TunerView must be closed.'],['Σύνδεση Bluetooth','Bluetooth connection'],['Αντιγραφή διεύθυνσης','Copy address'],['Αντιγράφηκε','Copied'],['Διεύθυνση','Address'],['Οι ρυθμίσεις και τα layouts του Safari δεν περνάνε αυτόματα στο Bluefy.','Settings and layouts from Safari do not carry over to Bluefy automatically.'],['Χρονόμετρο επιδόσεων','Performance timer'],['Περιμένω ταχύτητα (GPS ή αισθητήρας)…','Waiting for speed (GPS or sensor)…'],['Έτοιμο: φύγε όποτε θέλεις.','Ready: launch whenever you want.'],['Μέτρηση…','Measuring…'],['Σταμάτα το αυτοκίνητο για νέα μέτρηση από στάση.','Stop the car for a new standing-start run.'],['ρεκόρ','best'],['Μηδενισμός ρεκόρ','Reset bests'],['Μηδενισμός όλων των ρεκόρ;','Reset all bests?'],['Μετράει μόνο του: 0–100 και 400 m ξεκινώντας από στάση, 100–200 και 60–130 και εν κινήσει. Οι χρόνοι είναι σε km/h. Η ταχύτητα έρχεται από τον αισθητήρα του εγκεφάλου ή, αν δεν υπάρχει, από το GPS του κινητού (λιγότερο ακριβές, περίπου ±0.2 s). Μόνο σε κλειστή πίστα, με ασφάλεια.','Measures automatically: 0–100 and 400 m from a standing start, 100–200 and 60–130 while rolling. Thresholds are in km/h. Speed comes from the ECU sensor or, if missing, from the phone GPS (less accurate, about ±0.2 s). Closed track only, safely.'],['Επιτάχυνση','Acceleration'],['Φρένο','Braking'],['Αριστερά','Left'],['Δεξιά','Right'],['Μηδενισμός μέγιστων','Reset peaks'],['Μηδενισμός θέσης κινητού','Zero phone position'],['Χρειάζεται μηδενισμός θέσης: σταμάτα σε επίπεδο σημείο με το κινητό στη βάση του και πάτα «Μηδενισμός θέσης κινητού».','Needs zeroing: stop on level ground with the phone in its mount and press “Zero phone position”.'],['Χρησιμοποιεί τους αισθητήρες του κινητού και τον ίδιο μηδενισμό με την κλίση δρόμου. Πάνω = επιτάχυνση, κάτω = φρένο, πλάι = στροφές. Υπάρχουν και κουτάκια «G διαμήκης» και «G πλευρική».','Uses the phone sensors and the same zero as road grade. Up = acceleration, down = braking, sides = corners. There are also “Long. G” and “Lat. G” tiles.'],['Διόρθωση για την κλίση του δρόμου','Road grade correction'],['μέγιστη ισχύς','peak power'],['μέγιστη ροπή','peak torque'],['Διαφορά','Difference'],['Στις','At'],['▶ Αναπαραγωγή','▶ Replay'],['Η κάθετη και η οριζόντια θέση έχουν','Portrait and landscape have a'],['ξεχωριστό layout','separate layout'],['. Με «Ξεκλείδωτο», όταν γυρίζεις το κινητό αλλάζει και το layout. Με «Κλειδωμένο», διαλέγεις εδώ ποιο layout θα φαίνεται (και ποιο επεξεργάζεσαι).','. When “Unlocked”, rotating the phone switches the layout. When “Locked”, choose here which layout is shown (and edited).'],
+['Έτοιμα layouts','Preset layouts'],['Τριπλέτα οργάνων','Gauge triplet'],['Εφαρμογή','Apply'],['Ξεκλείδωμα σελίδας (ελεύθερη επεξεργασία)','Unlock page (free editing)'],['Η σελίδα θα αντικατασταθεί. Συνέχεια;','This page will be replaced. Continue?'],['Έτοιμο. Edit → κράτα πατημένο ένα όργανο για να αλλάξεις κανάλι.','Done. Edit → press and hold a gauge to change its channel.'],['Η σελίδα ξεκλειδώθηκε','Page unlocked'],['Οι θέσεις και τα μεγέθη μένουν σταθερά. Στο edit, κράτα πατημένο ένα όργανο για να αλλάξεις τι δείχνει.','Positions and sizes stay fixed. In edit, press and hold a gauge to change what it shows.'],['Οριζόντια θέση','Landscape'],['Κάθετη θέση','Portrait'],['Ταχύτητα κιβωτίου','Gear'],['Θερμοκρασία λαδιού','Oil temperature'],['Ταχύτητα (km/h)','Speed (km/h)'],['Μέγεθος ','Size '],['G-meter (κύκλος)','G-meter (circle)'],['Μηδενισμός;','Zero?'],['Γύρνα το κινητό οριζόντια ή κάθετα: κάθε θέση έχει το δικό της layout.','Turn the phone landscape or portrait: each position has its own layout.'],['Κράτα πατημένο για ρυθμίσεις','Press and hold for settings'],['Σύρε · γωνία ή 2 δάχτυλα: μέγεθος · κράτα πατημένο: ρυθμίσεις · ✓','Drag · corner or 2 fingers: size · press and hold: settings · ✓'],['Το Safari του iPhone δεν επιτρέπει σύνδεση Bluetooth από ιστοσελίδες.','Safari on iPhone does not allow Bluetooth connections from web pages.'],['Αυτός ο browser δεν υποστηρίζει σύνδεση Bluetooth.','This browser does not support Bluetooth connections.'],[' Άνοιξε την εφαρμογή στον δωρεάν browser ',' Open the app in the free browser '],['1. Κατέβασε το Bluefy από το App Store.','1. Download Bluefy from the App Store.'],['2. Αντίγραψε τη διεύθυνση και άνοιξέ τη στο Bluefy.','2. Copy the address and open it in Bluefy.'],['3. Μενού → Σύνδεση → Bluetooth, διάλεξε τη συσκευή EMU.','3. Menu → Connection → Bluetooth, pick the EMU device.'],['Η TunerView πρέπει να είναι κλειστή.','TunerView must be closed.'],['Σύνδεση Bluetooth','Bluetooth connection'],['Αντιγραφή διεύθυνσης','Copy address'],['Αντιγράφηκε','Copied'],['Διεύθυνση','Address'],['Οι ρυθμίσεις και τα layouts του Safari δεν περνάνε αυτόματα στο Bluefy.','Settings and layouts from Safari do not carry over to Bluefy automatically.'],['Χρονόμετρο επιδόσεων','Performance timer'],['Περιμένω ταχύτητα (GPS ή αισθητήρας)…','Waiting for speed (GPS or sensor)…'],['Έτοιμο: φύγε όποτε θέλεις.','Ready: launch whenever you want.'],['Μέτρηση…','Measuring…'],['Σταμάτα το αυτοκίνητο για νέα μέτρηση από στάση.','Stop the car for a new standing-start run.'],['ρεκόρ','best'],['Μηδενισμός ρεκόρ','Reset bests'],['Μηδενισμός όλων των ρεκόρ;','Reset all bests?'],['Μετράει μόνο του: 0–100 και 400 m ξεκινώντας από στάση, 100–200 και 60–130 και εν κινήσει. Οι χρόνοι είναι σε km/h. Η ταχύτητα έρχεται από τον αισθητήρα του εγκεφάλου ή, αν δεν υπάρχει, από το GPS του κινητού (λιγότερο ακριβές, περίπου ±0.2 s). Μόνο σε κλειστή πίστα, με ασφάλεια.','Measures automatically: 0–100 and 400 m from a standing start, 100–200 and 60–130 while rolling. Thresholds are in km/h. Speed comes from the ECU sensor or, if missing, from the phone GPS (less accurate, about ±0.2 s). Closed track only, safely.'],['Επιτάχυνση','Acceleration'],['Φρένο','Braking'],['Αριστερά','Left'],['Δεξιά','Right'],['Μηδενισμός μέγιστων','Reset peaks'],['Μηδενισμός θέσης κινητού','Zero phone position'],['Χρειάζεται μηδενισμός θέσης: σταμάτα σε επίπεδο σημείο με το κινητό στη βάση του και πάτα «Μηδενισμός θέσης κινητού».','Needs zeroing: stop on level ground with the phone in its mount and press “Zero phone position”.'],['Χρησιμοποιεί τους αισθητήρες του κινητού και τον ίδιο μηδενισμό με την κλίση δρόμου. Πάνω = επιτάχυνση, κάτω = φρένο, πλάι = στροφές. Υπάρχουν και κουτάκια «G διαμήκης» και «G πλευρική».','Uses the phone sensors and the same zero as road grade. Up = acceleration, down = braking, sides = corners. There are also “Long. G” and “Lat. G” tiles.'],['Διόρθωση για την κλίση του δρόμου','Road grade correction'],['μέγιστη ισχύς','peak power'],['μέγιστη ροπή','peak torque'],['Διαφορά','Difference'],['Στις','At'],['▶ Αναπαραγωγή','▶ Replay'],['Η κάθετη και η οριζόντια θέση έχουν','Portrait and landscape have a'],['ξεχωριστό layout','separate layout'],['. Με «Ξεκλείδωτο», όταν γυρίζεις το κινητό αλλάζει και το layout. Με «Κλειδωμένο», διαλέγεις εδώ ποιο layout θα φαίνεται (και ποιο επεξεργάζεσαι).','. When “Unlocked”, rotating the phone switches the layout. When “Locked”, choose here which layout is shown (and edited).'],
 ['G διαμήκης (επιτάχυνση/φρένο)','Longitudinal G (accel/brake)'],['G πλευρική (στροφές)','Lateral G (corners)'],['G διαμήκης','Long. G'],['G πλευρική','Lat. G'],['Turbo timer (δευτ.)','Turbo timer (s)'],['Άφησε τη μηχανή στο ρελαντί μέχρι να γράψει OK, για να κρυώσει το turbo.','Let the engine idle until it shows OK, so the turbo cools down.'],
 ['Όνομα (κενό = προεπιλογή)','Name (empty = default)'],['Ταχύτητα κιβωτίου','Gear'],['Ταχύτητα km/h','Speed km/h'],['Ανάφλεξη','Ignition'],['Πίεση λαδιού','Oil pressure'],['Πίεση καυσίμου','Fuel pressure'],['Duty μπεκ','Injector duty'],['Θερμ. εγκεφάλου','ECU temp'],['Λάδι','Oil'],
 ['Καταγραφές (logs)','Logs'],['Αυτόματη καταγραφή','Automatic logging'],['Καταγραφή και στο Demo (για δοκιμή)','Log in Demo too (for testing)'],['Αποθηκευμένες διαδρομές','Saved drives'],['Εγγραφή τώρα','Recording now'],['Η αυτόματη καταγραφή είναι κλειστή.','Automatic logging is off.'],['Αναμονή: η καταγραφή ξεκινάει μόλις πάρει μπροστά ο κινητήρας.','Waiting: logging starts as soon as the engine starts.'],['Η καταγραφή ξεκινάει μόνη της όταν πάρει μπροστά ο κινητήρας και αποθηκεύεται όταν σβήσει. Κρατιούνται οι τελευταίες 50 διαδρομές, οι παλιότερες σβήνονται αυτόματα.','Logging starts by itself when the engine starts and is saved when it stops. The last 50 drives are kept; older ones are deleted automatically.'],['Δεν υπάρχουν ακόμα καταγραφές.','No logs yet.'],['Διάρκεια','Duration'],['Απόσταση','Distance'],['Max νερό','Max coolant'],['‹ Λίστα','‹ List'],['Αποστολή CSV','Send CSV'],['Σύρε το δάχτυλο πάνω στα γραφήματα για να δεις τις τιμές.','Drag your finger over the charts to see the values.'],['Δεν υπάρχουν δεδομένα.','No data.'],['Διαγραφή αυτής της καταγραφής;','Delete this log?'],['Η καταγραφή είναι σε εξέλιξη','Logging is in progress'],['Η διαδρομή αποθηκεύτηκε','Drive saved'],['Η καταγραφή δεν αποθηκεύτηκε','The log could not be saved'],['Η καταγραφή δεν βρέθηκε','Log not found'],['Η αποστολή απέτυχε','Sending failed'],
@@ -533,7 +533,7 @@ function stheme(w){
   if((w.xs||[]).length>=1)h+=T(74,69,2.6,'c1f',XL[w.xs[0]],'fill-opacity=".8"')+'<g class="xs c1f" data-i="0" data-p="74,70.5,.5,.5,c,0"></g>';
   return h+'</svg>';
 }
-const XL={peak:'PEAK',bat:'VOLT',afr:'AFR'};
+const XL={peak:'PEAK',bat:'VOLT',afr:'AFR',gear:'GEAR',oilp:'OIL P',oilt:'OIL T',iat:'IAT'};Object.defineProperty(XL,'spd',{get:()=>spU().toUpperCase(),enumerable:true});
 // --- Νέα θέματα: Αναλογικό (a) και Ψηφιακό LED (f). Γωνίες: 0 = πάνω, δεξιόστροφα.
 // Όνομα και μονάδα χωριστά ("MAP bar" -> ["MAP","bar"]), κεφαλαία χωρίς τόνους
 function nmU(c){const s=t(cn(c)).replace(/ \?$/,''),m=s.match(/^(.*\S)\s+(kPa|bar|psi|%|°[CF]|km\/h|mph|V)$/);return m?[m[1],m[2]]:[s,'']}
@@ -671,7 +671,7 @@ function gupd(d,w,c,v,pk){
   if(g){if(g.dataset.p){const a=g.dataset.p.split(',');g.innerHTML=seg7(v.toFixed(dec(c)),+a[0],+a[1],+a[2],+a[3],a[4],+a[5])}else g.textContent=v.toFixed(dec(c))}
   const nd=d.querySelector('.nd');if(nd)nd.setAttribute('transform','rotate('+(n[0]+(n[1]-n[0])*f)+' '+n[2]+' '+n[3]+')');
   const sg=d.querySelectorAll('.sg');if(sg.length){const k=Math.round(f*sg.length);sg.forEach((e,i)=>{const o=i<k;e.setAttribute('stroke-opacity',o?1:.14);e.setAttribute('fill-opacity',o?1:.14);e.classList.toggle('lit',o)})}
-  d.querySelectorAll('.xs').forEach(g=>{const ty=g.dataset.t||(w.xs||[])[+g.dataset.i],x=ty==='peak'?pk:ty==='bat'?val(M.bat):ty==='afr'?val(M.afr):null,s=x==null?'-':x.toFixed(ty==='peak'?dec(c):1);
+  d.querySelectorAll('.xs').forEach(g=>{const ty=g.dataset.t||(w.xs||[])[+g.dataset.i],x=ty==='peak'?pk:M[ty]?val(M[ty]):null,s=x==null?'-':x.toFixed(ty==='peak'?dec(c):ty==='bat'||ty==='afr'?1:dec(M[ty]));
     if(g.dataset.p){const a=g.dataset.p.split(',');g.innerHTML=seg7(s,+a[0],+a[1],+a[2],+a[3],a[4],+a[5])}else g.textContent=s});
   const pm=d.querySelector('.pkm');if(pm){if(pk==null||!isFinite(pk))pm.setAttribute('opacity',0);else{const fp=cl((pk-w.min)/(w.max-w.min),0,1);pm.setAttribute('opacity',1);pm.setAttribute('transform','rotate('+(n[0]+(n[1]-n[0])*fp)+' '+n[2]+' '+n[3]+')')}}
 }
@@ -718,7 +718,7 @@ function sdlg(w){
 function dots(st){const d=document.createElement('div');d.id='dots';d.innerHTML=S.pages.map((p,i)=>'<i'+(i===S.cur?' class="on"':'')+'></i>').join('');st.appendChild(d)}
 function build(){
   const st=$('#stage'),pg=S.pages[S.cur];st.innerHTML='';refs.clear();DRG=null;dots(st);
-  st.classList.toggle('ed',edit);$('#pa').style.display=(S.cur===S.pages.length-1&&S.pages.length<5&&!edit)?'':'none';$('#hb').textContent=edit?'✓':'☰';$('#hb').style.color=edit?'#4cd07d':'';
+  st.classList.toggle('ed',edit);st.classList.toggle('lk',LKP());$('#pa').style.display=(S.cur===S.pages.length-1&&S.pages.length<5&&!edit)?'':'none';$('#hb').textContent=edit?'✓':'☰';$('#hb').style.color=edit?'#4cd07d':'';
   stSet();
   if(!pg.w.length&&!S.orient&&!S.setup){const e=document.createElement('div');e.id='empty';e.dataset.ch=1;e.style.flexDirection='column';e.style.gap='14px';
     e.innerHTML='<div><button data-l="el">Ελληνικά</button> <button data-l="en">English</button></div><div class="dym" style="max-width:320px;text-align:center">Γύρνα το κινητό οριζόντια ή κάθετα: κάθε θέση έχει το δικό της layout.</div>';
@@ -734,18 +734,20 @@ function sqG(w){
   const nw=qw/W*100,nh=qh/H*100;w.x+=(w.w-nw)/2;w.y+=(w.h-nh)/2;w.w=nw;w.h=nh;return true;
 }
 let DRG=null; // ενεργό σύρσιμο οργάνου (για δεύτερο δάχτυλο)
+const LKP=()=>!!(S.pages[S.cur]&&S.pages[S.cur].lk); // σελίδα από έτοιμο layout: θέσεις κλειδωμένες, αλλάζει μόνο το κανάλι
 function drag(e,w,d){
   if(!edit){if(w.k==='grd'||isGm(w))grdHold(e,d);return}
   if(DRG&&DRG.d.isConnected&&Object.keys(DRG.P).length){DRG.add(e);return}DRG=null; // δεύτερο δάχτυλο: τσίμπημα
   const r=$('#stage').getBoundingClientRect(),br=d.getBoundingClientRect(),cz=Math.min(56,br.width*.4,br.height*.45);
-  const rz=e.target.classList.contains('rz')||(br.right-e.clientX<cz&&br.bottom-e.clientY<cz); // και η περιοχή κοντά στη γωνία
+  const rz=!LKP()&&(e.target.classList.contains('rz')||(br.right-e.clientX<cz&&br.bottom-e.clientY<cz)); // και η περιοχή κοντά στη γωνία
   const sx=e.clientX,sy=e.clientY,o={...w},P={};let mv=false,pz=null;d.setPointerCapture(e.pointerId);P[e.pointerId]=[sx,sy];
   const dist=()=>{const a=Object.values(P);return Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1])||1};
   let lp=rz?0:setTimeout(()=>{lp=0;if(!mv&&Object.keys(P).length===1){u2();try{navigator.vibrate&&navigator.vibrate(25)}catch(x){}w.t==='s'?sdlg(w):dlgW(w,false)}},550); // κράτημα: ρυθμίσεις
   DRG={d,P,add(ev){P[ev.pointerId]=[ev.clientX,ev.clientY];try{d.setPointerCapture(ev.pointerId)}catch(x){}
-    if(Object.keys(P).length===2){pz={d0:dist(),o:{...w}};mv=true;clearTimeout(lp)}}};
+    if(Object.keys(P).length===2&&!LKP()){pz={d0:dist(),o:{...w}};mv=true;clearTimeout(lp)}}};
   const m=ev=>{
     if(P[ev.pointerId])P[ev.pointerId]=[ev.clientX,ev.clientY];
+    if(LKP()){if(ev.pointerId===e.pointerId&&Math.abs(ev.clientX-sx)+Math.abs(ev.clientY-sy)>6){mv=true;clearTimeout(lp)}return}
     if(pz){if(Object.keys(P).length<2)return; // δύο δάχτυλα: μεγάλωμα/μίκρεμα γύρω από το κέντρο
       const o=pz.o,k=cl(dist()/pz.d0,.1,10),mx=Math.min(100/o.w,100/o.h),mn=Math.max(10/o.w,10/o.h);
       const kk=cl(k,Math.min(mn,1),mx),cx=o.x+o.w/2,cy=o.y+o.h/2;
@@ -817,7 +819,7 @@ function dlgW(w,isNew){
   if(w.t==='s'){sdlg(w);return}
   const o=DEF.map(c=>`<option value="${c.k}"${c.k===w.k?' selected':''}>${cn(c)}</option>`).join('');
   const c0=M[w.k],th=thm(),mx=th==='e'?2:th==='l'||th==='a'||th==='f'?1:0,xs=w.xs||[];
-  const op=v=>['peak','bat','afr'].map(k=>'<option value="'+k+'"'+(v===k?' selected':'')+'>'+({peak:'Peak',bat:'Μπαταρία (Volt)',afr:'AFR'})[k]+'</option>').join('');
+  const op=v=>['peak','bat','afr','gear','oilp','oilt','spd','iat'].map(k=>'<option value="'+k+'"'+(v===k?' selected':'')+'>'+({peak:'Peak',bat:'Μπαταρία (Volt)',afr:'AFR',gear:'Ταχύτητα κιβωτίου',oilp:'Πίεση λαδιού',oilt:'Θερμοκρασία λαδιού',spd:'Ταχύτητα (km/h)',iat:'IAT'})[k]+'</option>').join('');
   const xr=mx?'<label id="r_xn">Έξτρα οθόνες<select id="f_xn">'+[...Array(mx+1).keys()].map(i=>'<option value="'+i+'"'+(xs.length===i?' selected':'')+'>'+(i?i:'Όχι')+'</option>').join('')+'</select></label><label id="r_x1">Οθόνη 1<select id="f_x1">'+op(xs[0])+'</select></label><label id="r_x2">Οθόνη 2<select id="f_x2">'+op(xs[1])+'</select></label>':'';
   D(`<div id="f_pvw"><div id="f_pv"></div></div><h3>${isNew?'Νέο όργανο':'Όργανο'}</h3>
   <label>Τύπος<select id="f_t"><option value="b"${w.t==='b'?' selected':''}>Κουτάκι</option><option value="g"${w.t==='g'?' selected':''}>Αναλογικό</option><option value="r"${w.t==='r'?' selected':''}>Μπάρα</option></select></label>
@@ -858,6 +860,7 @@ function dlgW(w,isNew){
     if(th==='e'&&ty!=='r'&&$('#f_nf'))$('#f_nf').closest('label').style.display='none'; // LCD: διάφανο φόντο μόνο για μπάρα
     };
   $('#f_t').onchange=syncT;if(mx)$('#f_xn').onchange=syncT;syncT();
+  if(LKP()&&!isNew){['#f_t','#f_sz'].forEach(i=>{const e=$(i);if(e)e.closest('label').style.display='none'});const x=$('#f_del');if(x)x.style.display='none'}
   $('#f_k').onchange=()=>{const c=M[$('#f_k').value];$('#f_lb').placeholder=t(cn(c));$('#f_min').value=dmin(c);$('#f_max').value=dmax(c);syncT()};syncT();
   $('#f_x').onclick=closeD;
   if(!isNew)$('#f_del').onclick=()=>{const a=S.pages[S.cur].w;a.splice(a.indexOf(w),1);save();closeD();build()};
@@ -1360,12 +1363,13 @@ ruler:'<rect x="2" y="8" width="20" height="8" rx="1.5"/><path d="M6 8v4M10 8v3M
 wifi:'<path d="M4 10a12 12 0 0 1 16 0"/><path d="M7 13.5a8 8 0 0 1 10 0"/><circle cx="12" cy="17.5" r="1.3"/>',
 palette:'<path d="M12 3a9 9 0 1 0 0 18c1.6 0 2-1.1 1.4-2s0-2 1.6-2h1.8a4.2 4.2 0 0 0 4.2-4.2C21 6.5 17 3 12 3z"/><circle cx="7.5" cy="11.5" r="1"/><circle cx="11" cy="7.5" r="1"/><circle cx="16" cy="9" r="1"/>',
 gear:'<circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1"/>',
+grid:'<rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/>',
 lock:'<rect x="5" y="11" width="14" height="9.5" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
 unlock:'<rect x="5" y="11" width="14" height="9.5" rx="2"/><path d="M8 11V8a4 4 0 0 1 7.5-1.8"/>'};
 const ic=k=>'<svg viewBox="0 0 24 24">'+IC[k]+'</svg>';
 let oc=null;
 function menu(){
-  const T=[['edit','edit','Επεξεργασία Layout'],...(TL.need()?[['grz','grade','Μηδενισμός κλίσης']]:[]),
+  const T=[['edit','edit','Επεξεργασία Layout'],['lay','grid','Έτοιμα layouts'],...(TL.need()?[['grz','grade','Μηδενισμός κλίσης']]:[]),
    ['alarms','bell','Συναγερμοί',[['sl','Shift Light']]],
    ['units','ruler','Μονάδες εμφάνισης'],
    ['conn','wifi','Συνδεσιμότητα',BT.want?[['c','Σύνδεση Bluetooth'],['x','Αποσύνδεση']]:[['c','Σύνδεση Bluetooth']]],
@@ -1389,6 +1393,29 @@ function menu(){
 function openSP(title,html){
   const e=$('#sp');e.innerHTML='<div class="sh"><button id="sb">‹</button><span>Μενού</span></div><h1>'+title+'</h1>'+html;e.classList.add('open');
   $('#sb').onclick=()=>{e.classList.remove('open');menu();$('#mn').classList.add('open')};
+}
+// ---- Έτοιμα layouts ----
+// Τριπλέτα: 3 αναλογικά (μεσαίο μεγάλο), 2 κουτάκια πάνω από κάθε πλαϊνό όργανο. Γεωμετρία σε pixels της σκηνής → %.
+const LAYS={t1:{n:'Τριπλέτα οργάνων',
+  geo(W,H){const g=6,R=[];const P=(x,y,w,h)=>({x:x/W*100,y:y/H*100,w:w/W*100,h:h/H*100});
+    if(W>=H){const B=Math.min(H,W*.42),bx=(W-B)/2,Sw=bx-2*g,s=Math.min(Sw,H*.62),th=(H-s-2*g)/2;
+      R.push(P(g+(Sw-s)/2,H-s,s,s),P(bx,H-B,B,B),P(W-g-Sw+(Sw-s)/2,H-s,s,s));
+      R.push(P(g,0,Sw,th),P(g,th+g,Sw,th),P(W-g-Sw,0,Sw,th),P(W-g-Sw,th+g,Sw,th))}
+    else{const tw=(W-3*g)/2,th=Math.min(H*.11,tw*.45),y0=2*th+2*g,B=Math.min(W-2*g,(H-y0-2*g)*.6),s=Math.min((W-3*g)/2,H-y0-B-2*g);
+      R.push(P(g,H-s,s,s),P((W-B)/2,y0,B,B),P(W-g-s,H-s,s,s));
+      R.push(P(g,0,tw,th),P(g,th+g,tw,th),P(2*g+tw,0,tw,th),P(2*g+tw,th+g,tw,th))}
+    return R},
+  w:[['g','afr'],['g','boost'],['g','oilt'],['b','iat'],['b','ect'],['b','bat'],['b','oilp']],
+  svg:'<svg viewBox="0 0 160 70" style="width:100%;max-width:340px;display:block;margin:6px auto"><g fill="none" stroke="#ff2d2d" stroke-width="1.5"><circle cx="24" cy="51" r="17"/><circle cx="80" cy="37" r="31"/><circle cx="136" cy="51" r="17"/></g><g fill="none" stroke="#888" stroke-width="1.2"><rect x="4" y="3" width="40" height="13" rx="2"/><rect x="4" y="18" width="40" height="13" rx="2"/><rect x="116" y="3" width="40" height="13" rx="2"/><rect x="116" y="18" width="40" height="13" rx="2"/></g><g fill="#aaa" font-size="6" text-anchor="middle" font-family="sans-serif"><text x="24" y="53">AFR</text><text x="80" y="39">BOOST</text><text x="136" y="53">OIL</text><text x="24" y="11.5">IAT</text><text x="24" y="26.5">WATER</text><text x="136" y="11.5">VOLT</text><text x="136" y="26.5">OIL P</text></g></svg>'}};
+function layApply(id){const L=LAYS[id],st=$('#stage'),W=st.clientWidth||innerWidth,H=st.clientHeight||innerHeight,G=L.geo(W,H),pg=S.pages[S.cur];
+  pg.w=L.w.map(([t,k],i)=>Object.assign({t,k,min:dmin(M[k]),max:dmax(M[k])},G[i]));pg.lk=id;save();build()}
+function layPage(){const pg=S.pages[S.cur],ls=document.body.classList.contains('ls');
+  let h='<div class="dym">'+t('Σελίδα')+' '+(S.cur+1)+' · '+t(ls?'Οριζόντια θέση':'Κάθετη θέση')+'<br>'+t('Οι θέσεις και τα μεγέθη μένουν σταθερά. Στο edit, κράτα πατημένο ένα όργανο για να αλλάξεις τι δείχνει.')+'</div>';
+  for(const id in LAYS)h+='<div class="dym">'+LAYS[id].svg+'<div class="dyb"><b style="flex:1;align-self:center">'+LAYS[id].n+'</b><button class="pri" data-ly="'+id+'">Εφαρμογή</button></div></div>';
+  if(pg.lk)h+='<div class="dyb"><button id="ly_u">Ξεκλείδωμα σελίδας (ελεύθερη επεξεργασία)</button></div>';
+  openSP('Έτοιμα layouts',h);
+  $('#sp').querySelectorAll('[data-ly]').forEach(b=>b.onclick=()=>{if(pg.w.length&&!confirm(t('Η σελίδα θα αντικατασταθεί. Συνέχεια;')))return;$('#sp').classList.remove('open');layApply(b.dataset.ly);toast(t('Έτοιμο. Edit → κράτα πατημένο ένα όργανο για να αλλάξεις κανάλι.'),null,null,3500)});
+  if($('#ly_u'))$('#ly_u').onclick=()=>{delete pg.lk;save();build();$('#sp').classList.remove('open');toast(t('Η σελίδα ξεκλειδώθηκε'))};
 }
 function unitsPage(){
   const o=(v,l,c)=>'<option value="'+v+'"'+(c===v?' selected':'')+'>'+l+'</option>',u=UN();
@@ -1569,7 +1596,7 @@ $('#stage').addEventListener('pointerdown',e=>{
   $('#mn').classList.remove('open');
   const wd=e.target.closest('.w'),ch=e.target.closest('#empty[data-ch]');
   if(!ch&&(!wd||!edit))sw={x:e.clientX,y:e.clientY};
-  if(!edit||wd||ch)return;
+  if(!edit||wd||ch||LKP())return;
   const x0=e.clientX,y0=e.clientY;let t;
   const cancel=()=>{clearTimeout(t);removeEventListener('pointermove',mv);removeEventListener('pointerup',cancel);removeEventListener('pointercancel',cancel)};
   const mv=ev=>{if(Math.abs(ev.clientX-x0)+Math.abs(ev.clientY-y0)>10)cancel()};
@@ -1586,6 +1613,7 @@ $('#mn').addEventListener('click',e=>{
   if(b.dataset.cat){const k=b.dataset.cat;
     if(k==='edit'){cm();edit=true;build()}
     else if(k==='grz'){cm();grdZero()}
+    else if(k==='lay'){cm();layPage()}
     else if(k==='logs'){cm();logPage()}
     else if(k==='perf'){cm();perfPage()}
     else if(k==='gm'){cm();gPage()}
