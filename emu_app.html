@@ -308,7 +308,7 @@ const get=(c,f)=>{const v=(S.ch[c.k]||{})[f];return v!==undefined?v:c[f]};
 // Γλώσσα / Language
 if(!S.lang)S.lang=(navigator.language||'').slice(0,2)==='el'?'el':'en';
 const DICT=[
-['Κράτα πατημένο για ρυθμίσεις','Press and hold for settings'],['Σύρε · γωνία ή 2 δάχτυλα: μέγεθος · κράτα πατημένο: ρυθμίσεις · ✓','Drag · corner or 2 fingers: size · press and hold: settings · ✓'],['Το Safari του iPhone δεν επιτρέπει σύνδεση Bluetooth από ιστοσελίδες.','Safari on iPhone does not allow Bluetooth connections from web pages.'],['Αυτός ο browser δεν υποστηρίζει σύνδεση Bluetooth.','This browser does not support Bluetooth connections.'],[' Άνοιξε την εφαρμογή στον δωρεάν browser ',' Open the app in the free browser '],['1. Κατέβασε το Bluefy από το App Store.','1. Download Bluefy from the App Store.'],['2. Αντίγραψε τη διεύθυνση και άνοιξέ τη στο Bluefy.','2. Copy the address and open it in Bluefy.'],['3. Μενού → Σύνδεση → Bluetooth, διάλεξε τη συσκευή EMU.','3. Menu → Connection → Bluetooth, pick the EMU device.'],['Η TunerView πρέπει να είναι κλειστή.','TunerView must be closed.'],['Σύνδεση Bluetooth','Bluetooth connection'],['Αντιγραφή διεύθυνσης','Copy address'],['Αντιγράφηκε','Copied'],['Διεύθυνση','Address'],['Οι ρυθμίσεις και τα layouts του Safari δεν περνάνε αυτόματα στο Bluefy.','Settings and layouts from Safari do not carry over to Bluefy automatically.'],['Χρονόμετρο επιδόσεων','Performance timer'],['Περιμένω ταχύτητα (GPS ή αισθητήρας)…','Waiting for speed (GPS or sensor)…'],['Έτοιμο: φύγε όποτε θέλεις.','Ready: launch whenever you want.'],['Μέτρηση…','Measuring…'],['Σταμάτα το αυτοκίνητο για νέα μέτρηση από στάση.','Stop the car for a new standing-start run.'],['ρεκόρ','best'],['Μηδενισμός ρεκόρ','Reset bests'],['Μηδενισμός όλων των ρεκόρ;','Reset all bests?'],['Μετράει μόνο του: 0–100 και 400 m ξεκινώντας από στάση, 100–200 και 60–130 και εν κινήσει. Οι χρόνοι είναι σε km/h. Η ταχύτητα έρχεται από τον αισθητήρα του εγκεφάλου ή, αν δεν υπάρχει, από το GPS του κινητού (λιγότερο ακριβές, περίπου ±0.2 s). Μόνο σε κλειστή πίστα, με ασφάλεια.','Measures automatically: 0–100 and 400 m from a standing start, 100–200 and 60–130 while rolling. Thresholds are in km/h. Speed comes from the ECU sensor or, if missing, from the phone GPS (less accurate, about ±0.2 s). Closed track only, safely.'],['Επιτάχυνση','Acceleration'],['Φρένο','Braking'],['Αριστερά','Left'],['Δεξιά','Right'],['Μηδενισμός μέγιστων','Reset peaks'],['Μηδενισμός θέσης κινητού','Zero phone position'],['Χρειάζεται μηδενισμός θέσης: σταμάτα σε επίπεδο σημείο με το κινητό στη βάση του και πάτα «Μηδενισμός θέσης κινητού».','Needs zeroing: stop on level ground with the phone in its mount and press “Zero phone position”.'],['Χρησιμοποιεί τους αισθητήρες του κινητού και τον ίδιο μηδενισμό με την κλίση δρόμου. Πάνω = επιτάχυνση, κάτω = φρένο, πλάι = στροφές. Υπάρχουν και κουτάκια «G διαμήκης» και «G πλευρική».','Uses the phone sensors and the same zero as road grade. Up = acceleration, down = braking, sides = corners. There are also “Long. G” and “Lat. G” tiles.'],['Διόρθωση για την κλίση του δρόμου','Road grade correction'],['μέγιστη ισχύς','peak power'],['μέγιστη ροπή','peak torque'],['Διαφορά','Difference'],['Στις','At'],['▶ Αναπαραγωγή','▶ Replay'],['Η κάθετη και η οριζόντια θέση έχουν','Portrait and landscape have a'],['ξεχωριστό layout','separate layout'],['. Με «Ξεκλείδωτο», όταν γυρίζεις το κινητό αλλάζει και το layout. Με «Κλειδωμένο», διαλέγεις εδώ ποιο layout θα φαίνεται (και ποιο επεξεργάζεσαι).','. When “Unlocked”, rotating the phone switches the layout. When “Locked”, choose here which layout is shown (and edited).'],
+['Γύρνα το κινητό οριζόντια ή κάθετα: κάθε θέση έχει το δικό της layout.','Turn the phone landscape or portrait: each position has its own layout.'],['Κράτα πατημένο για ρυθμίσεις','Press and hold for settings'],['Σύρε · γωνία ή 2 δάχτυλα: μέγεθος · κράτα πατημένο: ρυθμίσεις · ✓','Drag · corner or 2 fingers: size · press and hold: settings · ✓'],['Το Safari του iPhone δεν επιτρέπει σύνδεση Bluetooth από ιστοσελίδες.','Safari on iPhone does not allow Bluetooth connections from web pages.'],['Αυτός ο browser δεν υποστηρίζει σύνδεση Bluetooth.','This browser does not support Bluetooth connections.'],[' Άνοιξε την εφαρμογή στον δωρεάν browser ',' Open the app in the free browser '],['1. Κατέβασε το Bluefy από το App Store.','1. Download Bluefy from the App Store.'],['2. Αντίγραψε τη διεύθυνση και άνοιξέ τη στο Bluefy.','2. Copy the address and open it in Bluefy.'],['3. Μενού → Σύνδεση → Bluetooth, διάλεξε τη συσκευή EMU.','3. Menu → Connection → Bluetooth, pick the EMU device.'],['Η TunerView πρέπει να είναι κλειστή.','TunerView must be closed.'],['Σύνδεση Bluetooth','Bluetooth connection'],['Αντιγραφή διεύθυνσης','Copy address'],['Αντιγράφηκε','Copied'],['Διεύθυνση','Address'],['Οι ρυθμίσεις και τα layouts του Safari δεν περνάνε αυτόματα στο Bluefy.','Settings and layouts from Safari do not carry over to Bluefy automatically.'],['Χρονόμετρο επιδόσεων','Performance timer'],['Περιμένω ταχύτητα (GPS ή αισθητήρας)…','Waiting for speed (GPS or sensor)…'],['Έτοιμο: φύγε όποτε θέλεις.','Ready: launch whenever you want.'],['Μέτρηση…','Measuring…'],['Σταμάτα το αυτοκίνητο για νέα μέτρηση από στάση.','Stop the car for a new standing-start run.'],['ρεκόρ','best'],['Μηδενισμός ρεκόρ','Reset bests'],['Μηδενισμός όλων των ρεκόρ;','Reset all bests?'],['Μετράει μόνο του: 0–100 και 400 m ξεκινώντας από στάση, 100–200 και 60–130 και εν κινήσει. Οι χρόνοι είναι σε km/h. Η ταχύτητα έρχεται από τον αισθητήρα του εγκεφάλου ή, αν δεν υπάρχει, από το GPS του κινητού (λιγότερο ακριβές, περίπου ±0.2 s). Μόνο σε κλειστή πίστα, με ασφάλεια.','Measures automatically: 0–100 and 400 m from a standing start, 100–200 and 60–130 while rolling. Thresholds are in km/h. Speed comes from the ECU sensor or, if missing, from the phone GPS (less accurate, about ±0.2 s). Closed track only, safely.'],['Επιτάχυνση','Acceleration'],['Φρένο','Braking'],['Αριστερά','Left'],['Δεξιά','Right'],['Μηδενισμός μέγιστων','Reset peaks'],['Μηδενισμός θέσης κινητού','Zero phone position'],['Χρειάζεται μηδενισμός θέσης: σταμάτα σε επίπεδο σημείο με το κινητό στη βάση του και πάτα «Μηδενισμός θέσης κινητού».','Needs zeroing: stop on level ground with the phone in its mount and press “Zero phone position”.'],['Χρησιμοποιεί τους αισθητήρες του κινητού και τον ίδιο μηδενισμό με την κλίση δρόμου. Πάνω = επιτάχυνση, κάτω = φρένο, πλάι = στροφές. Υπάρχουν και κουτάκια «G διαμήκης» και «G πλευρική».','Uses the phone sensors and the same zero as road grade. Up = acceleration, down = braking, sides = corners. There are also “Long. G” and “Lat. G” tiles.'],['Διόρθωση για την κλίση του δρόμου','Road grade correction'],['μέγιστη ισχύς','peak power'],['μέγιστη ροπή','peak torque'],['Διαφορά','Difference'],['Στις','At'],['▶ Αναπαραγωγή','▶ Replay'],['Η κάθετη και η οριζόντια θέση έχουν','Portrait and landscape have a'],['ξεχωριστό layout','separate layout'],['. Με «Ξεκλείδωτο», όταν γυρίζεις το κινητό αλλάζει και το layout. Με «Κλειδωμένο», διαλέγεις εδώ ποιο layout θα φαίνεται (και ποιο επεξεργάζεσαι).','. When “Unlocked”, rotating the phone switches the layout. When “Locked”, choose here which layout is shown (and edited).'],
 ['G διαμήκης (επιτάχυνση/φρένο)','Longitudinal G (accel/brake)'],['G πλευρική (στροφές)','Lateral G (corners)'],['G διαμήκης','Long. G'],['G πλευρική','Lat. G'],['Turbo timer (δευτ.)','Turbo timer (s)'],['Άφησε τη μηχανή στο ρελαντί μέχρι να γράψει OK, για να κρυώσει το turbo.','Let the engine idle until it shows OK, so the turbo cools down.'],
 ['Όνομα (κενό = προεπιλογή)','Name (empty = default)'],['Ταχύτητα κιβωτίου','Gear'],['Ταχύτητα km/h','Speed km/h'],['Ανάφλεξη','Ignition'],['Πίεση λαδιού','Oil pressure'],['Πίεση καυσίμου','Fuel pressure'],['Duty μπεκ','Injector duty'],['Θερμ. εγκεφάλου','ECU temp'],['Λάδι','Oil'],
 ['Καταγραφές (logs)','Logs'],['Αυτόματη καταγραφή','Automatic logging'],['Καταγραφή και στο Demo (για δοκιμή)','Log in Demo too (for testing)'],['Αποθηκευμένες διαδρομές','Saved drives'],['Εγγραφή τώρα','Recording now'],['Η αυτόματη καταγραφή είναι κλειστή.','Automatic logging is off.'],['Αναμονή: η καταγραφή ξεκινάει μόλις πάρει μπροστά ο κινητήρας.','Waiting: logging starts as soon as the engine starts.'],['Η καταγραφή ξεκινάει μόνη της όταν πάρει μπροστά ο κινητήρας και αποθηκεύεται όταν σβήσει. Κρατιούνται οι τελευταίες 50 διαδρομές, οι παλιότερες σβήνονται αυτόματα.','Logging starts by itself when the engine starts and is saved when it stops. The last 50 drives are kept; older ones are deleted automatically.'],['Δεν υπάρχουν ακόμα καταγραφές.','No logs yet.'],['Διάρκεια','Duration'],['Απόσταση','Distance'],['Max νερό','Max coolant'],['‹ Λίστα','‹ List'],['Αποστολή CSV','Send CSV'],['Σύρε το δάχτυλο πάνω στα γραφήματα για να δεις τις τιμές.','Drag your finger over the charts to see the values.'],['Δεν υπάρχουν δεδομένα.','No data.'],['Διαγραφή αυτής της καταγραφής;','Delete this log?'],['Η καταγραφή είναι σε εξέλιξη','Logging is in progress'],['Η διαδρομή αποθηκεύτηκε','Drive saved'],['Η καταγραφή δεν αποθηκεύτηκε','The log could not be saved'],['Η καταγραφή δεν βρέθηκε','Log not found'],['Η αποστολή απέτυχε','Sending failed'],
@@ -365,18 +365,19 @@ new MutationObserver(ms=>{if(S.lang!=='en')return;for(const m of ms){if(m.type==
 function setLang(l){S.lang=l;save();document.documentElement.lang=l;if(l==='en'){build();trNode(document.body)}else{closeD();build();menu()}}
 let edit=false,demo=false,buf=[],cal=false,rot=false;const raw={},mm={},refs=new Map();
 function fit(){
-  const b=document.body,w=innerWidth,h=innerHeight;const lk=S.olock!==false;b.classList.toggle('ls',lk?S.orient!=='p':w>h);
-  rot=lk&&S.orient!=='p'&&h>w;
+  // Προσανατολισμός πάντα αυτόματος: ακολουθεί τη θέση του κινητού (όχι το μέγεθος παραθύρου, για να μην αλλάζει όταν ανοίγει το πληκτρολόγιο)
+  const b=document.body,w=innerWidth,h=innerHeight,so=screen.orientation&&screen.orientation.type,wo=window.orientation;
+  const eo=so?(so.startsWith('portrait')?'p':'l'):(typeof wo==='number'?(Math.abs(wo)===90?'l':'p'):(h>=w?'p':'l'));
+  b.classList.toggle('ls',eo==='l');rot=false;
   if(rot)Object.assign(b.style,{position:'fixed',left:'0',top:'0',width:h+'px',height:w+'px',transformOrigin:'0 0',transform:'translateX('+w+'px) rotate(90deg)'});
   else b.removeAttribute('style');
   // Κάθε προσανατολισμός έχει το δικό του layout: S.pages = τωρινό, S.pagesAlt = του άλλου προσανατολισμού
-  const so=screen.orientation&&screen.orientation.type,eo=lk?(S.orient==='p'?'p':'l'):(so?(so.startsWith('portrait')?'p':'l'):(h>w?'p':'l'));
-  if(S.orient&&S.pages){if(!S.pagesOr)S.pagesOr=eo;
+  if(S.pages){if(!S.pagesOr)S.pagesOr=eo;
     if(S.pagesOr!==eo){if(!S.pagesAlt)S.pagesAlt=JSON.parse(JSON.stringify(S.pages));
       const a=S.pages;S.pages=S.pagesAlt;S.pagesAlt=a;const c=S.cur;S.cur=S.curAlt||0;S.curAlt=c;S.pagesOr=eo;if(S.cur>=S.pages.length)S.cur=0;
       save();if($('#stage'))build()}}
 }
-addEventListener('resize',fit);addEventListener('orientationchange',()=>setTimeout(fit,250));
+addEventListener('resize',fit);addEventListener('orientationchange',()=>setTimeout(fit,250));try{screen.orientation&&screen.orientation.addEventListener('change',()=>setTimeout(fit,50))}catch(e){}
 
 const UN=()=>S.u||(S.u={t:'C',s:'kmh',p:'bar'});
 const KIND={ect:'t',iat:'t',egt1:'t',egt2:'t',oilt:'t',emut:'t',spd:'s',map:'p',boost:'p',oilp:'p',fuelp:'p'};
@@ -699,9 +700,9 @@ function build(){
   const st=$('#stage'),pg=S.pages[S.cur];st.innerHTML='';refs.clear();dots(st);
   st.classList.toggle('ed',edit);$('#pa').style.display=(S.cur===S.pages.length-1&&S.pages.length<5&&!edit)?'':'none';$('#hb').textContent=edit?'✓':'☰';$('#hb').style.color=edit?'#4cd07d':'';
   stSet();
-  if(!pg.w.length&&!S.orient){const e=document.createElement('div');e.id='empty';e.dataset.ch=1;e.style.flexDirection='column';e.style.gap='14px';
-    e.innerHTML='<div><button data-l="el">Ελληνικά</button> <button data-l="en">English</button></div><div>Πώς θες να χρησιμοποιείς την εφαρμογή;</div><button data-o="l">Οριζόντια (landscape)</button><button data-o="p">Κάθετη (portrait)</button>';
-    e.onclick=ev=>{const l=ev.target.dataset.l;if(l){setLang(l);build();return}const o=ev.target.dataset.o;if(o){S.orient=o;save();fit();build()}};st.appendChild(e);return}
+  if(!pg.w.length&&!S.orient&&!S.setup){const e=document.createElement('div');e.id='empty';e.dataset.ch=1;e.style.flexDirection='column';e.style.gap='14px';
+    e.innerHTML='<div><button data-l="el">Ελληνικά</button> <button data-l="en">English</button></div><div class="dym" style="max-width:320px;text-align:center">Γύρνα το κινητό οριζόντια ή κάθετα: κάθε θέση έχει το δικό της layout.</div>';
+    e.onclick=ev=>{const l=ev.target.dataset.l;if(l){S.setup=1;setLang(l);build();return}const o=ev.target.dataset.o;if(o){S.orient=o;save();fit();build()}};st.appendChild(e);return}
   if(!pg.w.length){if(edit){const e=document.createElement('div');e.id='empty';e.textContent='Tap and hold';st.appendChild(e)}return}
   pg.w.forEach(w=>st.appendChild(mk(w)));
 }
@@ -1342,7 +1343,7 @@ function menu(){
    ['units','ruler','Μονάδες εμφάνισης'],
    ['conn','wifi','Συνδεσιμότητα',BT.want?[['c','Σύνδεση Bluetooth'],['x','Αποσύνδεση']]:[['c','Σύνδεση Bluetooth']]],
    ['skins','palette','Skins',[['t','Θέμα οργάνων'],['b','Φόντο και logo']]],
-   ['set','gear','Ρυθμίσεις',[['o','Προσανατολισμός οθόνης'],['k','Βαθμονόμηση καναλιών'],['gr','Κλίση δρόμου'],['d','Demo'],['lg','🌐 Ελληνικά / English'],['r','Επαναφορά όλων']]],
+   ['set','gear','Ρυθμίσεις',[['k','Βαθμονόμηση καναλιών'],['gr','Κλίση δρόμου'],['d','Demo'],['lg','🌐 Ελληνικά / English'],['r','Επαναφορά όλων']]],
    ['dyno','dyno','Dyno / Ιπποδύναμη',[['dr','Νέα μέτρηση'],['dc','Στοιχεία αυτοκινήτου'],['dh','Αποθηκευμένες μετρήσεις']]],
    ['logs','log','Καταγραφές (logs)'],
    ['perf','timer','Χρονόμετρο επιδόσεων'],
@@ -1353,7 +1354,6 @@ function menu(){
     if(subs&&oc===k)for(const [a,m] of subs){
       let r='';
       if(a==='d')r='<b>'+(demo?'ΝΑΙ':'ΟΧΙ')+'</b>';
-      if(a==='o')r='<b>'+(S.orient==='p'?'Κάθετη':'Οριζόντια')+'</b><i data-a="ol">'+ic(S.olock===false?'unlock':'lock')+'</i>';
       h+='<button class="ms" data-a="'+a+'"><span>'+m+'</span>'+r+'</button>';
     }
   }
@@ -1535,13 +1535,6 @@ function gradePage(){
   $('#gr_g').onchange=e=>{S.grdGps=e.target.value==='1'?undefined:false;save();TL.geo()};
   $('#gr_i').onchange=e=>{S.grdInv=e.target.value==='1'||undefined;if(S.grd0)S.grd0=S.grd0.map(q=>-q);TL.u=TL.u&&TL.u.map(q=>-q);TL.f=null;save()};
 }
-function orientPage(){
-  const o=(v,l,c)=>'<option value="'+v+'"'+(c===v?' selected':'')+'>'+l+'</option>',cur=S.orient==='p'?'p':'l',lk=S.olock===false?'0':'1';
-  openSP('Προσανατολισμός οθόνης','<label>Προσανατολισμός</label><select id="o_s">'+o('l','Οριζόντια',cur)+o('p','Κάθετη',cur)+'</select><label>Κλείδωμα</label><select id="o_l">'+o('1','Κλειδωμένο',lk)+o('0','Ξεκλείδωτο',lk)+'</select>'
-    +'<div class="dym">Η κάθετη και η οριζόντια θέση έχουν <b>ξεχωριστό layout</b>. Με «Ξεκλείδωτο», όταν γυρίζεις το κινητό αλλάζει και το layout. Με «Κλειδωμένο», διαλέγεις εδώ ποιο layout θα φαίνεται (και ποιο επεξεργάζεσαι).</div>');
-  $('#o_s').onchange=e=>{S.orient=e.target.value;save();fit();build()};
-  $('#o_l').onchange=e=>{S.olock=e.target.value==='1';save();fit();build()};
-}
 $('#hb').onclick=()=>{if(edit){edit=false;save();closeD();build();return}menu();$('#mn').classList.toggle('open')};
 $('#pa').onclick=()=>{if(S.pages.length<5){S.pages.push({n:'Σελίδα '+(S.pages.length+1),w:[]});S.cur=S.pages.length-1;save();build()}};
 let sw=null;
@@ -1562,7 +1555,6 @@ addEventListener('pointerup',e=>{
 });
 $('#mn').addEventListener('click',e=>{
   const cm=()=>$('#mn').classList.remove('open');
-  if(e.target.closest('[data-a="ol"]')){S.olock=S.olock===false;save();fit();build();menu();return}
   const b=e.target.closest('button');if(!b)return;
   if(b.dataset.cat){const k=b.dataset.cat;
     if(k==='edit'){cm();edit=true;build()}
@@ -1579,7 +1571,7 @@ $('#mn').addEventListener('click',e=>{
   else if(a==='x'){cm();disconnect()}
   else if(a==='t'){cm();thPanel()}
   else if(a==='b'){cm();bgPanel()}
-  else if(a==='o'){cm();orientPage()}
+
   else if(a==='k'){cm();panel()}
   else if(a==='gr'){cm();gradePage()}
   else if(a==='dr'){cm();dyRun()}
