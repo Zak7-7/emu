@@ -338,7 +338,10 @@ function bv(c){
 }
 function val(c){return fromBase(c.k,bv(c))}
 const pt=a=>{const r=a*Math.PI/180;return(50+38*Math.sin(r)).toFixed(1)+' '+(55-38*Math.cos(r)).toFixed(1)};
-const pos=(d,w)=>{d.style.left=w.x+'%';d.style.top=w.y+'%';d.style.width=w.w+'%';d.style.height=w.h+'%'};
+const ARW=w=>w.t==='g'?1:w.t==='r'?5:0; // αναλογία πλάτος/ύψος: στρογγυλό 1:1, μπάρα 5:1
+const pos=(d,w)=>{let x=w.x,y=w.y,ww=w.w,hh=w.h;const A=ARW(w),st=$('#stage'),W=st&&st.clientWidth,H=st&&st.clientHeight;
+  if(A&&W&&H){const pw=ww*W/100,ph=hh*H/100,qw=Math.min(pw,ph*A),qh=qw/A,nw=qw/W*100,nh=qh/H*100;x+=(ww-nw)/2;y+=(hh-nh)/2;ww=nw;hh=nh} // σχήμα μόνο στην εμφάνιση
+  d.style.left=x+'%';d.style.top=y+'%';d.style.width=ww+'%';d.style.height=hh+'%'};
 
 // Κουτάκι στο θέμα LED τόξο: αριθμοί 7-segment με την ίδια κλίση (-6°) όπως στα όργανα
 // sk = κλίση, gh = "σβηστά" 8άρια από πίσω (θέμα Ψηφιακό LCD)
@@ -617,11 +620,9 @@ function build(){
     e.innerHTML='<div><button data-l="el">Ελληνικά</button> <button data-l="en">English</button></div><div>Πώς θες να χρησιμοποιείς την εφαρμογή;</div><button data-o="l">Οριζόντια (landscape)</button><button data-o="p">Κάθετη (portrait)</button>';
     e.onclick=ev=>{const l=ev.target.dataset.l;if(l){setLang(l);build();return}const o=ev.target.dataset.o;if(o){S.orient=o;save();fit();build()}};st.appendChild(e);return}
   if(!pg.w.length){if(edit){const e=document.createElement('div');e.id='empty';e.textContent='Tap and hold';st.appendChild(e)}return}
-  if(pg.w.map(sqG).includes(true))save();
   pg.w.forEach(w=>st.appendChild(mk(w)));
 }
 // Τα στρογγυλά όργανα είναι τετράγωνα: το κουτί τους μικραίνει γύρω από το κέντρο ώστε να "αγκαλιάζει" το όργανο
-const ARW=w=>w.t==='g'?1:w.t==='r'?5:0; // αναλογία πλάτος/ύψος: στρογγυλό 1:1, μπάρα 5:1
 function sqG(w){
   const A=ARW(w);if(!A)return false;
   const W=$('#stage').clientWidth,H=$('#stage').clientHeight;if(!W||!H)return false;
