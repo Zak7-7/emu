@@ -107,6 +107,7 @@ table{border-collapse:collapse;font-size:13px}th,td{padding:3px 4px;text-align:l
 #dots{position:absolute;bottom:2px;left:0;right:0;display:flex;justify-content:center;gap:6px;pointer-events:none;z-index:3}
 #dots i{width:5px;height:5px;border-radius:50%;background:#555}#dots i.on{background:#ddd}
 .mh{padding:2px 0 12px}.mh img{width:84px;display:block}.mh .ml{height:3px;background:#fff;margin-top:14px;border-radius:2px}
+#cdot{width:10px;height:10px;border-radius:50%;background:#ff2d2d;box-shadow:0 0 6px #ff2d2d;flex:none;margin-left:-6px}#cdot.on{background:#2d9bff;box-shadow:0 0 7px #2d9bff}
 #mn button.mi{display:flex;align-items:center;gap:14px;width:100%;text-align:left;border:0;background:none;padding:13px 4px;font-size:17px;border-radius:0;margin:0}
 #mn svg{width:26px;height:26px;fill:none;stroke:#fff;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
 #mn button.ms{display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left;border:0;background:none;padding:10px 4px 10px 44px;color:#cfcfcf;font-size:15px;border-radius:0;margin:0}
@@ -930,7 +931,7 @@ const isNative=()=>!!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.is
 const U16=n=>'0000'+n+'-0000-1000-8000-00805f9b34fb',SV=U16('ffe0'),CH=U16('ffe1');
 const BTK='emubt_dev'; // αποθηκευμένη συσκευή για αυτόματη σύνδεση (native)
 // Ένδειξη πάνω δεξιά: τελεία (πράσινη/πορτοκαλί/κόκκινη) + κείμενο + frames/s
-function stSet(){
+function stSet(){cDot();
   const e=$('#st');if(!e)return;let c='',l='';
   if(BT.s==='live'){const st=Date.now()-BT.last>2000;c=st?'w':'g';l=(st?'Χωρίς δεδομένα · ':'Live · ')+BT.name+(st?'':' · '+BT.fps+' fps')}
   else if(BT.s==='conn'){c='w';l='Σύνδεση…'}
@@ -941,7 +942,9 @@ function stSet(){
   const x=edit?'Σύρε · γωνία ή 2 δάχτυλα: μέγεθος · κράτα πατημένο: ρυθμίσεις · ✓':(demo?'Demo':l);
   if(e.dataset.x!==x){e.dataset.x=x;e.textContent=x}
 }
-setInterval(()=>{BT.fps=BT.n;BT.n=0;if(BT.s==='live')stSet()},1000);
+setInterval(()=>{BT.fps=BT.n;BT.n=0;if(BT.s==='live')stSet();cDot()},1000);
+const btOn=()=>BT.s==='live'&&Date.now()-BT.last<2000; // κουκκίδα σύνδεσης στο μενού: μπλε = συνδεδεμένο, κόκκινη = όχι
+function cDot(){const e=$('#cdot');if(e)e.classList.toggle('on',btOn())}
 // Η οθόνη να μένει αναμμένη (στο native το κάνει και το MainActivity)
 function keepOn(){try{if(navigator.wakeLock&&document.visibilityState==='visible')navigator.wakeLock.request('screen').catch(()=>{})}catch(e){}}
 document.addEventListener('visibilitychange',()=>{if(BT.want)keepOn()});
@@ -1350,7 +1353,7 @@ function menu(){
    ['gm','gmeter','G-meter']];
   let h='<div class="mh">'+LOGO.replace(/style="[^"]*"/,'')+'<div class="ml"></div></div>';
   for(const [k,i,n,subs] of T){
-    h+='<button class="mi" data-cat="'+k+'">'+ic(i)+'<span>'+n+'</span></button>';
+    h+='<button class="mi" data-cat="'+k+'">'+ic(i)+'<span>'+n+'</span>'+(k==='conn'?'<i id="cdot"'+(btOn()?' class="on"':'')+'></i>':'')+'</button>';
     if(subs&&oc===k)for(const [a,m] of subs){
       let r='';
       if(a==='d')r='<b>'+(demo?'ΝΑΙ':'ΟΧΙ')+'</b>';
