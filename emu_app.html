@@ -717,7 +717,7 @@ function sdlg(w){
 }
 function dots(st){const d=document.createElement('div');d.id='dots';d.innerHTML=S.pages.map((p,i)=>'<i'+(i===S.cur?' class="on"':'')+'></i>').join('');st.appendChild(d)}
 function build(){
-  const st=$('#stage'),pg=S.pages[S.cur];st.innerHTML='';refs.clear();dots(st);
+  const st=$('#stage'),pg=S.pages[S.cur];st.innerHTML='';refs.clear();DRG=null;dots(st);
   st.classList.toggle('ed',edit);$('#pa').style.display=(S.cur===S.pages.length-1&&S.pages.length<5&&!edit)?'':'none';$('#hb').textContent=edit?'✓':'☰';$('#hb').style.color=edit?'#4cd07d':'';
   stSet();
   if(!pg.w.length&&!S.orient&&!S.setup){const e=document.createElement('div');e.id='empty';e.dataset.ch=1;e.style.flexDirection='column';e.style.gap='14px';
@@ -736,13 +736,13 @@ function sqG(w){
 let DRG=null; // ενεργό σύρσιμο οργάνου (για δεύτερο δάχτυλο)
 function drag(e,w,d){
   if(!edit){if(w.k==='grd'||isGm(w))grdHold(e,d);return}
-  if(DRG){DRG.add(e);return} // δεύτερο δάχτυλο: τσίμπημα
+  if(DRG&&DRG.d.isConnected&&Object.keys(DRG.P).length){DRG.add(e);return}DRG=null; // δεύτερο δάχτυλο: τσίμπημα
   const r=$('#stage').getBoundingClientRect(),br=d.getBoundingClientRect(),cz=Math.min(56,br.width*.4,br.height*.45);
   const rz=e.target.classList.contains('rz')||(br.right-e.clientX<cz&&br.bottom-e.clientY<cz); // και η περιοχή κοντά στη γωνία
   const sx=e.clientX,sy=e.clientY,o={...w},P={};let mv=false,pz=null;d.setPointerCapture(e.pointerId);P[e.pointerId]=[sx,sy];
   const dist=()=>{const a=Object.values(P);return Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1])||1};
   let lp=rz?0:setTimeout(()=>{lp=0;if(!mv&&Object.keys(P).length===1){u2();try{navigator.vibrate&&navigator.vibrate(25)}catch(x){}w.t==='s'?sdlg(w):dlgW(w,false)}},550); // κράτημα: ρυθμίσεις
-  DRG={add(ev){P[ev.pointerId]=[ev.clientX,ev.clientY];try{d.setPointerCapture(ev.pointerId)}catch(x){}
+  DRG={d,P,add(ev){P[ev.pointerId]=[ev.clientX,ev.clientY];try{d.setPointerCapture(ev.pointerId)}catch(x){}
     if(Object.keys(P).length===2){pz={d0:dist(),o:{...w}};mv=true;clearTimeout(lp)}}};
   const m=ev=>{
     if(P[ev.pointerId])P[ev.pointerId]=[ev.clientX,ev.clientY];
@@ -761,9 +761,9 @@ function drag(e,w,d){
     else if(rz){w.w=cl(sn(o.w+dx),10,100-w.x);w.h=cl(sn(o.h+dy),10,100-w.y)}
     else{w.x=cl(sn(o.x+dx),0,100-w.w);w.y=cl(sn(o.y+dy),0,100-w.h)}
     pos(d,w)};
-  const u2=()=>{clearTimeout(lp);DRG=null;d.removeEventListener('pointermove',m);d.removeEventListener('pointerup',u);d.removeEventListener('pointercancel',u)};
+  const u2=()=>{clearTimeout(lp);DRG=null;removeEventListener('pointermove',m);removeEventListener('pointerup',u);removeEventListener('pointercancel',u)};
   const u=ev=>{delete P[ev.pointerId];if(Object.keys(P).length)return;const tap=lp&&!mv&&!rz;u2();save();if(tap)toast(t('Κράτα πατημένο για ρυθμίσεις'),null,null,1500)};
-  d.addEventListener('pointermove',m);d.addEventListener('pointerup',u);d.addEventListener('pointercancel',u);
+  addEventListener('pointermove',m);addEventListener('pointerup',u);addEventListener('pointercancel',u); // σε όλο το παράθυρο: δουλεύει και όταν το δάχτυλο βγει έξω από το όργανο (iOS/Bluefy)
 }
 $('#stage').addEventListener('pointerdown',e=>{if(edit&&DRG&&!e.target.closest('.w')){DRG.add(e)}},true);
 setInterval(()=>{
