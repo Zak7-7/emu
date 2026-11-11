@@ -342,6 +342,7 @@ const ARW=w=>w.t==='g'?1:w.t==='r'?5:0; // αναλογία πλάτος/ύψο�
 const pos=(d,w)=>{let x=w.x,y=w.y,ww=w.w,hh=w.h;const A=ARW(w),st=$('#stage'),W=st&&st.clientWidth,H=st&&st.clientHeight;
   if(A&&W&&H){const pw=ww*W/100,ph=hh*H/100,qw=Math.min(pw,ph*A),qh=qw/A,nw=qw/W*100,nh=qh/H*100;x+=(ww-nw)/2;y+=(hh-nh)/2;ww=nw;hh=nh} // σχήμα μόνο στην εμφάνιση
   d.style.left=x+'%';d.style.top=y+'%';d.style.width=ww+'%';d.style.height=hh+'%'};
+if(window.ResizeObserver)new ResizeObserver(()=>{for(const [w,d] of refs)if(ARW(w)&&d.isConnected)pos(d,w)}).observe($('#stage')); // π.χ. όταν κλείνει το πληκτρολόγιο
 
 // Κουτάκι στο θέμα LED τόξο: αριθμοί 7-segment με την ίδια κλίση (-6°) όπως στα όργανα
 // sk = κλίση, gh = "σβηστά" 8άρια από πίσω (θέμα Ψηφιακό LCD)
