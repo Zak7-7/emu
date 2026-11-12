@@ -839,7 +839,7 @@ let DRG=null; // ενεργό σύρσιμο οργάνου (για δεύτερ
 const LKP=()=>!!(S.pages[S.cur]&&S.pages[S.cur].lk);
 // ---- Πλέγμα (ελεύθερες σελίδες) ----
 const GRP=()=>!!S.pages[S.cur]&&!LKP();
-function GD(){const st=$('#stage'),W=st.clientWidth,H=st.clientHeight,C=W>=H?24:12,cs=W/C;return{W,H,C,cs,R:Math.max(1,Math.floor(H/cs+.01))}}
+function GD(){const st=$('#stage'),W=st.clientWidth,H=st.clientHeight,C=W>=H?36:18,cs=W/C;return{W,H,C,cs,R:Math.max(1,Math.floor(H/cs+.01))}}
 const gSq=w=>(w.t==='g'&&thm()!=='h')||isGm(w); // στρογγυλά: τετράγωνα κελιά
 function gPct(w,G){w.x=w.gx/G.C*100;w.w=w.gw/G.C*100;w.y=w.gy*G.cs/G.H*100;w.h=w.gh*G.cs/G.H*100}
 function gCand(w,G){G=G||GD();let gw=Math.max(1,Math.round(w.w/100*G.C)),gh=Math.max(1,Math.round(w.h/100*G.H/G.cs));
@@ -861,7 +861,7 @@ function gPrep(pg){const G=GD();if(!G.W||!G.H)return G;
 // νέο όργανο στο κελί που πατήθηκε: τυπικό μέγεθος, μικραίνει αν δεν χωράει
 let NEWAT=null;
 function gNew(w){const G=GD(),pg=S.pages[S.cur],at=NEWAT||{x:0,y:0};NEWAT=null;
-  const L=gSq(w)?[[8,8],[7,7],[6,6],[5,5],[4,4]]:w.t==='r'?[[10,2],[8,2],[6,1],[5,1]]:[[6,4],[5,3],[4,3],[4,2],[3,2]];
+  const L=gSq(w)?[[12,12],[11,11],[10,10],[9,9],[8,8],[7,7],[6,6]]:w.t==='r'?[[15,3],[13,3],[10,2],[8,2],[6,1]]:[[9,6],[8,5],[7,5],[6,4],[5,3],[4,3]];
   for(const [gw,gh] of L){let b=null,bd=1e9;for(let y=at.y-gh+1;y<=at.y;y++)for(let x=at.x-gw+1;x<=at.x;x++){const c={gx:x,gy:y,gw,gh},d=(x-at.x)**2+(y-at.y)**2;if(d<bd&&gOk(w,c,G,pg)){bd=d;b=c}}
     if(b){Object.assign(w,b);gPct(w,G);return true}}
   return false}
