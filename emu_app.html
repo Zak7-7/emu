@@ -985,7 +985,6 @@ function dlgW(w,isNew){
   D(`<div id="f_pvw"><div id="f_pv"></div></div><h3>${isNew?'Νέο όργανο':'Όργανο'}</h3>
   <label>Τύπος<select id="f_t"><option value="b"${w.t==='b'?' selected':''}>Κουτάκι</option><option value="g"${w.t==='g'?' selected':''}>Αναλογικό</option><option value="r"${w.t==='r'?' selected':''}>Μπάρα</option></select></label>
   <label>Κανάλι<select id="f_k">${o}<option value="clk"${w.k==='clk'?' selected':''}>Ρολόι (ώρα)</option><option value="grd"${w.k==='grd'?' selected':''}>Κλίση δρόμου %</option>${['cel','turbo','gm'].map(k=>'<option value="'+k+'"'+((k==='gm'?isGm(w):w.k===k)?' selected':'')+'>'+({cel:'Check engine',turbo:'Turbo timer (δευτ.)',gm:'G-meter (κύκλος)'})[k]+'</option>').join('')}</select></label>
-  ${isNew?"":"<label>Μέγεθος <span id=f_szv>"+Math.round(w.w)+"%</span><input type=range id=f_sz min=8 max=100 step=1 value="+Math.round(w.w)+" style=\"width:55%\"></label>"}
   ${th==='d'?'<label class="rg">Δεύτερο κανάλι<select id="f_k2"><option value="">Κανένα</option>'+DEF.map(c=>'<option value="'+c.k+'"'+(w.k2===c.k?' selected':'')+'>'+cn(c)+'</option>').join('')+'</select></label><label class="rg">Διάταξη<select id="f_dl"><option value="">Αριστερά / Δεξιά</option><option value="v"'+(w.dl==='v'?' selected':'')+'>Πάνω / Κάτω</option></select></label><label class="rg">Βελόνα<input type="checkbox" id="f_dn"'+(w.dn?' checked':'')+' style="width:auto"></label>':''}
   <label>Όνομα (κενό = προεπιλογή)<input id="f_lb" value="${(w.lbl||'').replace(/"/g,'')}" placeholder="${t(cn(c0))}" maxlength="24"></label>
   <label>Συναγερμός κάτω από<span><input id="f_lo" value="${w.lo??''}" style="width:72px"> <input type="color" id="f_lc" value="${w.lc||'#2d7bff'}" style="width:44px;padding:2px"></span></label>
@@ -1043,7 +1042,6 @@ function dlgW(w,isNew){
     const L=document.body.classList.contains('ls'),AW=L?innerWidth*.42-40:$('#dlg').clientWidth-24,AH=L?(rot?innerWidth:innerHeight)-40:Math.min(220,(rot?innerWidth:innerHeight)*.3);
     const ww=Math.min(AW,AH*ar);b.style.width=ww+'px';b.style.height=ww/ar+'px';b.innerHTML='';b.appendChild(d);if(CQP)CQP.observe(d);PV={w:p,d}};
   $('#dlg').addEventListener('input',pv);$('#dlg').addEventListener('change',()=>setTimeout(pv));pv();
-  if($('#f_sz'))$('#f_sz').oninput=e=>{$('#f_szv').textContent=e.target.value+'%'};
   $('#f_ok').onclick=()=>{rdF(w);
     if(!isNew&&$('#f_sz')&&GRP()&&w.gx!=null){const k=+$('#f_sz').value/w.w;if(k&&Math.abs(k-1)>.005&&!gScale(w,k))toast(t('Δεν χωράει μεγαλύτερο εδώ'))}
     else if(!isNew&&$('#f_sz')){let k=+$('#f_sz').value/w.w;if(k&&Math.abs(k-1)>.005){k=Math.min(k,100/w.w,100/w.h);const cx=w.x+w.w/2,cy=w.y+w.h/2;w.w*=k;w.h*=k;w.x=cl(cx-w.w/2,0,100-w.w);w.y=cl(cy-w.h/2,0,100-w.h)}} // μέγεθος από το ρυθμιστικό (εναλλακτική της λαβής)
