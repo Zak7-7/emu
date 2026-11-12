@@ -764,14 +764,14 @@ function rupd(d,w,c,v,pk){
 function gupd(d,w,c,v,pk){
   const f=cl((v-w.min)/(w.max-w.min),0,1),sv=d.querySelector('svg'),n=(sv&&sv.dataset.n?sv.dataset.n:'-135,135,50,55').split(',').map(Number);
   const g=d.querySelector('.gv');
-  if(g){if(g.dataset.p){const a=g.dataset.p.split(',');g.innerHTML=seg7(v.toFixed(dec(c)),+a[0],+a[1],+a[2],+a[3],a[4],+a[5])}else g.textContent=v.toFixed(dec(c))}
+  if(g){const s=v.toFixed(dec(c));if(g._s!==s){g._s=s;if(g.dataset.p){const a=g.dataset.p.split(',');g.innerHTML=seg7(s,+a[0],+a[1],+a[2],+a[3],a[4],+a[5])}else g.textContent=s}} // μόνο όταν αλλάζει (πολλές ενημερώσεις/s)
   const nd=d.querySelector('.nd');if(nd)nd.setAttribute('transform','rotate('+(n[0]+(n[1]-n[0])*f)+' '+n[2]+' '+n[3]+')');
   const fa=d.querySelector('.fa');if(fa)fa.setAttribute('stroke-dasharray',(f*100).toFixed(1)+' 100');
   const fa2=d.querySelector('.fa2');if(fa2&&w.k2&&M[w.k2]){const c2=M[w.k2],v2=val(c2),g2=d.querySelector('.gv2'),a=dmin(c2),b=dmax(c2);
     fa2.setAttribute('stroke-dasharray',(v2==null?0:cl((v2-a)/((b-a)||1),0,1)*100).toFixed(1)+' 100');const s2=v2==null?'-':v2.toFixed(dec(c2));if(g2&&g2.textContent!==s2)g2.textContent=s2}
   const sg=d.querySelectorAll('.sg');if(sg.length){const k=Math.round(f*sg.length);sg.forEach((e,i)=>{const o=i<k;e.setAttribute('stroke-opacity',o?1:.14);e.setAttribute('fill-opacity',o?1:.14);e.classList.toggle('lit',o)})}
   d.querySelectorAll('.xs').forEach(g=>{const ty=g.dataset.t||(w.xs||[])[+g.dataset.i],x=ty==='peak'?pk:M[ty]?val(M[ty]):null,s=x==null?'-':x.toFixed(ty==='peak'?dec(c):ty==='bat'||ty==='afr'?1:dec(M[ty]));
-    if(g.dataset.p){const a=g.dataset.p.split(',');g.innerHTML=seg7(s,+a[0],+a[1],+a[2],+a[3],a[4],+a[5])}else g.textContent=s});
+    if(g._s===s)return;g._s=s;if(g.dataset.p){const a=g.dataset.p.split(',');g.innerHTML=seg7(s,+a[0],+a[1],+a[2],+a[3],a[4],+a[5])}else g.textContent=s});
   const pm=d.querySelector('.pkm');if(pm){if(pk==null||!isFinite(pk))pm.setAttribute('opacity',0);else{const fp=cl((pk-w.min)/(w.max-w.min),0,1);pm.setAttribute('opacity',1);pm.setAttribute('transform','rotate('+(n[0]+(n[1]-n[0])*fp)+' '+n[2]+' '+n[3]+')')}}
 }
 function thPanel(){
@@ -909,14 +909,9 @@ function drag(e,w,d){
   addEventListener('pointermove',m);addEventListener('pointerup',u);addEventListener('pointercancel',u); // σε όλο το παράθυρο: δουλεύει και όταν το δάχτυλο βγει έξω από το όργανο (iOS/Bluefy)
 }
 $('#stage').addEventListener('pointerdown',e=>{if(edit&&DRG&&!e.target.closest('.w')){DRG.add(e)}},true);
-setInterval(()=>{
-  if(demo)sim();
-  if(RP.on)RP.step();
-  LOG.tick();{const e=$('#lg_st');if(e)lgStat(e)}
-  GP.tick();TT.tick();topInd();if(typeof PF!=='undefined')PF.tick();if(typeof GM!=='undefined'&&GM.open)GM.draw();
-  if(!TL.on&&!TL.ios&&TL.need())TL.start();
-  if(TL.on&&!demo){const sv=bv(M.spd);if(sv!=null){TL.ecu=Date.now();TL.spd(sv/3.6,Date.now())}else if(Date.now()-TL.ecu>2000)TL.ecu=0}
-  {const e=$('#gr_v');if(e){const v=bv(GRD);e.textContent=v==null?(S.grd0||demo?'-':t('Κάνε μηδενισμό')):(v>0?'+':'')+v.toFixed(1)+' %'}}
+// Ζωγραφίζει τα όργανα της σελίδας (καλείται με κάθε νέο δεδομένο και κάθε 100 ms)
+let RAFQ=0;const drawSoon=()=>{if(!RAFQ)RAFQ=requestAnimationFrame(()=>{RAFQ=0;drawW()})};
+function drawW(){
   for(const w of PV?S.pages[S.cur].w.concat(PV.w):S.pages[S.cur].w){
     if(PV&&w===PV.w&&!refs.has(w))refs.set(w,PV.d);
     const d=refs.get(w);if(!d)continue;
@@ -934,10 +929,20 @@ setInterval(()=>{
     else if(w.t==='r')rupd(d,eff(w),c,v,m.b);
     else if(d.classList.contains('wL')){s7(d.querySelector('.bv'),v.toFixed(dec(c)),0,ghost(w,c));const b=d.querySelectorAll('.bm b');s7(b[0],m.a.toFixed(dec(c)),0);s7(b[1],m.b.toFixed(dec(c)),0)}
     else if(d.classList.contains('w7')){s7(d.querySelector('.bv'),v.toFixed(dec(c)));const b=d.querySelectorAll('.bm b');s7(b[0],m.a.toFixed(dec(c)));s7(b[1],m.b.toFixed(dec(c)))}
-    else{d.querySelector('.bv').textContent=v.toFixed(dec(c));const b=d.querySelectorAll('.bm b');b[0].textContent=m.a.toFixed(dec(c));b[1].textContent=m.b.toFixed(dec(c))}
+    else{const T=(e,s)=>{if(e&&e.textContent!==s)e.textContent=s},b=d.querySelectorAll('.bm b');T(d.querySelector('.bv'),v.toFixed(dec(c)));T(b[0],m.a.toFixed(dec(c)));T(b[1],m.b.toFixed(dec(c)))}
   }
   const r=val(M.rpm);document.body.style.setProperty('--sl',S.col);
   document.body.classList.toggle('flash',on(S.shift)&&r!=null&&r>=S.shift);
+}
+setInterval(()=>{
+  if(demo)sim();
+  if(RP.on)RP.step();
+  LOG.tick();{const e=$('#lg_st');if(e)lgStat(e)}
+  GP.tick();TT.tick();topInd();if(typeof PF!=='undefined')PF.tick();if(typeof GM!=='undefined'&&GM.open)GM.draw();
+  if(!TL.on&&!TL.ios&&TL.need())TL.start();
+  if(TL.on&&!demo){const sv=bv(M.spd);if(sv!=null){TL.ecu=Date.now();TL.spd(sv/3.6,Date.now())}else if(Date.now()-TL.ecu>2000)TL.ecu=0}
+  {const e=$('#gr_v');if(e){const v=bv(GRD);e.textContent=v==null?(S.grd0||demo?'-':t('Κάνε μηδενισμό')):(v>0?'+':'')+v.toFixed(1)+' %'}}
+  drawW();
   if(cal){for(const c of DEF){const e=$('#r_'+c.k),id=get(c,'id');if(e)e.textContent=id!=null&&raw[id]!==undefined?raw[id]:'-'}
     const a=$('#all');if(a)a.textContent=Object.keys(raw).map(Number).sort((x,y)=>x-y).map(k=>hx(k)+'='+raw[k]).join('  ')}
   if(DY.ui)DY.ui();
@@ -1097,7 +1102,7 @@ function bgPanel(){
 const BT={s:'off',name:'',want:false,id:null,dev:null,n:0,fps:0,last:0,tries:0,timer:null,err:'',init:false};
 function parse(){while(buf.length>=5){
   if(buf[1]===0xA3&&(((buf[0]+buf[1]+buf[2]+buf[3])&255)===buf[4]||(buf[0]+buf[1]+buf[2]+buf[3])%255===buf[4])){const i0=buf[0];raw[i0]=(buf[2]<<8)|buf[3];buf.splice(0,5);BT.n++;BT.last=Date.now();dyS(i0)}else buf.shift()}}
-const onData=d=>{for(let i=0;i<d.byteLength;i++)buf.push(d.getUint8(i));parse()};
+const onData=d=>{for(let i=0;i<d.byteLength;i++)buf.push(d.getUint8(i));parse();if(!RP.on)drawSoon()};
 const isNative=()=>!!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform()&&window.BleClient);
 const U16=n=>'0000'+n+'-0000-1000-8000-00805f9b34fb',SV=U16('ffe0'),CH=U16('ffe1');
 const BTK='emubt_dev'; // αποθηκευμένη συσκευή για αυτόματη σύνδεση (native)
@@ -1139,7 +1144,7 @@ function retry(){
   },Math.min(2000*BT.tries,10000));
 }
 // Native Android (Capacitor): μόνο notify στο FFE1, ποτέ εγγραφή στο FFE2
-async function nOpen(id){await BleClient.connect(id,onLost);await BleClient.startNotifications(id,SV,CH,onData)}
+async function nOpen(id){await BleClient.connect(id,onLost);try{await BleClient.requestConnectionPriority(id,1)}catch(e){}await BleClient.startNotifications(id,SV,CH,onData)}
 async function connectNative(pick){
   clearTimeout(BT.timer);
   try{
