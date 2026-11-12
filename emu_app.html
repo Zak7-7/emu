@@ -606,7 +606,7 @@ function ktheme(w){
 function htheme(w){
   const c=MW(w),nu=nmU(c),A0=-90,A1=90,rg=(w.max-w.min)||1,fr=v=>A0+(A1-A0)*(v-w.min)/rg;
   const k=Math.max(Math.abs(w.max),Math.abs(w.min))>=2000?1000:1,L=k>1?(()=>{const o=[];for(let v=Math.ceil(w.min/1000-1e-9)*1000;v<=w.max+1e-9;v+=1000)o.push(v);return o})():lbls(w.min,w.max),f=L.length>1?L[1]-L[0]:rg;
-  let s='<svg viewBox="0 0 100 70" data-n="'+A0+','+A1+',50,50">'+(w.nf?'':'<path d="M2 50A48 48 0 0 1 98 50L98 69L2 69Z" fill="#0A0A0B"/>');
+  let s='<svg viewBox="0 0 100 70" data-n="'+A0+','+A1+',50,50">'+''/* μισός κύκλος: πάντα χωρίς φόντο */;
   s+='<path class="c2s" d="'+arcL(45,A0,A1)+'" fill="none" stroke-width=".8"/>'+gZone(w,42.5,fr,2.6);
   const st=f/5;let mj='',mn='';
   for(let i=Math.ceil(w.min/st-1e-9);i*st<=w.max+1e-9;i++){const x=i*st,a=fr(x),q=(x-L[0])/f,maj=Math.abs(q-Math.round(q))<1e-6,p=Q(45,a),p2=Q(maj?38.5:41.5,a);if(maj)mj+='M'+p[0]+' '+p[1]+'L'+p2[0]+' '+p2[1];else mn+='M'+p[0]+' '+p[1]+'L'+p2[0]+' '+p2[1]}
