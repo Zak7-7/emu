@@ -661,7 +661,11 @@ function gsvg(w,th){
 }
 
 // --- Μπάρα (w.t==='r'): οριζόντια κλίμακα 600x120, ένα σχέδιο ανά θέμα ---
+// πλάτος viewBox της μπάρας από το σχήμα του κουτιού (ύψος 120)
+function barVW(w){const st=$('#stage'),W=st&&st.clientWidth,H=st&&st.clientHeight;if(!W||!H||!w.w||!w.h)return 600;return Math.round(cl(120*(w.w*W)/(w.h*H),360,2400))}
+function rebar(d,w){const s=d.querySelector('svg');if(!s)return;const t=document.createElement('div');t.innerHTML=bsvg(eff(w),thm());s.replaceWith(t.firstChild);d._rb=0}
 function bsvg(w,th){
+  const VW=barVW(w),R=VW-600;
   if(th==='k'||th==='h'||th==='d')return bsvg3(w,th);
   const c=MW(w),nu=nmU(c),rg=(w.max-w.min)||1,k=Math.max(Math.abs(w.max),Math.abs(w.min))>=2000?1000:1;
   const L=k>1?(()=>{const o=[];for(let v=Math.ceil(w.min/1000-1e-9)*1000;v<=w.max+1e-9;v+=1000)o.push(v);return o})():lbls(w.min,w.max);
@@ -674,21 +678,21 @@ function bsvg(w,th){
       o+=draw(x0+i*sw,sw,(fl?'sg':'sg '+(i>=eN?'ef':'af')),fl,hot)}return o};
   let s;
   if(th==='l'){ // LED τόξο: τμήματα με κλίση, ψηφιακοί αριθμοί
-    const x0=20,x1=sv?470:575,X=fx(x0,x1);s='<svg viewBox="0 0 600 120" data-b="'+x0+','+x1+'" data-o=".14">'+(bb?'<rect x="4" y="4" width="592" height="112" rx="10" fill="none" stroke="#2c2c2c" stroke-width="2"/>':'');
+    const x0=20,x1=(sv?470:575)+R,X=fx(x0,x1);s='<svg viewBox="0 0 '+VW+' 120" data-b="'+x0+','+x1+'" data-o=".14">'+(bb?'<rect x="4" y="4" width="'+(592+R)+'" height="112" rx="10" fill="none" stroke="#2c2c2c" stroke-width="2"/>':'');
     L.forEach(v=>{const x=X(v);s+='<line class="c2s" x1="'+x+'" y1="36" x2="'+x+'" y2="42" stroke-width="2"/><g class="c2f">'+seg7(lab(v),x,16,.85,.85,'c',-6)+'</g>'});
     s+=segs(40,x0,x1,(x,sw,cls,fl)=>'<rect class="'+cls+'"'+fl+' x="'+(x+1.5).toFixed(1)+'" y="48" width="'+(sw-3).toFixed(1)+'" height="40" opacity=".14" transform="translate(5 0) skewX(-6)"/>');
     s+='<line class="c2s" x1="20" y1="100" x2="'+x1+'" y2="100" stroke-width="1.5" stroke-opacity=".6"/><text class="c2f" x="'+x1+'" y="114" text-anchor="end" font-weight="700" font-size="14" font-family="-apple-system,Helvetica,Arial,sans-serif">'+nm+(un?' '+un:'')+'</text>';
-    if(sv)s+='<g class="gv c1f" data-p="585,50,2.1,2.1,r,-6"></g>';
+    if(sv)s+='<g class="gv c1f" data-p="'+(585+R)+',50,2.1,2.1,r,-6"></g>';
   }else if(th==='e'){ // Ψηφιακό LCD: σβηστά τμήματα, ψηφιακά γράμματα, 8άρια από πίσω
-    const x0=22,x1=sv?440:578,X=fx(x0,x1),LL=L.length>6?L.filter((_,i)=>i%2===0):L;s='<svg viewBox="0 0 600 120" data-b="'+x0+','+x1+'" data-o=".12">';
-    s+='<rect x="4" y="6" width="592" height="108" rx="10" fill="'+(w.nf?'none':'#0b0d0b')+'"'+(bb?' stroke="#2c2c2c"':'')+'/>';
+    const x0=22,x1=(sv?440:578)+R,X=fx(x0,x1),LL=L.length>6?L.filter((_,i)=>i%2===0):L;s='<svg viewBox="0 0 '+VW+' 120" data-b="'+x0+','+x1+'" data-o=".12">';
+    s+='<rect x="4" y="6" width="'+(592+R)+'" height="108" rx="10" fill="'+(w.nf?'none':'#0b0d0b')+'"'+(bb?' stroke="#2c2c2c"':'')+'/>';
     LL.forEach(v=>s+='<g class="c2f" fill-opacity=".85">'+seg7(lab(v),X(v),18,.55,.55,'c',0)+'</g>');
     s+=segs(50,x0,x1,(x,sw,cls,fl,hot)=>'<rect class="'+cls+'"'+fl+' x="'+(x+1).toFixed(1)+'" y="34" width="'+(sw-2).toFixed(1)+'" height="'+(hot?44:36)+'" opacity=".12"/>');
     s+='<g class="c1f" fill-opacity=".8">'+segTxt(nm+(un?' '+un:''),22,88,.85,.85,'l',0)+'</g>';
-    if(sv)s+='<g class="c1f" fill-opacity=".13">'+seg7(ghost(w,c),582,30,2.6,2.6,'r',0)+'</g><g class="gv c1f" data-p="582,30,2.6,2.6,r,0"></g>';
+    if(sv)s+='<g class="c1f" fill-opacity=".13">'+seg7(ghost(w,c),582+R,30,2.6,2.6,'r',0)+'</g><g class="gv c1f" data-p="'+(582+R)+',30,2.6,2.6,r,0"></g>';
   }else if(th==='a'){ // Αναλογικό: γραμμική κλίμακα με δείκτη, όλα στο χρώμα γραμμάτων
-    const x0=34,x1=566,X=fx(x0,x1),FB='font-family="GBar,\'Arial Narrow\',sans-serif" font-weight="600"';s='<svg viewBox="0 0 600 120" data-b="'+x0+','+x1+'">';
-    s+='<rect x="4" y="6" width="592" height="108" rx="14" fill="'+(w.nf?'none':'#0A0A0B')+'"'+(bb?' stroke="#3A3C40" stroke-width="3"':'')+'/>';
+    const x0=34,x1=566+R,X=fx(x0,x1),FB='font-family="GBar,\'Arial Narrow\',sans-serif" font-weight="600"';s='<svg viewBox="0 0 '+VW+' 120" data-b="'+x0+','+x1+'">';
+    s+='<rect x="4" y="6" width="'+(592+R)+'" height="108" rx="14" fill="'+(w.nf?'none':'#0A0A0B')+'"'+(bb?' stroke="#3A3C40" stroke-width="3"':'')+'/>';
     if(onV(w.hi)){const a=X(+w.hi);s+='<rect x="'+a+'" y="58" width="'+(X(w.max)-a)+'" height="6" fill="'+(w.hc||'#D6452E')+'"/>'}
     if(onV(w.lo)){const b=X(+w.lo);s+='<rect x="'+x0+'" y="58" width="'+(b-x0)+'" height="6" fill="'+(w.lc||'#2d7bff')+'"/>'}
     const st=(L.length>1?L[1]-L[0]:rg)/5;
@@ -697,20 +701,21 @@ function bsvg(w,th){
     L.forEach(v=>s+='<text class="c2f" x="'+X(v)+'" y="32" text-anchor="middle" font-size="20" '+FB+'>'+lab(v)+'</text>');
     s+='<g class="ptr" transform="translate('+x0+' 0)"><path class="c2f" d="M0 66L-8 82L8 82Z"/><line class="c2s" x1="0" y1="36" x2="0" y2="68" stroke-width="3"/></g>';
     s+='<text class="c2f" x="34" y="104" font-size="15" letter-spacing="3" '+FB+'>'+nm+'</text>'+(un?'<text class="c2f" fill-opacity=".6" x="'+(40+nm.length*12)+'" y="104" font-size="13" '+FB+'>'+un+'</text>':'');
-    if(sv)s+='<text class="gv c2f" x="566" y="106" text-anchor="end" font-size="26" '+FB+'>-</text>';
+    if(sv)s+='<text class="gv c2f" x="'+(566+R)+'" y="106" text-anchor="end" font-size="26" '+FB+'>-</text>';
   }else{ // Ψηφιακό LED: λεπτά LED, peak, μεγάλη τιμή στο χρώμα του τόξου
-    const x0=40,x1=sv?400:560,FC='font-family="GChk,sans-serif" font-weight="600"';s='<svg viewBox="0 0 600 120" data-b="'+x0+','+x1+'" data-o=".14">';
-    s+='<rect x="4" y="6" width="592" height="108" rx="54" fill="'+(w.nf?'none':(w.fc||'#05070A'))+'"'+(bb?' stroke="#1A1D22" stroke-width="3"':'')+'/>';
+    const x0=40,x1=(sv?400:560)+R,FC='font-family="GChk,sans-serif" font-weight="600"';s='<svg viewBox="0 0 '+VW+' 120" data-b="'+x0+','+x1+'" data-o=".14">';
+    s+='<rect x="4" y="6" width="'+(592+R)+'" height="108" rx="54" fill="'+(w.nf?'none':(w.fc||'#05070A'))+'"'+(bb?' stroke="#1A1D22" stroke-width="3"':'')+'/>';
     s+=segs(60,x0,x1,(x,sw,cls,fl)=>'<rect class="'+cls+'"'+fl+' x="'+(x+1).toFixed(1)+'" y="46" width="'+(sw-2).toFixed(1)+'" height="28" rx="1.5" opacity=".14"/>');
     s+='<g class="pkm" opacity="0" transform="translate('+x0+' 0)"><line x1="0" y1="40" x2="0" y2="80" stroke="#E6F4FA" stroke-width="2.5"/></g>';
     s+='<text x="40" y="34" fill="#7F98A8" font-size="13" letter-spacing="3" '+FC+'>'+nm+(un?' '+un:'')+'</text>';
     s+='<text x="'+x1+'" y="96" text-anchor="end" fill="#7F98A8" font-size="11" letter-spacing="2" '+FC+'>PEAK <tspan class="pkv" fill="#E6F4FA">-</tspan></text>';
-    if(sv)s+='<text class="gv af" x="560" y="74" text-anchor="end" font-size="46" '+FC+'>-</text><circle class="wd" cx="548" cy="94" r="4"/>';
+    if(sv)s+='<text class="gv af" x="'+(560+R)+'" y="74" text-anchor="end" font-size="46" '+FC+'>-</text><circle class="wd" cx="'+(548+R)+'" cy="94" r="4"/>';
   }
   return s+'</svg>';
 }
 // μπάρες των θεμάτων k/h/d (600×120)
 function bsvg3(w,th){
+  const VW=barVW(w),R=VW-600;
   const c=MW(w),nu=nmU(c),rg=(w.max-w.min)||1,k=Math.max(Math.abs(w.max),Math.abs(w.min))>=2000?1000:1,sv=!w.nv,bb=w.bb??true;
   const L=k>1?(()=>{const o=[];for(let v=Math.ceil(w.min/1000-1e-9)*1000;v<=w.max+1e-9;v+=1000)o.push(v);return o})():lbls(w.min,w.max);
   const un=UPx(k>1?(nu[1]?nu[1]+' ':'')+'×1000':nu[1]),nm=UPx(nu[0]),lab=v=>String(+(v/k).toFixed(2)).replace(/^(-?)0\./,'$1.');
@@ -718,16 +723,16 @@ function bsvg3(w,th){
   const zones=(X,y,hh)=>{let o='';if(onV(w.hi)){const a=X(+w.hi);o+='<rect x="'+a+'" y="'+y+'" width="'+(X(w.max)-a)+'" height="'+hh+'" fill="'+(w.hc||'#ff2d2d')+'"/>'}if(onV(w.lo)){const b=X(+w.lo),a=X(w.min);o+='<rect x="'+a+'" y="'+y+'" width="'+(b-a)+'" height="'+hh+'" fill="'+(w.lc||'#2d7bff')+'"/>'}return o};
   let s;
   if(th==='k'){ // Carbon: χοντρή λωρίδα που γεμίζει, μεγάλη τιμή δεξιά
-    const x0=24,x1=sv?420:576,X=v=>x0+(x1-x0)*cl((v-w.min)/rg,0,1);
-    s='<svg viewBox="0 0 600 120" data-b="'+x0+','+x1+'"><defs><pattern id="cbn2" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="12" height="12" fill="#141414"/><rect width="6" height="6" fill="#222"/><rect x="6" y="6" width="6" height="6" fill="#222"/></pattern></defs>'
-      +'<rect x="3" y="5" width="594" height="110" rx="10" fill="'+(w.nf?'none':'url(#cbn2)')+'"'+(bb?' stroke="#777" stroke-width="2.5"':'')+'/>';
+    const x0=24,x1=(sv?420:576)+R,X=v=>x0+(x1-x0)*cl((v-w.min)/rg,0,1);
+    s='<svg viewBox="0 0 '+VW+' 120" data-b="'+x0+','+x1+'"><defs><pattern id="cbn2" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="12" height="12" fill="#141414"/><rect width="6" height="6" fill="#222"/><rect x="6" y="6" width="6" height="6" fill="#222"/></pattern></defs>'
+      +'<rect x="3" y="5" width="'+(594+R)+'" height="110" rx="10" fill="'+(w.nf?'none':'url(#cbn2)')+'"'+(bb?' stroke="#777" stroke-width="2.5"':'')+'/>';
     s+=TX(x0,32,15,'c2f',nm+(un?' '+un:''),'letter-spacing="2" fill-opacity=".8"')+zones(X,42,4);
     s+='<rect x="'+x0+'" y="50" width="'+(x1-x0)+'" height="34" fill="#2c2c2c"/><rect class="af fb" x="'+x0+'" y="50" width="0" height="34"/>';
     s+=TX(x0,104,13,'c2f',lab(w.min),'fill-opacity=".6"')+TX(x1,104,13,'c2f',lab(w.max),'text-anchor="end" fill-opacity=".6"');
-    if(sv)s+=TX(578,84,52,'gv c1f','-','text-anchor="end"');
+    if(sv)s+=TX(578+R,84,52,'gv c1f','-','text-anchor="end"');
   }else if(th==='h'){ // Μισός κύκλος: κλίμακα με γραμμές και βελόνα, τιμή κάτω δεξιά
-    const x0=34,x1=566,X=v=>x0+(x1-x0)*cl((v-w.min)/rg,0,1);
-    s='<svg viewBox="0 0 600 120" data-b="'+x0+','+x1+'"><rect x="3" y="5" width="594" height="110" rx="14" fill="'+(w.nf?'none':'#0A0A0B')+'"'+(bb?' stroke="#3A3C40" stroke-width="3"':'')+'/>';
+    const x0=34,x1=566+R,X=v=>x0+(x1-x0)*cl((v-w.min)/rg,0,1);
+    s='<svg viewBox="0 0 '+VW+' 120" data-b="'+x0+','+x1+'"><rect x="3" y="5" width="'+(594+R)+'" height="110" rx="14" fill="'+(w.nf?'none':'#0A0A0B')+'"'+(bb?' stroke="#3A3C40" stroke-width="3"':'')+'/>';
     s+='<line class="c2s" x1="'+x0+'" y1="72" x2="'+x1+'" y2="72" stroke-width="1.5"/>'+zones(X,66,5);
     const st=(L.length>1?L[1]-L[0]:rg)/5;
     for(let i=Math.ceil(w.min/st-1e-9);i*st<=w.max+1e-9;i++){const v=i*st,x=X(v),q=(v-L[0])/(st*5),maj=Math.abs(q-Math.round(q))<1e-6;
@@ -735,17 +740,17 @@ function bsvg3(w,th){
     L.forEach(v=>s+=TX(X(v),40,20,'c2f',lab(v),'text-anchor="middle"'));
     s+='<g class="ptr" transform="translate('+x0+' 0)"><line class="as" x1="0" y1="80" x2="0" y2="22" stroke-width="4" stroke-linecap="round"/><circle cx="0" cy="80" r="6" fill="#2A2B2E"/><circle class="c2f" cx="0" cy="80" r="2.5"/></g>';
     s+=TX(34,108,15,'c2f',nm+(un?' '+un:''),'letter-spacing="2" fill-opacity=".75"');
-    if(sv)s+=TX(566,110,26,'gv c1f','-','text-anchor="end"');
+    if(sv)s+=TX(566+R,110,26,'gv c1f','-','text-anchor="end"');
   }else{ // Διπλό: δύο λωρίδες (κανάλι πάνω, δεύτερο κανάλι κάτω) με τιμές δεξιά
-    const c2=w.k2&&M[w.k2],x0=24,x1=sv?440:576,X=v=>x0+(x1-x0)*cl((v-w.min)/rg,0,1);
-    s='<svg viewBox="0 0 600 120" data-b="'+x0+','+x1+'"><rect x="3" y="5" width="594" height="110" rx="12" fill="'+(w.nf?'none':'#0A0A0B')+'"'+(bb?' stroke="#555" stroke-width="2"':'')+'/>';
+    const c2=w.k2&&M[w.k2],x0=24,x1=(sv?440:576)+R,X=v=>x0+(x1-x0)*cl((v-w.min)/rg,0,1);
+    s='<svg viewBox="0 0 '+VW+' 120" data-b="'+x0+','+x1+'"><rect x="3" y="5" width="'+(594+R)+'" height="110" rx="12" fill="'+(w.nf?'none':'#0A0A0B')+'"'+(bb?' stroke="#555" stroke-width="2"':'')+'/>';
     if(c2){const n2=nmU(c2);
       s+=TX(x0,30,13,'c2f',nm,'letter-spacing="2" fill-opacity=".75"')+'<rect x="'+x0+'" y="36" width="'+(x1-x0)+'" height="18" fill="#2c2c2c"/><rect class="af fb" x="'+x0+'" y="36" width="0" height="18"/>';
       s+=TX(x0,80,13,'c2f',UPx(n2[0]),'letter-spacing="2" fill-opacity=".75"')+'<rect x="'+x0+'" y="86" width="'+(x1-x0)+'" height="18" fill="#2c2c2c"/><rect class="af fb2" x="'+x0+'" y="86" width="0" height="18"/>';
-      if(sv)s+=TX(578,56,30,'gv c1f','-','text-anchor="end"')+TX(578,106,30,'gv2 c1f','-','text-anchor="end"');
+      if(sv)s+=TX(578+R,56,30,'gv c1f','-','text-anchor="end"')+TX(578+R,106,30,'gv2 c1f','-','text-anchor="end"');
     }else{
       s+=TX(x0,34,14,'c2f',nm+(un?' '+un:''),'letter-spacing="2" fill-opacity=".75"')+zones(X,42,4)+'<rect x="'+x0+'" y="50" width="'+(x1-x0)+'" height="32" fill="#2c2c2c"/><rect class="af fb" x="'+x0+'" y="50" width="0" height="32"/>';
-      if(sv)s+=TX(578,84,46,'gv c1f','-','text-anchor="end"')}
+      if(sv)s+=TX(578+R,84,46,'gv c1f','-','text-anchor="end"')}
   }
   return s+'</svg>'}
 function rupd(d,w,c,v,pk){
@@ -882,7 +887,7 @@ function drag(e,w,d){
   const rz=!LKP()&&(e.target.classList.contains('rz')||(br.right-e.clientX<cz&&br.bottom-e.clientY<cz)); // και η περιοχή κοντά στη γωνία
   const sx=e.clientX,sy=e.clientY,o={...w},P={};let mv=false,pz=null;d.setPointerCapture(e.pointerId);P[e.pointerId]=[sx,sy];
   const dist=()=>{const a=Object.values(P);return Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1])||1};
-  const chk=()=>{if(GRP())d.classList.toggle('bad',!gOk(w,gCand(w)))}; // κόκκινο όταν η θέση είναι πιασμένη
+  const chk=()=>{if(GRP())d.classList.toggle('bad',!gOk(w,gCand(w)));if(w.t==='r'&&(rz||pz)&&!d._rb)d._rb=requestAnimationFrame(()=>rebar(d,w))}; // κόκκινο όταν η θέση είναι πιασμένη
   let lp=rz?0:setTimeout(()=>{lp=0;if(!mv&&Object.keys(P).length===1){u2();try{navigator.vibrate&&navigator.vibrate(25)}catch(x){}w.t==='s'?sdlg(w):dlgW(w,false)}},550); // κράτημα: ρυθμίσεις
   DRG={d,P,add(ev){P[ev.pointerId]=[ev.clientX,ev.clientY];try{d.setPointerCapture(ev.pointerId)}catch(x){}
     if(Object.keys(P).length===2&&!LKP()){pz={d0:dist(),o:{...w}};mv=true;clearTimeout(lp)}}};
@@ -905,7 +910,7 @@ function drag(e,w,d){
     else{w.x=cl(sn(o.x+dx),0,100-w.w);w.y=cl(sn(o.y+dy),0,100-w.h)}
     pos(d,w);chk()};
   const u2=()=>{clearTimeout(lp);DRG=null;removeEventListener('pointermove',m);removeEventListener('pointerup',u);removeEventListener('pointercancel',u)};
-  const u=ev=>{delete P[ev.pointerId];if(Object.keys(P).length)return;const tap=lp&&!mv&&!rz;u2();if(mv&&GRP())gSnap(w,o,d,rz||!!pz);save();if(tap)toast(t('Κράτα πατημένο για ρυθμίσεις'),null,null,1500)};
+  const u=ev=>{delete P[ev.pointerId];if(Object.keys(P).length)return;const tap=lp&&!mv&&!rz;u2();if(mv&&GRP())gSnap(w,o,d,rz||!!pz);if(mv&&w.t==='r'&&(rz||pz))rebar(d,w);save();if(tap)toast(t('Κράτα πατημένο για ρυθμίσεις'),null,null,1500)};
   addEventListener('pointermove',m);addEventListener('pointerup',u);addEventListener('pointercancel',u); // σε όλο το παράθυρο: δουλεύει και όταν το δάχτυλο βγει έξω από το όργανο (iOS/Bluefy)
 }
 $('#stage').addEventListener('pointerdown',e=>{if(edit&&DRG&&!e.target.closest('.w')){DRG.add(e)}},true);
