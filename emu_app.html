@@ -1892,6 +1892,9 @@ async function shareFile(name,txt,type){const C=window.CapFS;
     const a=document.createElement('a');a.href=URL.createObjectURL(fl);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500)
   }catch(e){if(!/cancel/i.test(String(e&&e.message)))toast('Η αποστολή απέτυχε')}}
 // ---- Χρονόμετρο επιδόσεων ----
+const PFL={t100:20,t200:40,t60:25,q:25}; // μέγιστος χρόνος (s) για να μετρήσει ως τράβηγμα
+// μία φορά: σβήνει παλιά «ρεκόρ» από κανονική οδήγηση και ξαναβγάζει τα ρεκόρ από το ιστορικό
+if(S.perf&&S.perfv!==2){const P=S.perf;P.hist=(P.hist||[]).filter(x=>PFL[x.k]!=null&&x.v>0&&x.v<=PFL[x.k]);const B={};P.hist.forEach(x=>{if(B[x.k]==null||x.v<B[x.k])B[x.k]=x.v});if(P.best&&P.best.qv&&B.q===P.best.q)B.qv=P.best.qv;P.best=B;S.perfv=2;save()}
 const PF={open:false,st:'wait',lv:null,lt:0,gt:0,still:0,t0:0,d:0,x100:null,r:{},roll:null,mx:0,
   sample(){const e=demo?null:bv(M.spd),g=GP.kmh();
     if(e!=null&&(e>1||g==null||g<5))return{v:e,t:Date.now(),src:'ECU'};
@@ -1905,17 +1908,23 @@ const PF={open:false,st:'wait',lv:null,lt:0,gt:0,still:0,t0:0,d:0,x100:null,r:{}
       const a=X(100);if(a&&this.r.t100==null){this.r.t100=(a-this.t0)/1000;this.x100=a;this.res('0–100',this.r.t100)}
       const b=X(200);if(b&&this.x100&&this.r.t200==null){this.r.t200=(b-this.x100)/1000;this.res('100–200',this.r.t200)}
       if(d0<400&&this.d>=400){const q=pt+(400-d0)/(this.d-d0)*(t-pt);this.r.q=(q-this.t0)/1000;this.r.qv=v;this.res('400 m',this.r.q)}
-      if(v<this.mx-15||(this.d>2000))this.end()}
-    if(this.roll==null){const a=X(60);if(a)this.roll=a}else{const b=X(130);if(b){this.r.t60=(b-this.roll)/1000;this.res('60–130',this.r.t60);this.roll=null}else if(v<55)this.roll=null}
+      const el=(t-this.t0)/1000;if(this.r.t100==null&&el>PFL.t100)this.r.t100=-1; // αργή επιτάχυνση: όχι 0–100
+      if(this.r.q==null&&el>PFL.q)this.r.q=-1;
+      if(this.x100&&this.r.t200==null&&(t-this.x100)/1000>PFL.t200)this.r.t200=-1;
+      if(v<this.mx-15||(this.d>2000)||(this.r.t100!=null&&this.r.q!=null&&(this.r.t200!=null||!this.x100)))this.end()}
+    if(this.roll==null){const a=X(60);if(a){this.roll=a;this.rmx=v}}else{const b=X(130);this.rmx=Math.max(this.rmx||0,v);
+      if(b){this.r.t60=(b-this.roll)/1000;this.res('60–130',this.r.t60);this.roll=null}
+      else if(v<55||v<this.rmx-8||(t-this.roll)/1000>PFL.t60)this.roll=null} // έπεσε η ταχύτητα ή αργεί: όχι τράβηγμα
     if($('#pf_v'))this.ui()},
-  res(n,v){const P=S.perf||(S.perf={best:{},hist:[]}),k={'0–100':'t100','100–200':'t200','400 m':'q','60–130':'t60'}[n];
+  res(n,v){const k0={'0–100':'t100','100–200':'t200','400 m':'q','60–130':'t60'}[n];if(!(v>0)||v>PFL[k0])return;
+    const P=S.perf||(S.perf={best:{},hist:[]}),k=k0;
     const nb=P.best[k]==null||v<P.best[k];if(nb){P.best[k]=+v.toFixed(2);if(k==='q')P.best.qv=Math.round(this.r.qv)}
     P.hist.unshift({d:Date.now(),k,v:+v.toFixed(2),src:this.src});P.hist.length=Math.min(P.hist.length,30);save();
     toast(n+': '+v.toFixed(2)+' s'+(nb?'  🏆':''),null,null,5000)},
   end(){this.st='wait'},
   ui(){const e=$('#pf_v');if(!e)return;const v=this.lv;e.innerHTML=(v==null?'-':Math.round(fromBase('spd',v)))+'<small>'+spU()+'</small>';
     $('#pf_s').textContent=t(this.lv==null?'Περιμένω ταχύτητα (GPS ή αισθητήρας)…':this.st==='ready'?'Έτοιμο: φύγε όποτε θέλεις.':this.st==='run'?'Μέτρηση…':'Σταμάτα το αυτοκίνητο για νέα μέτρηση από στάση.')+(this.src?'  ·  '+this.src:'');
-    const P=S.perf||{best:{},hist:[]},f=x=>x==null?'-':x.toFixed(2)+' s',r=this.r,B=P.best;
+    const P=S.perf||{best:{},hist:[]},f=x=>x==null||x<0?'-':x.toFixed(2)+' s',r=this.r,B=P.best;
     $('#pf_r').innerHTML='<div><small>0–100</small><b>'+f(r.t100)+'</b><small>'+t('ρεκόρ')+' '+f(B.t100)+'</small></div><div><small>100–200</small><b>'+f(r.t200)+'</b><small>'+t('ρεκόρ')+' '+f(B.t200)+'</small></div>'
       +'<div><small>60–130</small><b>'+f(r.t60)+'</b><small>'+t('ρεκόρ')+' '+f(B.t60)+'</small></div><div><small>400 m</small><b>'+f(r.q)+'</b><small>'+(r.qv?Math.round(fromBase('spd',r.qv))+' '+spU()+' · ':'')+t('ρεκόρ')+' '+f(B.q)+'</small></div>'}};
 function perfPage(){PF.open=true;
