@@ -360,7 +360,7 @@ addEventListener('visibilitychange',()=>{if(document.hidden)LOG.flush()});
 document.addEventListener('click',e=>{if(e.target.closest('#cel')){const v=$('#cel')._v;toast('Check engine: '+(v?celTxt(v):'OK'),null,null,6000)}else if(e.target.closest('#ttm'))toast('Άφησε τη μηχανή στο ρελαντί μέχρι να γράψει OK, για να κρυώσει το turbo.',null,null,6000)});addEventListener('pagehide',()=>LOG.flush()); // iPhone: η άδεια θέλει άγγιγμα
 const hhmm=()=>{const n=new Date();return String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')};
 let S={};try{S=JSON.parse(localStorage.getItem('emudash2'))||{}}catch(e){}
-S.pages=S.pages&&S.pages.length?S.pages:[1,2,3].map(i=>({n:'Σελίδα '+i,w:[]}));while(S.pages.length<1)S.pages.push({n:'Σελίδα '+(S.pages.length+1),w:[]});S.cur=S.cur||0;if(S.cur>=S.pages.length)S.cur=0;S.ch=S.ch||{};
+S.pages=S.pages&&S.pages.length?S.pages:[1,2,3].map(i=>({n:'Σελίδα '+i,w:[]}));while(S.pages.length<1)S.pages.push({n:'Σελίδα '+(S.pages.length+1),w:[]});S.cur=S.cur||0;if(S.cur>=S.pages.length)S.cur=0;if(!S.lnm){for(const p of [...S.pages,...(S.pagesAlt||[])])if(p.lk)for(const w of p.w)if(w.t==='b')w.nm=true;S.lnm=1} /* έτοιμα layouts: κουτάκια χωρίς Min/Max (μία φορά) */S.ch=S.ch||{};
 if(S.baro==null)S.baro=100;S.col=S.col||'#ff2d2d';
 if((S.chv||1)<2){['ect','iat','afr','bat','spd'].forEach(k=>delete S.ch[k]);S.chv=2;try{localStorage.setItem('emudash2',JSON.stringify(S))}catch(e){}}
 const save=()=>{try{localStorage.setItem('emudash2',JSON.stringify(S));return true}catch(e){return false}};
@@ -1817,7 +1817,7 @@ LAYS.t12={n:'Dyno',
     return R},
   w:[['b','dyno'],['b','rpm'],['b','boost'],['b','afr'],['b','tps']]};
 function layApply(id){const L=LAYS[id],st=$('#stage'),W=st.clientWidth||innerWidth,H=st.clientHeight||innerHeight,G=L.geo(W,H),pg=S.pages[S.cur];
-  pg.w=L.w.map(([t,k,o],i)=>Object.assign({t,k,min:dmin(M[k]),max:dmax(M[k]),slot:i},o||{},G[i]));pg.lk=id;save();build()}
+  pg.w=L.w.map(([t,k,o],i)=>Object.assign({t,k,min:dmin(M[k]),max:dmax(M[k]),slot:i},t==='b'?{nm:true}:{},o||{},G[i]));pg.lk=id;save();build()}
 const LSN={p100:'0–100',p200:'100–200',p60:'60–130',pq:'400 m',dyno:'DYNO',vgps:'KM/H',tps:'TPS',afr:'AFR',boost:'BOOST',oilt:'OIL T',iat:'IAT',ect:'WATER',bat:'VOLT',oilp:'OIL P',rpm:'RPM',spd:'KM/H',gear:'GEAR',clk:'CLOCK',gm:'G',grd:'GRADE',turbo:'TURBO',cel:'CHECK',knock:'KNOCK',ign:'IGN',injdc:'INJ DC',egt1:'EGT',map:'MAP',tps:'TPS',lam:'LAMBDA'};
 function layThumb(id){const L=LAYS[id],st=$('#stage'),ls=document.body.classList.contains('ls');
   let W=st.clientWidth,H=st.clientHeight;if(!W||!H||(W>=H)!==ls){W=ls?840:360;H=ls?340:760}
