@@ -441,6 +441,7 @@ const MW=w=>w.lbl?Object.assign({},M[w.k],{n:w.lbl}):M[w.k]; // όργανο μ�
 function cn(c){let n=c.n;const u=UN();
   if(KIND[c.k]==='t')n=n.replace('°C','°'+u.t);else if(c.k==='spd')n=n.replace('km/h',u.s==='mph'?'mph':'km/h');
   else if(c.k==='map')n=n.replace('kPa',u.p);else if(KIND[c.k]==='p')n=n.replace('bar',u.p);return n}
+const OFF=()=>!demo&&!RP.on&&Date.now()-BT.last>2000; // χωρίς φρέσκα δεδομένα: οι τιμές του εγκεφάλου μηδενίζουν
 function bv(c){
   if(RP.on&&c.k in RP.cur)return RP.cur[c.k]; // αναπαραγωγή καταγραφής
   if(c.k==='grd')return demo?(raw.grd??null):TL.v;
@@ -448,10 +449,11 @@ function bv(c){
   if(c.k==='vgps')return demo?bv(M.spd):spdK(); // ταχύτητα από τον εγκέφαλο ή, αν δεν υπάρχει, από το GPS
   if(c.k==='glat')return demo?(raw.glat??null):TL.gy;
   if(c.k==='turbo')return TT.wait();
-  if(c.k==='cel')return raw[255]===undefined?null:raw[255];
+  if(c.k==='cel')return OFF()?0:raw[255]===undefined?null:raw[255];
   if(c.k==='gear'){const id=get(c,'id');let e=null;if(id!=null&&raw[id]!==undefined){e=raw[id]&255;if(e>127)e-=256}return e>0?e:(spdK()!=null?gearCalc():e)}
-  if(c.k==='boost'){const m=bv(M.map);if(m==null)return null;const b=bv(M.baro);return(m-(b!=null&&b>50&&b<120?b:S.baro))/100} // baro από τον εγκέφαλο, αλλιώς η ρύθμιση
+  if(c.k==='boost'){if(OFF())return 0;const m=bv(M.map);if(m==null)return null;const b=bv(M.baro);return(m-(b!=null&&b>50&&b<120?b:S.baro))/100} // baro από τον εγκέφαλο, αλλιώς η ρύθμιση
   const id=get(c,'id');
+  if(id!=null&&OFF())return 0;
   if(id==null||raw[id]===undefined)return null;
   let r=raw[id];if(c.sg===8){r&=255;if(r>127)r-=256}else if(c.sg===16&&r>32767)r-=65536; // προσημασμένα κανάλια
   return r*get(c,'s')+get(c,'o');
@@ -1037,9 +1039,9 @@ function drawW(){
     if(w.k==='cel'){const v=bv(M.cel),s=v==null?'-':v?celTxt(v):'OK',e=d.querySelector('.bv');if(e._c!==s){e._c=s;e._s=null;e.classList.add('celt');if(d.classList.contains('wL'))s14(e,s);else e.textContent=s}d.classList.toggle('al',!!v);if(v)d.style.setProperty('--al','#ffb020');continue}
     if(w.k==='clk'){const s=hhmm(),bvv=d.querySelector('.bv');if(d.classList.contains('wL'))s7(bvv,s,0,'88:88');else if(d.classList.contains('w7'))s7(bvv,s);else if(bvv.textContent!==s)bvv.textContent=s;continue}
     const c=M[w.k],v=val(c);if(v==null)continue;
-    const m=mm[c.k]||(mm[c.k]={a:v,b:v});m.a=Math.min(m.a,v);m.b=Math.max(m.b,v);
+    const off=OFF(),m=mm[c.k]||(off?{a:v,b:v}:(mm[c.k]={a:v,b:v}));if(!off){m.a=Math.min(m.a,v);m.b=Math.max(m.b,v)}
     let ac=null;
-    if(on(w.hi)&&v>w.hi)ac=w.hc||'#ff2d2d';else if(on(w.lo)&&v<w.lo)ac=w.lc||'#2d7bff';
+    if(off);else if(on(w.hi)&&v>w.hi)ac=w.hc||'#ff2d2d';else if(on(w.lo)&&v<w.lo)ac=w.lc||'#2d7bff';
     if(c.k==='afr'&&on(S.lean)&&bv(M.boost)>.2&&v>S.lean&&!ac)ac='#ff2d2d';
     d.classList.toggle('al',!!ac);if(ac)d.style.setProperty('--al',ac);
     if(w.t==='g')gupd(d,eff(w),c,v,m.b);
@@ -1057,7 +1059,7 @@ setInterval(()=>{
   LOG.tick();{const e=$('#lg_st');if(e)lgStat(e)}
   GP.tick();TT.tick();topInd();if(typeof PF!=='undefined')PF.tick();if(typeof GM!=='undefined'&&GM.open)GM.draw();
   if(!TL.on&&!TL.ios&&TL.need())TL.start();
-  if(TL.on&&!demo){const sv=bv(M.spd);if(sv!=null){TL.ecu=Date.now();TL.spd(sv/3.6,Date.now())}else if(Date.now()-TL.ecu>2000)TL.ecu=0}
+  if(TL.on&&!demo){const sv=OFF()?null:bv(M.spd);if(sv!=null){TL.ecu=Date.now();TL.spd(sv/3.6,Date.now())}else if(Date.now()-TL.ecu>2000)TL.ecu=0}
   {const e=$('#gr_v');if(e){const v=bv(GRD);e.textContent=v==null?(S.grd0||demo?'-':t('Κάνε μηδενισμό')):(v>0?'+':'')+v.toFixed(1)+' %'}}
   drawW();
   if(cal){for(const c of DEF){const e=$('#r_'+c.k),id=get(c,'id');if(e)e.textContent=id!=null&&raw[id]!==undefined?raw[id]:'-'}
