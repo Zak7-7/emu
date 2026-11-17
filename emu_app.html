@@ -1247,8 +1247,8 @@ function dlgW(w,isNew){
     if(PV)refs.delete(PV.w);const d=mk(p);refs.delete(p);d.style.position='absolute';
     const st=$('#stage'),SW=st.clientWidth||400,SH=st.clientHeight||300;let ar=isGm(p)||p.t==='g'?1:p.t==='r'?5:(p.w*SW)/(p.h*SH||1);
     if(p.t==='r'&&!isGm(p)){const V=p.bv==='v',own=!isNew&&w.t==='r'&&(w.bv==='v')===V,r0=(w.w*SW)/(w.h*SH||1);ar=own?cl(r0,.2,10):V?.42:5;p.h=50;p.w=ar*50*SH/SW} // κάθετη μπάρα: όρθιο κουτί στην προεπισκόπηση
-    const L=document.body.classList.contains('ls'),AW=L?innerWidth*.42-40:$('#dlg').clientWidth-24,AH=L?(rot?innerWidth:innerHeight)-40:Math.min(220,(rot?innerWidth:innerHeight)*.3);
-    const AH2=p.t==='r'&&p.bv==='v'&&!L?Math.min(320,innerHeight*.42):AH,ww=Math.min(AW,AH2*ar);b.style.width=ww+'px';b.style.height=ww/ar+'px';b.innerHTML='';b.appendChild(d);if(CQP)CQP.observe(d);PV={w:p,d}};
+    const L=document.body.classList.contains('ls'),BW=document.body.clientWidth||innerWidth,BH=document.body.clientHeight||innerHeight,AW=L?BW*.42-40:$('#dlg').clientWidth-24,AH=L?BH-40:Math.min(220,BH*.3); // μέγεθος από το body (και μέσα στο κάδρο Προβολής)
+    const AH2=p.t==='r'&&p.bv==='v'&&!L?Math.min(320,BH*.42):AH,ww=Math.min(AW,AH2*ar);b.style.width=ww+'px';b.style.height=ww/ar+'px';b.innerHTML='';b.appendChild(d);if(CQP)CQP.observe(d);PV={w:p,d}};
   $('#dlg').addEventListener('input',pv);$('#dlg').addEventListener('change',()=>setTimeout(pv));pv();
   $('#f_ok').onclick=()=>{rdF(w);
     if(!isNew&&$('#f_sz')&&GRP()&&w.gx!=null){const k=+$('#f_sz').value/w.w;if(k&&Math.abs(k-1)>.005&&!gScale(w,k))toast(t('Δεν χωράει μεγαλύτερο εδώ'))}
