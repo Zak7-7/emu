@@ -32,7 +32,7 @@ button{font-weight:600}
 #logo{display:flex;align-items:center;justify-content:center}
 #top{position:absolute;top:0;left:0;right:0;z-index:4;height:44px;display:flex;align-items:center;gap:6px;padding:0 6px;pointer-events:none}#top>*{pointer-events:auto}
 body:not(.edm) #rec,body:not(.edm) #cel,body:not(.edm) #ttm,body:not(.edm) #st{display:none!important}
-body:not(.edm) #hb{opacity:.6}body.edm #st{pointer-events:none;text-shadow:0 0 4px #000,0 0 8px #000}body.edm #hb,body.edm #rs{background:rgba(0,0,0,.6);border-radius:10px}
+body:not(.edm) #hb{opacity:.6}body.edm #st{pointer-events:none;text-shadow:0 0 4px #000,0 0 8px #000}body.edm #hb,body.edm #rs,body.edm #pd{background:rgba(0,0,0,.6);border-radius:10px}
 #hb{font-size:24px;border:0;background:none;padding:2px 10px}
 #pn{font-weight:600;min-width:70px;text-align:center}
 #st{color:var(--mut);font-size:12px;margin-left:auto;text-align:right}
@@ -131,6 +131,7 @@ body.ls #cpk .sd{flex-direction:column;align-items:stretch}body.ls #cpk .pv{widt
 table{border-collapse:collapse;font-size:13px}th,td{padding:3px 4px;text-align:left;white-space:nowrap}
 .h{color:var(--mut);font-size:12px;margin:8px 0}
 #pa{font-size:24px;border:0;background:none;padding:2px 10px}
+#pd{border:0;background:none;color:#ff5a5a;margin-left:26px;min-width:46px;min-height:42px;padding:6px 10px;display:flex;align-items:center;justify-content:center}
 #rs{border:0;background:none;color:#ff8a3d;margin-left:26px;min-width:46px;min-height:42px;padding:6px 10px;display:flex;align-items:center;justify-content:center} /* καθαρισμός σελίδας: απόσταση από το ✓ για να μην πατιέται κατά λάθος */
 #stage{touch-action:none}
 #rpb{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:8;background:rgba(20,20,20,.94);border:1px solid #444;border-radius:14px;padding:6px 10px;display:flex;gap:8px;align-items:center;width:min(94vw,680px);color:#fff;font-size:13px}
@@ -148,7 +149,7 @@ table{border-collapse:collapse;font-size:13px}th,td{padding:3px 4px;text-align:l
 #tst{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#222;color:#fff;border:1px solid #555;border-radius:12px;padding:10px 16px;z-index:9;display:flex;gap:14px;align-items:center;font-size:15px;white-space:nowrap}
 #tst button{padding:6px 12px;font-size:14px;border-radius:9px;margin:0}
 .w.zf{animation:zf .7s}@keyframes zf{0%,100%{opacity:1}50%{opacity:.2}}
-#dots{position:absolute;bottom:2px;left:0;right:0;display:flex;justify-content:center;gap:6px;pointer-events:none;z-index:3}
+#dots{position:absolute;bottom:2px;left:0;right:0;display:flex;flex-wrap:wrap;justify-content:center;gap:6px;pointer-events:none;z-index:3}
 #dots i{width:5px;height:5px;border-radius:50%;background:#555}#dots i.on{background:#ddd}
 .mh{padding:2px 0 12px}.mh img{width:84px;display:block}.mh .ml{height:3px;background:#fff;margin-top:14px;border-radius:2px}
 #cdot{width:10px;height:10px;border-radius:50%;background:#ff2d2d;box-shadow:0 0 6px #ff2d2d;flex:none;margin-left:-6px}#cdot.on{background:#2d9bff;box-shadow:0 0 7px #2d9bff}
@@ -191,7 +192,7 @@ body.ls #mn button.mi{padding:8px 4px;font-size:16px}body.ls .mh img{width:54px}
 </head>
 <body>
 <div id="bgl"></div><div id="logo"></div><div id="splash"></div>
-<div id="top"><button id="hb">☰</button><button id="rs" style="display:none" aria-label="Καθαρισμός σελίδας"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.3-5.6"/><path d="M4 4v4h4"/></svg></button><button id="pa" style="display:none">＋</button><span id="rec">● REC</span><span id="cel"><svg viewBox="0 0 24 24"><path d="M4 10h2l2-3h6l2 3h2v2h2v4h-2v2h-3l-2 2H9l-2-2H5v-4H3v-4h1z"/></svg>CHECK</span><span id="ttm"></span><span id="st"></span></div>
+<div id="top"><button id="hb">☰</button><button id="rs" style="display:none" aria-label="Καθαρισμός σελίδας"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.3-5.6"/><path d="M4 4v4h4"/></svg></button><button id="pd" style="display:none" aria-label="Διαγραφή σελίδας"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg></button><button id="pa" style="display:none">＋</button><span id="rec">● REC</span><span id="cel"><svg viewBox="0 0 24 24"><path d="M4 10h2l2-3h6l2 3h2v2h2v4h-2v2h-3l-2 2H9l-2-2H5v-4H3v-4h1z"/></svg>CHECK</span><span id="ttm"></span><span id="st"></span></div>
 <div id="stage"></div>
 <div id="mn"></div>
 <div id="dlg"></div><div id="sp"></div>
@@ -359,7 +360,7 @@ addEventListener('visibilitychange',()=>{if(document.hidden)LOG.flush()});
 document.addEventListener('click',e=>{if(e.target.closest('#cel')){const v=$('#cel')._v;toast('Check engine: '+(v?celTxt(v):'OK'),null,null,6000)}else if(e.target.closest('#ttm'))toast('Άφησε τη μηχανή στο ρελαντί μέχρι να γράψει OK, για να κρυώσει το turbo.',null,null,6000)});addEventListener('pagehide',()=>LOG.flush()); // iPhone: η άδεια θέλει άγγιγμα
 const hhmm=()=>{const n=new Date();return String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')};
 let S={};try{S=JSON.parse(localStorage.getItem('emudash2'))||{}}catch(e){}
-S.pages=S.pages||[{n:'Σελίδα 1',w:[]}];while(S.pages.length<3)S.pages.push({n:'Σελίδα '+(S.pages.length+1),w:[]});S.cur=S.cur||0;if(S.cur>=S.pages.length)S.cur=0;S.ch=S.ch||{};
+S.pages=S.pages&&S.pages.length?S.pages:[1,2,3].map(i=>({n:'Σελίδα '+i,w:[]}));while(S.pages.length<1)S.pages.push({n:'Σελίδα '+(S.pages.length+1),w:[]});S.cur=S.cur||0;if(S.cur>=S.pages.length)S.cur=0;S.ch=S.ch||{};
 if(S.baro==null)S.baro=100;S.col=S.col||'#ff2d2d';
 if((S.chv||1)<2){['ect','iat','afr','bat','spd'].forEach(k=>delete S.ch[k]);S.chv=2;try{localStorage.setItem('emudash2',JSON.stringify(S))}catch(e){}}
 const save=()=>{try{localStorage.setItem('emudash2',JSON.stringify(S));return true}catch(e){return false}};
@@ -401,7 +402,7 @@ const DICT=[
 ['Μετονομασία σελίδας','Rename page'],['Χρώμα σβηστού LED','Unlit LED color'],
 ['Προσανατολισμός:','Orientation:'],['LED μπάρα στροφών','RPM LED bar'],
 ['Όλα τα ID (ωμές):','All IDs (raw):'],['Φωτογραφία φόντου','Background photo'],
-['Διαγραφή σελίδας;','Delete page?'],['Διαγραφή σελίδας','Delete page'],
+['Διαγραφή σελίδας;','Delete page?'],['Η σελίδα διαγράφηκε','Page deleted'],['Διαγραφή σελίδας','Delete page'],
 ['Φόντο και logo','Background and logo'],['Χρώμα κλίμακας','Scale color'],
 ['Επαναφορά logo','Reset logo'],['Θέμα οργάνων','Gauge theme'],['Επαναφορά όλων','Reset all'],
 ['Δικό σου logo','Your own logo'],['Σύνδεση EMUBT','Connect EMUBT'],['Όνομα σελίδας','Page name'],
@@ -959,7 +960,7 @@ function sdlg(w){
 function dots(st){const d=document.createElement('div');d.id='dots';d.innerHTML=S.pages.map((p,i)=>'<i'+(i===S.cur?' class="on"':'')+'></i>').join('');st.appendChild(d)}
 function build(){
   const st=$('#stage'),pg=S.pages[S.cur];st.innerHTML='';refs.clear();DRG=null;dots(st);
-  st.classList.toggle('ed',edit);st.classList.toggle('lk',LKP());$('#pa').style.display=(S.cur===S.pages.length-1&&S.pages.length<5&&!edit)?'':'none';$('#hb').textContent=edit?'✓':'☰';document.body.classList.toggle('edm',edit);$('#rs').style.display=edit?'':'none';$('#hb').style.color=edit?'#4cd07d':'';
+  st.classList.toggle('ed',edit);st.classList.toggle('lk',LKP());$('#pa').style.display=(S.cur===S.pages.length-1&&!edit)?'':'none';$('#hb').textContent=edit?'✓':'☰';document.body.classList.toggle('edm',edit);$('#rs').style.display=edit?'':'none';$('#pd').style.display=edit&&S.pages.length>1?'':'none';$('#hb').style.color=edit?'#4cd07d':'';
   stSet();
   if(!pg.w.length&&!S.orient&&!S.setup&&!edit){const e=document.createElement('div');e.id='empty';e.dataset.ch=1;e.style.flexDirection='column';e.style.gap='14px';
     e.innerHTML='<div><button data-l="el">Ελληνικά</button> <button data-l="en">English</button></div><div class="dym" style="max-width:320px;text-align:center">Γύρνα το κινητό οριζόντια ή κάθετα: κάθε θέση έχει το δικό της layout.</div>';
@@ -2071,7 +2072,9 @@ function gradePage(){
 $('#hb').onclick=()=>{if(edit){edit=false;save();closeD();build();return}menu();$('#mn').classList.toggle('open')};
 // καθαρισμός της σελίδας που φαίνεται: άδεια και ελεύθερη (με πλέγμα), χωρίς επιβεβαίωση (απόφαση χρήστη)
 $('#rs').onclick=()=>{const pg=S.pages[S.cur];pg.w=[];delete pg.lk;save();closeD();build();toast(t('Η σελίδα καθαρίστηκε'),null,null,2000)};
-$('#pa').onclick=()=>{if(S.pages.length<5){S.pages.push({n:'Σελίδα '+(S.pages.length+1),w:[]});S.cur=S.pages.length-1;save();build()}};
+$('#pa').onclick=()=>{S.pages.push({n:'Σελίδα '+(S.pages.length+1),w:[]});S.cur=S.pages.length-1;save();build()};
+$('#pd').onclick=()=>{if(S.pages.length<2)return;const pg=S.pages[S.cur];if(pg.w.length&&!cf('Διαγραφή σελίδας;'))return;
+  S.pages.splice(S.cur,1);S.cur=Math.min(S.cur,S.pages.length-1);save();closeD();build();toast(t('Η σελίδα διαγράφηκε'),null,null,2000)};
 let sw=null;
 $('#stage').addEventListener('pointerdown',e=>{
   $('#mn').classList.remove('open');
