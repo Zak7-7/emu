@@ -488,7 +488,12 @@ function bv(c){
 }
 function val(c){return fromBase(c.k,bv(c))}
 const pt=a=>{const r=a*Math.PI/180;return(50+38*Math.sin(r)).toFixed(1)+' '+(55-38*Math.cos(r)).toFixed(1)};
-const ARW=w=>isGm(w)?1:w.t==='g'?(thm()==='h'&&w.q!=='q'?1.43:1):0; // η μπάρα έχει ελεύθερο σχήμα (η κλίμακα χωράει μέσα της) // αναλογία πλάτος/ύψος: στρογγυλό 1:1, μπάρα 5:1
+function tAR(w){ // αναλογία πλάτος/ύψος που χρειάζεται ένα κουτάκι χωρίς Min/Max (όνομα πάνω, τιμή στη μέση)
+  if(w.t!=='b'||!w.nm||w.nh||!M[w.k]||isGm(w)||TILEONLY.includes(w.k)||(typeof isTx==='function'&&isTx(w.k)))return 0;
+  const c=MW(w),dc=dec(c),z=(w.vz||100)/100,a=w.min??dmin(c),b=w.max??dmax(c),mx=Math.max(Math.abs(+a||0),Math.abs(+b||0));
+  const L=String(Math.floor(mx)).length+(dc?dc+.4:0)+((+a)<0?1:0),nm=t(cn(c)).length;
+  return cl((Math.max(L*40*z*.64,nm*12*.62)+12)/100,.5,4)}
+const ARW=w=>isGm(w)?1:w.t==='g'?(thm()==='h'&&w.q!=='q'?1.43:1):w.t==='b'?tAR(w):0; // η μπάρα έχει ελεύθερο σχήμα (η κλίμακα χωράει μέσα της) // αναλογία πλάτος/ύψος: στρογγυλό 1:1, μπάρα 5:1
 const pos=(d,w)=>{let x=w.x,y=w.y,ww=w.w,hh=w.h;const A=ARW(w),st=$('#stage'),W=st&&st.clientWidth,H=st&&st.clientHeight;
   if(A&&W&&H){const pw=ww*W/100,ph=hh*H/100,qw=Math.min(pw,ph*A),qh=qw/A,nw=qw/W*100,nh=qh/H*100;x+=(ww-nw)/2;y+=(hh-nh)/2;ww=nw;hh=nh} // σχήμα μόνο στην εμφάνιση
   d.style.left=x+'%';d.style.top=y+'%';d.style.width=ww+'%';d.style.height=hh+'%'};
@@ -1044,7 +1049,7 @@ function GD(){const st=$('#stage'),W=st.clientWidth,H=st.clientHeight,C=W>=H?36:
 const gSq=w=>(w.t==='g'&&thm()!=='h')||isGm(w); // στρογγυλά: τετράγωνα κελιά
 function gPct(w,G){w.x=w.gx/G.C*100;w.w=w.gw/G.C*100;w.y=w.gy*G.cs/G.H*100;w.h=w.gh*G.cs/G.H*100}
 function gCand(w,G){G=G||GD();let gw=Math.max(1,Math.round(w.w/100*G.C)),gh=Math.max(1,Math.round(w.h/100*G.H/G.cs));
-  if(gSq(w))gw=gh=Math.max(1,Math.round((gw+gh)/2));if(w.t==='g'&&thm()==='h'&&w.q!=='q')gh=Math.max(1,Math.round(gw/1.43));gw=Math.min(gw,G.C);gh=Math.min(gh,G.R);
+  if(gSq(w))gw=gh=Math.max(1,Math.round((gw+gh)/2));if(w.t==='g'&&thm()==='h'&&w.q!=='q')gh=Math.max(1,Math.round(gw/1.43));{const A=tAR(w);if(A)gw=Math.max(1,Math.round(gh*A*G.cs/(G.W/G.C)))}gw=Math.min(gw,G.C);gh=Math.min(gh,G.R);
   return{gx:cl(Math.round(w.x/100*G.C),0,G.C-gw),gy:cl(Math.round(w.y/100*G.H/G.cs),0,G.R-gh),gw,gh}}
 function gOk(w,c,G,pg){G=G||GD();pg=pg||S.pages[S.cur];if(c.gx<0||c.gy<0||c.gx+c.gw>G.C||c.gy+c.gh>G.R)return false;
   return!pg.w.some(o=>o!==w&&o.gx!=null&&c.gx<o.gx+o.gw&&o.gx<c.gx+c.gw&&c.gy<o.gy+o.gh&&o.gy<c.gy+c.gh)}
@@ -1057,7 +1062,7 @@ function gPrep(pg){const G=GD();if(!G.W||!G.H)return G;
   for(const w of pg.w){if(w.gx!=null)continue;let c=gCand(w,G);
     if(!gOk(w,c,G,pg)){let n=null;for(let k=10;k>=2&&!n;k--){const f=k/10,gw=Math.max(2,Math.round(c.gw*f)),gh=gSq(w)?gw:Math.max(1,Math.round(c.gh*f));n=gSpot(w,gw,gh,c.gx,c.gy,G,pg)}if(n)c=n} // μικραίνει αναλογικά, η μπάρα μένει μακρόστενη
     Object.assign(w,c)}
-  for(const w of pg.w){if(gSq(w)&&w.gw!==w.gh)w.gw=w.gh=Math.min(w.gw,w.gh);gPct(w,G)}
+  for(const w of pg.w){if(gSq(w)&&w.gw!==w.gh)w.gw=w.gh=Math.min(w.gw,w.gh);{const A=tAR(w);if(A&&w.gw!=null){const n=Math.max(1,Math.round(w.gh*A*G.cs/(G.W/G.C)));if(n<w.gw){w.gx+=Math.floor((w.gw-n)/2);w.gw=n}}}gPct(w,G)}
   return G}
 // νέο όργανο στο κελί που πατήθηκε: τυπικό μέγεθος, μικραίνει αν δεν χωράει
 let NEWAT=null;
