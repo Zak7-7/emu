@@ -30,7 +30,9 @@ button{font-weight:600}
 #splash{position:absolute;inset:0;z-index:20;background:#000;display:flex;align-items:center;justify-content:center;transition:opacity .7s}
 #splash.out{opacity:0;pointer-events:none}
 #logo{display:flex;align-items:center;justify-content:center}
-#top{position:relative;z-index:1;height:44px;flex:none;display:flex;align-items:center;gap:6px;padding:0 6px}
+#top{position:absolute;top:0;left:0;right:0;z-index:4;height:44px;display:flex;align-items:center;gap:6px;padding:0 6px;pointer-events:none}#top>*{pointer-events:auto}
+body:not(.edm) #rec,body:not(.edm) #cel,body:not(.edm) #ttm,body:not(.edm) #st{display:none!important}
+body:not(.edm) #hb{opacity:.6}body.edm #st{pointer-events:none;text-shadow:0 0 4px #000,0 0 8px #000}body.edm #hb,body.edm #rs{background:rgba(0,0,0,.6);border-radius:10px}
 #hb{font-size:24px;border:0;background:none;padding:2px 10px}
 #pn{font-weight:600;min-width:70px;text-align:center}
 #st{color:var(--mut);font-size:12px;margin-left:auto;text-align:right}
@@ -151,6 +153,7 @@ table{border-collapse:collapse;font-size:13px}th,td{padding:3px 4px;text-align:l
 .mh{padding:2px 0 12px}.mh img{width:84px;display:block}.mh .ml{height:3px;background:#fff;margin-top:14px;border-radius:2px}
 #cdot{width:10px;height:10px;border-radius:50%;background:#ff2d2d;box-shadow:0 0 6px #ff2d2d;flex:none;margin-left:-6px}#cdot.on{background:#2d9bff;box-shadow:0 0 7px #2d9bff}
 #mcard{display:flex;align-items:center;gap:10px;background:#1b1b1b;border-radius:12px;padding:10px 12px;margin:2px 0 4px}#mcard #cdot{margin:0}
+#mcard #mrec{display:none;color:#ff3b30;letter-spacing:1px}#mcard #mrec.on{display:block}
 #mcard .mct{flex:1;min-width:0;font-size:15px;line-height:1.25}#mct1{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#mcard small{display:block;color:var(--mut);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #mn #mcard button{width:auto;flex:none;margin:0;padding:7px 12px;font-size:14px;border:1px solid #444;border-radius:9px;background:none}
 #mn .msec{font-size:11px;letter-spacing:1.6px;color:#777;margin:14px 4px 2px}
@@ -278,9 +281,9 @@ function spdK(){const e=bv(M.spd),g=GP.kmh();if(e!=null&&(e>1||g==null||g<5))ret
 function gearCalc(){const r=bv(M.rpm),v=spdK();if(r==null||v==null||v<7||r<800)return 0;const c=dCar(),ms=v/3.6;let b=0,be=1;
   dGears(c).forEach(g=>{const e=ms/dK(c,g),er=Math.abs(r-e)/e;if(er<be){be=er;b=g}});return be<.12?b:0}
 // Turbo timer: "θερμότητα" 0..1 που ανεβαίνει με boost και πέφτει στο ρελαντί· αναμονή = έως 90 s
-const TT={H:0,lt:0,okT:0,shown:false,
+const TT={H:0,lt:0,okT:0,shown:false,off:0,
   tick(){const now=Date.now(),dt=this.lt?Math.min(1,(now-this.lt)/1000):0;this.lt=now;
-    if(RP.on)return;const r=bv(M.rpm),b=bv(M.boost);if(r==null||r<300)return;
+    if(RP.on)return;const r=bv(M.rpm),b=bv(M.boost);if(r==null||r<300){if(!this.off)this.off=now;else if(now-this.off>10000){this.H=0;this.shown=false}return}this.off=0;
     if(b!=null&&b>.2)this.H=Math.min(1,this.H+dt*(b/1.5)/20);else this.H=Math.max(0,this.H-dt/(r>1500?240:90))},
   wait(){return Math.ceil(this.H*90)}}; // κλίση δρόμου από τους αισθητήρες του κινητού: μόνο για κουτάκια
 // Κλίση: u = φιλτραρισμένο διάνυσμα βαρύτητας (devicemotion), S.grd0 = "πάνω" σε επίπεδο σημείο (μηδενισμός).
@@ -351,7 +354,7 @@ function topInd(){
   if(idle&&w>0){TT.shown=true;e.className='on';e.textContent='TURBO '+w+'s'}
   else if(TT.shown&&idle&&w===0){TT.shown=false;TT.okT=Date.now()+5000}
   if(!(idle&&w>0)){if(Date.now()<TT.okT){e.className='on ok';e.textContent='TURBO OK'}else e.className=''}}
-function recUI(){const e=$('#rec');if(e)e.classList.toggle('on',!!LOG.cur)}
+function recUI(){const e=$('#rec');if(e)e.classList.toggle('on',!!LOG.cur);const m=$('#mrec');if(m)m.classList.toggle('on',!!LOG.cur)}
 addEventListener('visibilitychange',()=>{if(document.hidden)LOG.flush()});
 document.addEventListener('click',e=>{if(e.target.closest('#cel')){const v=$('#cel')._v;toast('Check engine: '+(v?celTxt(v):'OK'),null,null,6000)}else if(e.target.closest('#ttm'))toast('Άφησε τη μηχανή στο ρελαντί μέχρι να γράψει OK, για να κρυώσει το turbo.',null,null,6000)});addEventListener('pagehide',()=>LOG.flush()); // iPhone: η άδεια θέλει άγγιγμα
 const hhmm=()=>{const n=new Date();return String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')};
@@ -956,7 +959,7 @@ function sdlg(w){
 function dots(st){const d=document.createElement('div');d.id='dots';d.innerHTML=S.pages.map((p,i)=>'<i'+(i===S.cur?' class="on"':'')+'></i>').join('');st.appendChild(d)}
 function build(){
   const st=$('#stage'),pg=S.pages[S.cur];st.innerHTML='';refs.clear();DRG=null;dots(st);
-  st.classList.toggle('ed',edit);st.classList.toggle('lk',LKP());$('#pa').style.display=(S.cur===S.pages.length-1&&S.pages.length<5&&!edit)?'':'none';$('#hb').textContent=edit?'✓':'☰';$('#rs').style.display=edit?'':'none';$('#hb').style.color=edit?'#4cd07d':'';
+  st.classList.toggle('ed',edit);st.classList.toggle('lk',LKP());$('#pa').style.display=(S.cur===S.pages.length-1&&S.pages.length<5&&!edit)?'':'none';$('#hb').textContent=edit?'✓':'☰';document.body.classList.toggle('edm',edit);$('#rs').style.display=edit?'':'none';$('#hb').style.color=edit?'#4cd07d':'';
   stSet();
   if(!pg.w.length&&!S.orient&&!S.setup&&!edit){const e=document.createElement('div');e.id='empty';e.dataset.ch=1;e.style.flexDirection='column';e.style.gap='14px';
     e.innerHTML='<div><button data-l="el">Ελληνικά</button> <button data-l="en">English</button></div><div class="dym" style="max-width:320px;text-align:center">Γύρνα το κινητό οριζόντια ή κάθετα: κάθε θέση έχει το δικό της layout.</div>';
@@ -1688,7 +1691,7 @@ function menu(){
   const mq=(k,i,n)=>'<button class="mq'+(oc===k?' on':'')+'" data-cat="'+k+'">'+ic(i)+'<span>'+n+'</span></button>';
   let h='<div class="mh">'+LOGO.replace(/style="[^"]*"/,'')+'<div class="ml"></div></div>';
   // κάρτα σύνδεσης
-  h+='<div id="mcard"><i id="cdot"'+(btOn()?' class="on"':'')+'></i><div class="mct"><div id="mct1"></div><small id="mct2"></small></div><button data-a="'+(BT.want?'x':'c')+'">'+(BT.want?'Αποσύνδεση':'Σύνδεση Bluetooth')+'</button></div>';
+  h+='<div id="mcard"><i id="cdot"'+(btOn()?' class="on"':'')+'></i><div class="mct"><div id="mct1"></div><small id="mct2"></small><small id="mrec"'+(LOG.cur?' class="on"':'')+'>● REC</small></div><button data-a="'+(BT.want?'x':'c')+'">'+(BT.want?'Αποσύνδεση':'Σύνδεση Bluetooth')+'</button></div>';
   h+='<div class="msec">ΟΘΟΝΗ</div>'+mi('edit','edit','Επεξεργασία σελίδας')+mi('lay','grid','Έτοιμα layouts')
     +mi('look','palette','Εμφάνιση')+sub('look',[['t','Θέμα οργάνων'],['b','Φόντο και logo'],['u','Μονάδες εμφάνισης']])
     +mi('sl','bell','Shift light και συναγερμοί');
