@@ -32,7 +32,7 @@ button{font-weight:600}
 #logo{display:flex;align-items:center;justify-content:center}
 #top{position:absolute;top:0;left:0;right:0;z-index:4;height:44px;display:flex;align-items:center;gap:6px;padding:0 6px;pointer-events:none}#top>*{pointer-events:auto}
 body:not(.edm) #rec,body:not(.edm) #cel,body:not(.edm) #ttm,body:not(.edm) #st{display:none!important}
-body:not(.edm) #hb{opacity:.6}body.edm #st{pointer-events:none;text-shadow:0 0 4px #000,0 0 8px #000}body.edm #hb,body.edm #rs,body.edm #pd{background:rgba(0,0,0,.6);border-radius:10px}
+body:not(.edm) #hb{opacity:.6}#hb,#pa,#dots{transition:opacity .6s}body.idle:not(.edm) #hb,body.idle:not(.edm) #pa,body.idle:not(.edm) #dots{opacity:.12}body.edm #st{pointer-events:none;text-shadow:0 0 4px #000,0 0 8px #000}body.edm #hb,body.edm #rs,body.edm #pd{background:rgba(0,0,0,.6);border-radius:10px}
 #hb{font-size:24px;border:0;background:none;padding:2px 10px}
 #pn{font-weight:600;min-width:70px;text-align:center}
 #st{color:var(--mut);font-size:12px;margin-left:auto;text-align:right}
@@ -440,6 +440,7 @@ function fit(){
       const a=S.pages;S.pages=S.pagesAlt;S.pagesAlt=a;const c=S.cur;S.cur=S.curAlt||0;S.curAlt=c;S.pagesOr=eo;if(S.cur>=S.pages.length)S.cur=0;
       save();if($('#stage'))build()}}
 }
+{let it=0;const wake=()=>{document.body.classList.remove('idle');clearTimeout(it);it=setTimeout(()=>document.body.classList.add('idle'),4000)};['pointerdown','touchstart','keydown','wheel'].forEach(e=>addEventListener(e,wake,{passive:true,capture:true}));addEventListener('load',wake);wake()} // αδράνεια 4 s: ☰, ＋ και τελείες σελίδων αχνά
 addEventListener('resize',fit);addEventListener('orientationchange',()=>setTimeout(fit,250));try{screen.orientation&&screen.orientation.addEventListener('change',()=>setTimeout(fit,50))}catch(e){}
 
 const UN=()=>S.u||(S.u={t:'C',s:'kmh',p:'bar'});
