@@ -1272,7 +1272,9 @@ function retry(){
   },Math.min(2000*BT.tries,10000));
 }
 // Native Android (Capacitor): μόνο notify στο FFE1, ποτέ εγγραφή στο FFE2
-async function nOpen(id){await BleClient.connect(id,onLost);try{await BleClient.requestConnectionPriority(id,1)}catch(e){}await BleClient.startNotifications(id,SV,CH,onData)}
+const isIOS=()=>{try{return window.Capacitor&&Capacitor.getPlatform&&Capacitor.getPlatform()==='ios'}catch(e){return false}};
+async function nOpen(id){if(isIOS()){try{await BleClient.getDevices([id])}catch(e){}} // iOS: χωρίς αυτό «Device not found» στην αυτόματη σύνδεση
+  await BleClient.connect(id,onLost);try{await BleClient.requestConnectionPriority(id,1)}catch(e){}await BleClient.startNotifications(id,SV,CH,onData)}
 async function connectNative(pick){
   clearTimeout(BT.timer);
   try{
@@ -1282,7 +1284,7 @@ async function connectNative(pick){
     if(!id){
       if(BT.id){BT.want=false;try{await BleClient.disconnect(BT.id)}catch(e){}}
       const dev=await BleClient.requestDevice({namePrefix:'EMU',optionalServices:[SV]});id=dev.deviceId;name=dev.name||''}
-    BT.id=id;BT.name=name;BT.want=true;BT.s='conn';stSet();
+    BT.id=id;BT.name=String(name||'').replace(/[<>&"]/g,'');BT.want=true;BT.s='conn';stSet();
     try{localStorage.setItem(BTK,JSON.stringify({id,name}))}catch(e){}
     try{await nOpen(id)}catch(e){if(pick)throw e;retry();return} // αυτόματη σύνδεση: συνεχίζει να προσπαθεί
     goLive(true);
@@ -1307,7 +1309,7 @@ async function connect(all){
     // όνομα EMU… ή υπηρεσία FFE0 (στο iPhone το όνομα μπορεί να μη φαίνεται)· all = όλες οι συσκευές
     const dev=await navigator.bluetooth.requestDevice(all?{acceptAllDevices:true,optionalServices:[SV]}:{filters:[{namePrefix:'EMU'},{services:[SV]}],optionalServices:[SV]});
     if(BT.dev&&BT.dev!==dev){BT.want=false;try{BT.dev.gatt.disconnect()}catch(e){}}
-    clearTimeout(BT.timer);BT.dev=dev;BT.name=dev.name||'';BT.want=true;BT.s='conn';stSet();
+    clearTimeout(BT.timer);BT.dev=dev;BT.name=String(dev.name||'').replace(/[<>&"]/g,'');BT.want=true;BT.s='conn';stSet();
     dev.ongattserverdisconnected=()=>{if(BT.dev===dev)onLost()};
     await wOpen(dev);goLive(true);
   }catch(e){btErr(e);if(!isNative()&&!all){const m=String(e&&e.message||e||'');if(!/cancel/i.test(m)||/^\d+$/.test(m))toast(t('Δεν βρέθηκε η συσκευή EMU.'),t('Όλες οι συσκευές'),()=>connect(true),10000)}}
@@ -1607,7 +1609,7 @@ function dyCar(){
   $('#dc_car').onchange=e=>{const v=e.target.value;
     if(v==='new'){const n=carNew();n.pu=C.pu;D.cars.push(n);D.ac=n.id}else D.ac=+v;
     dyS0();save();dyCar();if(v==='new')setTimeout(()=>{const i=$('#dc_name');if(i){i.select();i.focus()}},50)};
-  $('#dc_name').oninput=e=>{C.name=e.target.value.slice(0,40);save();
+  $('#dc_name').oninput=e=>{C.name=e.target.value.replace(/[<>&"]/g,'').slice(0,40);save();
     $('#dc_find').href='https://www.google.com/search?q='+dyQ(C.name);
     const op=$('#dc_car').querySelector('option[value="'+C.id+'"]');if(op)op.textContent=C.name||'—'};
   if($('#dc_del'))$('#dc_del').onclick=()=>{if(!cf(t('Διαγραφή του αυτοκινήτου «')+(C.name||'')+'»;'))return;
